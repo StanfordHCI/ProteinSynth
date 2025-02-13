@@ -1,0 +1,14 @@
+{
+  "name": "com.unity.mars.tutorials",
+  "version": "0.1.0",
+  "displayName": "Unity MARS Tutorials",
+  "description": "Collection of interactive in-Editor tutorials (IET) for Unity MARS.",
+  "unity": "2019.4",
+  "unityRelease": "15f1",
+  "dependencies": {
+    "com.unity.learn.iet-framework": "2.1.0",
+    "com.unity.mars": "1.4.1",
+    "com.unity.xrtools.module-loader": "1.4.1",
+    "com.unity.xrtools.utils": "1.4.1"
+  }
+}

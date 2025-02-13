@@ -1,0 +1,25 @@
+{
+    "name": "Unity.MARS.Tutorials.Editor",
+    "references": [
+        "Unity.Tutorials.Core.Editor",
+        "Unity.MARS.Editor",
+        "Unity.MARS.Interfaces",
+        "Unity.XRTools.ModuleLoader",
+        "Unity.XRTools.ModuleLoader.Interfaces",
+        "Unity.XRTools.Utils",
+        "Unity.XRTools.Utils.Editor",
+        "Unity.MARS",
+        "Unity.Tutorials.Core"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
