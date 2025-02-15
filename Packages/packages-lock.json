@@ -157,19 +157,6 @@
       },
       "url": "https://packages.unity.com"
     },
-    "com.unity.mars-ar-foundation-support": {
-      "version": "file:../localcontentpacks/arfoundationsupport_bleedingedge",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.unity.xr.arfoundation": "4.1.3",
-        "com.unity.xr.arcore": "4.1.3",
-        "com.unity.xr.arkit-face-tracking": "4.1.3",
-        "com.unity.xr.arkit": "4.1.3",
-        "com.unity.xr.management": "3.2.17",
-        "com.unity.mars-ar-foundation-providers": "1.4.0"
-      }
-    },
     "com.unity.mars-nav-mesh": {
       "version": "1.5.0",
       "depth": 0,
@@ -401,15 +388,6 @@
         "com.unity.xr.management": "4.0.1",
         "com.unity.xr.arfoundation": "5.1.4",
         "com.unity.editorcoroutines": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.xr.arkit-face-tracking": {
-      "version": "5.0.2",
-      "depth": 1,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.xr.arkit": "5.0.2"
       },
       "url": "https://packages.unity.com"
     },

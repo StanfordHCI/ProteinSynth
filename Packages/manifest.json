@@ -10,7 +10,6 @@
     "com.unity.learn.iet-framework.authoring": "1.2.2",
     "com.unity.mars": "1.5.0",
     "com.unity.mars-ar-foundation-providers": "1.5.0",
-    "com.unity.mars-ar-foundation-support": "file:../localcontentpacks/arfoundationsupport_bleedingedge",
     "com.unity.mars-nav-mesh": "1.5.0",
     "com.unity.mars.tutorials": "file:../localcontentpacks/com.unity.mars.tutorials",
     "com.unity.render-pipelines.universal": "14.0.11",
