@@ -131,7 +131,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 792055959}
-  - component: {fileID: 792055958}
   - component: {fileID: 792055960}
   m_Layer: 0
   m_Name: Codon
@@ -140,22 +139,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &792055958
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 792055957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c6087610d9404ba4b6af6734d3af2d3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  codons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!4 &792055959
 Transform:
   m_ObjectHideFlags: 0
@@ -190,11 +173,15 @@ MonoBehaviour:
   codspeed: 1.36
   noiseScale: 0.18
   noiseStrength: 5.6
-  codons:
+  codonPos:
   - {x: 1, y: 0, z: 0}
   - {x: 0, y: 0, z: 0}
-  - {x: 1, y: 0, z: 0}
+  - {x: -1, y: 0, z: 0}
   go2codon: 0
+  codons:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1 &969910429
 GameObject:
   m_ObjectHideFlags: 0
