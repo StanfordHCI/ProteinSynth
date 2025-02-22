@@ -42,6 +42,7 @@ public class MoveSun : MonoBehaviour
         }
         yield return new WaitForSeconds(2f); // Optional delay before moving again
         FindObjectOfType<MakeProducts>().Assemble();
+        FindObjectOfType<SeparateMolecules>().KillBond();
 
     }
 
