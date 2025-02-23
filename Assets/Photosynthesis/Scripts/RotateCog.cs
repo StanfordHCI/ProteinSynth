@@ -19,15 +19,17 @@ public class RotateCog : MonoBehaviour
 
     IEnumerator RotateLoop()
     {
-        yield return new WaitForSeconds(initWait-waitTime);
+        yield return new WaitForSeconds(initWait);
         int i = 0;
         while (i<3) // Infinite loop
         {
             targetRotationY += rotateBy; // Increase target rotation
-            yield return new WaitForSeconds(waitTime); // Wait x seconds before rotating again
+
 
             yield return StartCoroutine(RotateOverTime(targetRotationY, rotationTime));
+            yield return new WaitForSeconds(waitTime); // Wait x seconds before rotating again
             i++;
+
 
         }
     }

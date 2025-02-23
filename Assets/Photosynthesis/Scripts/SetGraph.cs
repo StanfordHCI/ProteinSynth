@@ -7,14 +7,27 @@ public class SetGraph : MonoBehaviour
 {
     [SerializeField] Transform graph;
     public float totTime = 1f;
+    float initTime;
     float graphHeight = 10;
     bool graphit;
     // Start is called before the first frame update
     public void Graph(float amount)
     {
+        totTime = initTime;
         graphHeight+= amount;
         graphit = true;
         
+    }
+    void Awake()
+    {
+        initTime = totTime;
+    }
+
+    public void Graph(float amount, float duration)
+    {
+        totTime=duration;
+        graphHeight = amount;
+        graphit = true;
     }
 
     private void LateUpdate() {

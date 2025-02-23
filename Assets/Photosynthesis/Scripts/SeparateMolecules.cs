@@ -36,7 +36,7 @@ public class SeparateMolecules : MonoBehaviour
     public void KillBond()
     {
         foreach(var b in bonds)
-            Destroy(b.gameObject);
+            Destroy(b?.gameObject);
     }
 
     void KillParent(Transform parentObject, Transform CO2)

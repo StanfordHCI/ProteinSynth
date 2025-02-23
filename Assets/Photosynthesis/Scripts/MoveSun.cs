@@ -7,13 +7,14 @@ public class MoveSun : MonoBehaviour
  public Transform sun; // Assign the Sun GameObject in the Inspector
     public Transform startPosition; // Assign the Start Position in the Inspector
     public Transform[] endPositions; // Assign 12 End Positions in the Inspector
-    public float totalTime = 10f; // Time to reach each end position
-    float travelTime;
+    public float travelTime = 10f; // Time to reach each end position
+    public float waitTime = 0;
+    public float initDelay = 0;
     private int currentTargetIndex = 0; // Keeps track of the current destination
 
     void Start()
     {
-        travelTime = totalTime/endPositions.Length;
+
         if (sun != null && startPosition != null)
         {
             sun.position = startPosition.position; // Start at the initial position
@@ -27,22 +28,28 @@ public class MoveSun : MonoBehaviour
 
     IEnumerator SetSun()
     {
+        yield return new WaitForSeconds(initDelay);
         while (currentTargetIndex < endPositions.Length)
         {
             Transform targetPosition = endPositions[currentTargetIndex];
+            foreach (Renderer r in sun.GetComponentsInChildren<Renderer>())
+                r.enabled = true;
             yield return StartCoroutine(MoveToPosition(sun, targetPosition.position, travelTime));
 
             // Reset to start position
             sun.position = startPosition.position;
-
+            foreach (Renderer r in sun.GetComponentsInChildren<Renderer>())
+                r.enabled = false;
+            
+            yield return new WaitForSeconds(waitTime);         
             // Move to the next end position
             currentTargetIndex++;
 
            // yield return new WaitForSeconds(1f); // Optional delay before moving again
         }
         yield return new WaitForSeconds(2f); // Optional delay before moving again
-        FindObjectOfType<MakeProducts>().Assemble();
-        FindObjectOfType<SeparateMolecules>().KillBond();
+        FindObjectOfType<MakeProducts>()?.Assemble();
+        FindObjectOfType<SeparateMolecules>()?.KillBond();
 
     }
 

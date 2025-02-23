@@ -23,9 +23,9 @@ public class MoveLeaves : MonoBehaviour
 
     IEnumerator FloatObject(Transform obj, int index)
     {
-        yield return new WaitForSeconds(index); // Delay start by index seconds
+        yield return new WaitForSeconds(duration*index); // Delay start by index seconds
 
-        Vector3 startPos = obj.position;
+        Vector3 startPos = obj.localPosition;
         Vector3 endPos = startPos + Vector3.up * floatHeight;
         float elapsedTime = 0f;
 
@@ -33,10 +33,10 @@ public class MoveLeaves : MonoBehaviour
         {
             elapsedTime += Time.deltaTime;
             float progress = elapsedTime / duration; // Normalize progress (0 to 1)
-            obj.position = Vector3.Lerp(startPos, endPos, progress);
+            obj.localPosition = Vector3.Lerp(startPos, endPos, progress);
             yield return null; // Wait until the next frame
         }
 
-        obj.position = endPos; // Ensure it reaches the final position
+        obj.localPosition = endPos; // Ensure it reaches the final position
     }
 }

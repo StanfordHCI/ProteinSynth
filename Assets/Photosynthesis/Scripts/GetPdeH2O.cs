@@ -8,7 +8,7 @@ public class GetPdeH2O : MonoBehaviour
     public Vector3 H2OPos;
     public float H2ODuration;
     public float ProtonDuration;
-    public float separateTime;
+    public float fadeTime;
     public float separationForce;
 
     public float StartAfter;
@@ -31,7 +31,7 @@ public class GetPdeH2O : MonoBehaviour
             children[i] = transform.GetChild(i);
         }
         yield return StartCoroutine(MoveToY(transform, H2OPos, H2ODuration));
-        bot.Graph(2);
+        bot?.Graph(2);
         foreach(Transform child in children)
             if(child.tag == "Hydrogen")
             StartCoroutine(MoveToY(child, new Vector3(Random.Range(-.39f,3.3f),Random.Range(-.74f,-.09f)),ProtonDuration));
@@ -42,10 +42,10 @@ public class GetPdeH2O : MonoBehaviour
     {
         float elapsedTime = 0f;
 
-        while (elapsedTime < separateTime)
+        while (elapsedTime < fadeTime)
         {
             elapsedTime += Time.deltaTime;
-            float fadeAmount = 1 - (elapsedTime / separateTime);
+            float fadeAmount = 1 - (elapsedTime / fadeTime);
             Renderer objRenderer = t.GetComponent<Renderer>();
             if (objRenderer != null)
             {
@@ -90,14 +90,14 @@ public class GetPdeH2O : MonoBehaviour
         Vector3 targetPosition = startPosition + Direction;
 
         if(wait)
-        yield return new WaitForSeconds(separateTime);
+        yield return new WaitForSeconds(fadeTime);
 
         float elapsedTime = 0f;
 
-        while (elapsedTime < separateTime)
+        while (elapsedTime < fadeTime)
         {
             elapsedTime += Time.deltaTime;
-            float progress = elapsedTime / separateTime;
+            float progress = elapsedTime / fadeTime;
 
             // Move outward
             obj.transform.position = Vector3.Lerp(startPosition, targetPosition, progress);

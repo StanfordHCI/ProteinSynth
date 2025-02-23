@@ -219,6 +219,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2167129809369830603}
+  - component: {fileID: 6620663424599342647}
   m_Layer: 0
   m_Name: Sun
   m_TagString: Untagged
@@ -246,6 +247,28 @@ Transform:
   - {fileID: 3043560410590553023}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6620663424599342647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4085508707182024140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df7b80d85a2cb4214a84ea408aec8f47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sun: {fileID: 2167129809369830603}
+  startPosition: {fileID: 0}
+  endPositions:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  totalTime: 6
 --- !u!1 &5194858149418533510
 GameObject:
   m_ObjectHideFlags: 0
@@ -471,6 +494,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   separationForce: 3
   dissolveTime: 2
+  CO2s: []
+  parentName: 
 --- !u!1 &6771244806786292036
 GameObject:
   m_ObjectHideFlags: 0
