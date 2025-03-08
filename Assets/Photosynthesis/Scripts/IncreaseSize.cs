@@ -9,7 +9,7 @@ public class IncreaseSize : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(ScaleOverTime(1, targetRadius, duration));
+        StartCoroutine(ScaleOverTime(transform.localScale.y, targetRadius, duration));
     }
 
     IEnumerator ScaleOverTime(float startSize, float endSize, float time)

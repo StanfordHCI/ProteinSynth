@@ -16,12 +16,17 @@ public float fadeDuration = 2;
     private bool isBreaking = false;
     public Transform left, right, bond, Carbon, Glucose;
 
+
+
     void Start()
     {
                 
         StartCoroutine(VibrateAndSplit());
 
+
     }
+
+
 
     IEnumerator VibrateAndSplit()
     {
