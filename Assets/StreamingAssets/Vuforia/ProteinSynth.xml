@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="adenine-test" size="0.070000 0.056757" />
+    <ImageTarget name="cytosine-test" size="0.070000 0.060265" />
     <ImageTarget name="guanine-test" size="0.070000 0.052691" />
     <ImageTarget name="astronaut" size="0.070000 0.120909" />
   </Tracking>
