@@ -12,7 +12,7 @@ public class NucleoControl : MonoBehaviour
     Vector3 headPos = Vector3.zero;
   //  Rigidbody rb;
     private float offsetX, offsetZ, offsetY;
-    public Vector3[] codonPos = new Vector3[3];
+    public Transform[] TargetPos = new Transform[3];
      bool go2codon = false; 
      bool fst, scnd,thrd;
     [SerializeField] Transform[] codons = new Transform[3];
@@ -31,7 +31,7 @@ public class NucleoControl : MonoBehaviour
         offsetX = Random.Range(0f, 100f);
         offsetY = Random.Range(0f, 100f);
         offsetZ = Random.Range(0f, 100f);
-        head.position = 1.0f/3*(codons[0].position+codons[1].position+codons[2].position) +Vector3.up;
+        head.position = 1.0f/3*(codons[0].position+codons[1].position+codons[2].position) +Vector3.up*.3f;
  //       rb = GetComponent<Rigidbody>();
     }
 
@@ -67,7 +67,8 @@ public class NucleoControl : MonoBehaviour
         //this does kind of change direction when the codons present themselves, but making it more organic would mean using rigid bodies and then your dealing with forces which
         //is kind of unnecessary
         {
-            headPos = 1.0f/3*(codonPos[0]+codonPos[1]+codonPos[2]);
+            headPos = 1.0f/3*(TargetPos[0].position+TargetPos[1].position+TargetPos[2].position);
+            Debug.Log(headPos);
             if((transform.position - headPos).magnitude < .01) 
             {transform.position = headPos;}
             else
@@ -77,10 +78,10 @@ public class NucleoControl : MonoBehaviour
             //update internal codons
             for (int i=0; i<codons.Length; i++)
             {
-                Debug.Log(i);
-                codons[i].position =  Vector3.MoveTowards(codons[i].position, codonPos[i], codspeed * Time.deltaTime);
+//                Debug.Log(i);
+                codons[i].position =  Vector3.MoveTowards(codons[i].position, TargetPos[i].position, codspeed * Time.deltaTime);
             }
-            head.position = 1.0f/3*(codons[0].position+codons[1].position+codons[2].position) +Vector3.up;
+            head.position = 1.0f/3*(codons[0].position+codons[1].position+codons[2].position) +Vector3.up*.2f;
 
         }
 
