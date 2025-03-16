@@ -7,6 +7,7 @@ public class NucleoControl : MonoBehaviour
 {
     // Start is called before the first frame update
     public float codspeed = 2f;
+    public float floatSpeed = .2f;
     public float noiseScale = 1f;
     public float noiseStrength = 2f;
     Vector3 headPos = Vector3.zero;
@@ -61,9 +62,9 @@ public class NucleoControl : MonoBehaviour
         float y = (Mathf.PerlinNoise(Time.time * noiseScale + offsetY, 300f) -.5f ) * noiseStrength;
         float z = (Mathf.PerlinNoise(0f, Time.time * noiseScale + offsetZ)   -.5f ) * noiseStrength;
 
-        transform.position += new Vector3(x, y, z) * Time.deltaTime;
+        transform.position += new Vector3(x, y, z) * Time.deltaTime * floatSpeed;
 
-        if(fst == scnd == thrd == true) //this shoud be a coroutine. this is poling which is so inefficient. shame shame
+        if(fst == true && scnd == true && thrd == true) //this shoud be a coroutine. this is poling which is so inefficient. shame shame
         //this does kind of change direction when the codons present themselves, but making it more organic would mean using rigid bodies and then your dealing with forces which
         //is kind of unnecessary
         {

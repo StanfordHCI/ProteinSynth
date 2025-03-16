@@ -206,6 +206,21 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3562797395340230787, guid: 7ce53b733dab74cd6bfb757364a7df60,
         type: 3}
+      propertyPath: codspeed
+      value: 0.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3562797395340230787, guid: 7ce53b733dab74cd6bfb757364a7df60,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3562797395340230787, guid: 7ce53b733dab74cd6bfb757364a7df60,
+        type: 3}
+      propertyPath: floatSpeed
+      value: 0.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 3562797395340230787, guid: 7ce53b733dab74cd6bfb757364a7df60,
+        type: 3}
       propertyPath: noiseStrength
       value: 2.42
       objectReference: {fileID: 0}
@@ -272,7 +287,7 @@ PrefabInstance:
     - target: {fileID: 4717524697620461825, guid: 7ce53b733dab74cd6bfb757364a7df60,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.854
       objectReference: {fileID: 0}
     - target: {fileID: 4717524697620461825, guid: 7ce53b733dab74cd6bfb757364a7df60,
         type: 3}
