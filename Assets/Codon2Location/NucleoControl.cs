@@ -15,9 +15,11 @@ public class NucleoControl : MonoBehaviour
     private float offsetX, offsetZ, offsetY;
     public Transform[] TargetPos = new Transform[3];
      bool go2codon = false; 
-     bool fst, scnd,thrd;
+     bool fst, scnd,thrd; 
+     public bool total { get ;private set;}
     [SerializeField] Transform[] codons = new Transform[3];
-    Transform head;
+    public Transform head {get; private set;}
+    public Transform connector;
     void Awake()
     {
         Transform[] t = GetComponentsInChildren<Transform>();
@@ -74,7 +76,9 @@ public class NucleoControl : MonoBehaviour
             {transform.position = headPos;}
             else
             {
-            transform.position = Vector3.MoveTowards(transform.position, headPos, codspeed * Time.deltaTime);}
+            transform.position = Vector3.MoveTowards(transform.position, headPos, codspeed * Time.deltaTime);
+            total = true;
+            }
 
             //update internal codons
             for (int i=0; i<codons.Length; i++)
@@ -83,6 +87,7 @@ public class NucleoControl : MonoBehaviour
                 codons[i].position =  Vector3.MoveTowards(codons[i].position, TargetPos[i].position, codspeed * Time.deltaTime);
             }
             head.position = 1.0f/3*(codons[0].position+codons[1].position+codons[2].position) +Vector3.up*.2f;
+            transform.LookAt(Camera.main.transform);
 
         }
 
