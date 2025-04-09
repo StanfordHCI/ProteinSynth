@@ -21,11 +21,11 @@ public class AminoControl : MonoBehaviour
     void Update()
     {
         codons = codons.OrderByDescending(n => n.head.position.x).ToList(); //ones with the lower x values are listed first
-        //MakeConnection(codons[0], codons[1]);
+        
         
         for (int i = 0; i < codons.Count-1; i++)
         {
-            if(codons[i].total && codons[i].total)
+        //    if(codons[i].total && codons[i+1].total)
             {
                 MakeConnection(codons[i], codons[i+1]);
             }

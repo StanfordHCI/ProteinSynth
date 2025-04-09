@@ -314,7 +314,7 @@ GameObject:
   - component: {fileID: 272675702}
   - component: {fileID: 272675705}
   - component: {fileID: 272675704}
-  - component: {fileID: 272675703}
+  - component: {fileID: 272675706}
   m_Layer: 0
   m_Name: ImageTarget_Adenine (1)
   m_TagString: Untagged
@@ -338,25 +338,6 @@ Transform:
   - {fileID: 557965716}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &272675703
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 272675701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 272675705}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: adenine-test
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 272675705}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &272675704
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -398,7 +379,7 @@ MonoBehaviour:
   OnTargetFound:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 300154349}
+      - m_Target: {fileID: 805000474}
         m_TargetAssemblyTypeName: NucleoControl, Assembly-CSharp
         m_MethodName: FoundThird
         m_Mode: 1
@@ -413,7 +394,7 @@ MonoBehaviour:
   OnTargetLost:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 300154349}
+      - m_Target: {fileID: 805000474}
         m_TargetAssemblyTypeName: NucleoControl, Assembly-CSharp
         m_MethodName: LostThird
         m_Mode: 1
@@ -451,7 +432,26 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 272675703}
+  mPreview: {fileID: 272675706}
+--- !u!114 &272675706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 272675701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 272675705}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: adenine-test
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 272675705}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1001 &300154348
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -891,7 +891,7 @@ GameObject:
   - component: {fileID: 540733244}
   - component: {fileID: 540733247}
   - component: {fileID: 540733246}
-  - component: {fileID: 540733245}
+  - component: {fileID: 540733248}
   m_Layer: 0
   m_Name: ImageTarget_Cytosine (1)
   m_TagString: Untagged
@@ -915,25 +915,6 @@ Transform:
   - {fileID: 1416402115}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &540733245
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 540733243}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 540733247}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: cytosine-test
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 540733247}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &540733246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -975,7 +956,7 @@ MonoBehaviour:
   OnTargetFound:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 300154349}
+      - m_Target: {fileID: 805000474}
         m_TargetAssemblyTypeName: NucleoControl, Assembly-CSharp
         m_MethodName: FoundSecd
         m_Mode: 1
@@ -990,7 +971,7 @@ MonoBehaviour:
   OnTargetLost:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 300154349}
+      - m_Target: {fileID: 805000474}
         m_TargetAssemblyTypeName: NucleoControl, Assembly-CSharp
         m_MethodName: LostSecd
         m_Mode: 1
@@ -1028,7 +1009,26 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 540733245}
+  mPreview: {fileID: 540733248}
+--- !u!114 &540733248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540733243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 540733247}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: cytosine-test
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 540733247}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &557965715
 GameObject:
   m_ObjectHideFlags: 0
@@ -1300,7 +1300,7 @@ GameObject:
   - component: {fileID: 632992636}
   - component: {fileID: 632992639}
   - component: {fileID: 632992638}
-  - component: {fileID: 632992637}
+  - component: {fileID: 632992640}
   m_Layer: 0
   m_Name: ImageTarget_Guanine (1)
   m_TagString: Untagged
@@ -1324,25 +1324,6 @@ Transform:
   - {fileID: 1661612238}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &632992637
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 632992635}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 632992639}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: guanine-test
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 632992639}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &632992638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1384,7 +1365,7 @@ MonoBehaviour:
   OnTargetFound:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 300154349}
+      - m_Target: {fileID: 805000474}
         m_TargetAssemblyTypeName: NucleoControl, Assembly-CSharp
         m_MethodName: FoundFirst
         m_Mode: 1
@@ -1399,7 +1380,7 @@ MonoBehaviour:
   OnTargetLost:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 300154349}
+      - m_Target: {fileID: 805000474}
         m_TargetAssemblyTypeName: NucleoControl, Assembly-CSharp
         m_MethodName: LostFirst
         m_Mode: 1
@@ -1437,7 +1418,26 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 632992637}
+  mPreview: {fileID: 632992640}
+--- !u!114 &632992640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 632992635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 632992639}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: guanine-test
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 632992639}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &795266890
 GameObject:
   m_ObjectHideFlags: 0

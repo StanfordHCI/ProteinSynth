@@ -64,7 +64,7 @@ public class NucleoControl : MonoBehaviour
         float y = (Mathf.PerlinNoise(Time.time * noiseScale + offsetY, 300f) -.5f ) * noiseStrength;
         float z = (Mathf.PerlinNoise(0f, Time.time * noiseScale + offsetZ)   -.5f ) * noiseStrength;
 
-        transform.position += new Vector3(x, y, z) * Time.deltaTime * floatSpeed;
+        //transform.position += new Vector3(x, y, z) * Time.deltaTime * floatSpeed;
 
         if(fst == true && scnd == true && thrd == true) //this shoud be a coroutine. this is poling which is so inefficient. shame shame
         //this does kind of change direction when the codons present themselves, but making it more organic would mean using rigid bodies and then your dealing with forces which
