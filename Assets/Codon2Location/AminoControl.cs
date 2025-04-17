@@ -25,7 +25,7 @@ public class AminoControl : MonoBehaviour
         
         for (int i = 0; i < codons.Count-1; i++)
         {
-        //    if(codons[i].total && codons[i+1].total)
+        //    if(codons[i].total && codons[i+1].total) //when both codons have found the image target
             {
                 MakeConnection(codons[i], codons[i+1]);
             }

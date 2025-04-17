@@ -55,6 +55,12 @@ public class NucleoControl : MonoBehaviour
     }
     public void LostThird(){
         thrd = false;
+        
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+     // other.fun = 2;  
     }
     void Update()
     {
@@ -64,7 +70,7 @@ public class NucleoControl : MonoBehaviour
         float y = (Mathf.PerlinNoise(Time.time * noiseScale + offsetY, 300f) -.5f ) * noiseStrength;
         float z = (Mathf.PerlinNoise(0f, Time.time * noiseScale + offsetZ)   -.5f ) * noiseStrength;
 
-        //transform.position += new Vector3(x, y, z) * Time.deltaTime * floatSpeed;
+        //transform.position += new Vector3(x, y, z) * Time.deltaTime * floatSpeed; //this makes them float
 
         if(fst == true && scnd == true && thrd == true) //this shoud be a coroutine. this is poling which is so inefficient. shame shame
         //this does kind of change direction when the codons present themselves, but making it more organic would mean using rigid bodies and then your dealing with forces which
@@ -84,7 +90,7 @@ public class NucleoControl : MonoBehaviour
             for (int i=0; i<codons.Length; i++)
             {
 //                Debug.Log(i);
-                codons[i].position =  Vector3.MoveTowards(codons[i].position, TargetPos[i].position, codspeed * Time.deltaTime);
+                codons[i].position =  Vector3.MoveTowards(codons[i].position, TargetPos[i].position, codspeed * Time.deltaTime); //move codons to the position of the image target
             }
             head.position = 1.0f/3*(codons[0].position+codons[1].position+codons[2].position) +Vector3.up*.2f;
             transform.LookAt(Camera.main.transform);
