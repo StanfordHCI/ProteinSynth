@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="UGC" size="0.075000 0.056250" />
+    <ImageTarget name="UCU" size="0.075000 0.056250" />
+    <ImageTarget name="UAC" size="0.075000 0.056250" />
+    <ImageTarget name="GGU" size="0.075000 0.056250" />
+    <ImageTarget name="ACA" size="0.075000 0.056250" />
+    <ImageTarget name="AUG" size="0.075000 0.056250" />
     <ImageTarget name="adenine-test" size="0.070000 0.056757" />
     <ImageTarget name="cytosine-test" size="0.070000 0.060265" />
     <ImageTarget name="guanine-test" size="0.070000 0.052691" />

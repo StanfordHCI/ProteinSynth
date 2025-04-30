@@ -77,7 +77,7 @@ public class NucleoControl : MonoBehaviour
         //is kind of unnecessary
         {
             headPos = 1.0f/3*(TargetPos[0].position+TargetPos[1].position+TargetPos[2].position);
-            Debug.Log(headPos);
+            // Debug.Log(headPos);
             if((transform.position - headPos).magnitude < .01) 
             {transform.position = headPos;}
             else
