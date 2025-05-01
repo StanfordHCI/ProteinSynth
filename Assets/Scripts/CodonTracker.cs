@@ -6,19 +6,20 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class CodonTracker : MonoBehaviour
 {
-    /* Singleton instance so other scripts can access this tracker globally */
+    // Singleton instance so other scripts can access this tracker globally
     public static CodonTracker instance;
 
-    /* Dictionary to store currently tracked codons and their associated GameObjects */
+    // Dictionary to store currently tracked codons and their associated GameObjects 
     private Dictionary<string, GameObject> activeCodons = new Dictionary<string, GameObject>();
 
-    /* Keeps track of the last known codon string to detect changes */
+    // Keeps track of the last known codon string to detect changes 
     private string lastCodonString = "";
 
-    /* Dictionary mapping RNA codons to their corresponding amino acid names */
+    // Dictionary for codon --> amino acid
     private readonly Dictionary<string, string> codonToAminoAcid = new Dictionary<string, string>()
     {
         { "AUG", "Met" }, // Start codon
@@ -33,6 +34,11 @@ public class CodonTracker : MonoBehaviour
         { "UAG", "Stop" },
         { "UGA", "Stop" }
     };
+
+    // UI stuff
+    public TextMeshProUGUI codonTextUI;
+    public TextMeshProUGUI aminoAcidTextUI;
+
 
     /**
         Function: Awake
@@ -108,6 +114,12 @@ public class CodonTracker : MonoBehaviour
 
             Debug.Log("Codons: " + fullCodon);
             Debug.Log("Amino Acids: " + aminoAcidChain);
+
+            if (codonTextUI != null)
+                codonTextUI.text = "Codons: " + fullCodon;
+
+            if (aminoAcidTextUI != null)
+                aminoAcidTextUI.text = "Amino Acids: " + aminoAcidChain;
         }
     }
 

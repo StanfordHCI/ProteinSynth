@@ -25,13 +25,13 @@ public class CodonTarget : MonoBehaviour
         string codonName = behaviour.TargetName;
 
         // If we're tracking or extended tracked, register
-        if (status.Status == Status.TRACKED || status.Status == Status.EXTENDED_TRACKED)
+        if (status.Status == Status.TRACKED)
         {
             CodonTracker.instance.RegisterCodon(codonName, gameObject);
         }
 
         // If Vuforia says the target is lost or not observed anymore, unregister
-        if (status.Status == Status.NO_POSE || status.StatusInfo == StatusInfo.NOT_OBSERVED)
+        if (status.Status == Status.EXTENDED_TRACKED || status.Status == Status.NO_POSE || status.StatusInfo == StatusInfo.NOT_OBSERVED)
         {
             CodonTracker.instance.UnregisterCodon(codonName);
         }
