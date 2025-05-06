@@ -19,6 +19,10 @@ public class CodonTracker : MonoBehaviour
     // Keeps track of the last known codon string to detect changes 
     private string lastCodonString = "";
 
+    // Assign the game objects in the inspector
+    public GameObject floatingObject;
+    public GameObject mRNATargetObject;   
+
     // Dictionary for codon --> amino acid
     private readonly Dictionary<string, string> codonToAminoAcid = new Dictionary<string, string>()
     {
@@ -93,9 +97,11 @@ public class CodonTracker : MonoBehaviour
     */
     private void UpdateCodonStringIfChanged()
     {
+        // Sort codons by horizontal (x) position
         List<GameObject> sorted = new List<GameObject>(activeCodons.Values);
         sorted.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
 
+        // Build codon string
         string fullCodon = "";
         foreach (GameObject obj in sorted)
         {
@@ -106,6 +112,7 @@ public class CodonTracker : MonoBehaviour
 
         fullCodon = fullCodon.TrimEnd('-');
 
+        // Only update if the string has changed
         if (fullCodon != lastCodonString)
         {
             lastCodonString = fullCodon;
@@ -121,7 +128,34 @@ public class CodonTracker : MonoBehaviour
             if (aminoAcidTextUI != null)
                 aminoAcidTextUI.text = "Amino Acids: " + aminoAcidChain;
         }
+
+        // ----------------------------
+        // FOLLOW THE mRNA TRACKER
+        // ----------------------------
+
+        if (mRNATargetObject != null && mRNATargetObject.activeInHierarchy)
+        {
+            // Offset the floating object slightly above the target
+            float yOffset = 0.05f;
+            Vector3 hoverPosition = mRNATargetObject.transform.position + new Vector3(0, yOffset, 0);
+
+            floatingObject.transform.position = Vector3.Lerp(floatingObject.transform.position, hoverPosition, Time.deltaTime * 10f);
+
+            // Match the mRNA target's rotation with 90-degree correction
+            floatingObject.transform.rotation = mRNATargetObject.transform.rotation * Quaternion.Euler(0f, 90f, 0f);
+
+            if (!floatingObject.activeSelf)
+            {
+                floatingObject.SetActive(true);
+            }
+        }
+        else
+        {
+            if (floatingObject.activeSelf)
+                floatingObject.SetActive(false);
+        }
     }
+
 
 
     /** 

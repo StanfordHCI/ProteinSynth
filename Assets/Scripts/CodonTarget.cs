@@ -1,7 +1,7 @@
 /*
     CodonTarget.cs file: this script is attached to every ImageTracker_<CodonName> GameObject. 
     - Uses Vuforia library to observe if card is tracked 
-    - If target is tracked or untracked, then cal on CodonManager / CodonTracker to register or unregister the codon.
+    - If target is tracked or untracked, then call on CodonManager / CodonTracker to register or unregister the codon.
 */
 
 using UnityEngine;
