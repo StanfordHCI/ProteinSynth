@@ -1,0 +1,113 @@
+﻿title: Start
+tags:
+---
+
+// Misc. string variables
+<<declare $playerResponse = "" as string>>
+<<declare $gptResponse = "" as string>>
+<<declare $player_name = "test_player" as string>>
+<<declare $player_intro = "" as string>>
+<<declare $player_answer = "" as string>>
+<<declare $gptOption1 = "" as string>>
+<<declare $gptOption2 = "" as string>>
+<<declare $gptOption3 = "" as string>>
+<<declare $gptOption4 = "" as string>>
+<<declare $gptOption5 = "" as string>>
+
+<<declare $initial_state = "0_intro" as string>>
+
+// Research study
+<<declare $debug = false as bool>>
+<<declare $participant_id = "craftstest1" as string>>
+<<declare $condition = "treatment" as string>>
+<<declare $remote = false as bool>>
+<<declare $grade = "9th" as string>>
+
+Test: test!
+<<connect_to_server WebsocketManager>>
+
+<<set $player_name to "test_player3">>
+<<send_first_message WebsocketManager "$player_name" "$initial_state" "$participant_id" "$condition" "$grade">>
+<<jump SendingToServer>>
+
+===
+title: SendingToServer
+---
+// reset variables 
+<<set $playerResponse to "">>
+<<set $gptOption1 to "">>
+<<set $gptOption2 to "">>
+<<set $gptOption3 to "">>
+<<set $gptOption4 to "">>
+<<set $gptOption5 to "">>
+
+// <<if $current_state == "6_portal">>
+//     <<toggle_hide_images OliverThinking false>> // show oliver thinking
+//     <<wait_for_message WebsocketManager>> // wait for responses to show up in queue
+//     <<toggle_hide_images OliverThinking true>> // hide oliver thinking
+// <<else>>
+//     <<show_current_bubbles TwoCharacterDisplay>>
+//     <<set_characters_idle TwoCharacterDisplay>>
+    <<wait_for_message WebsocketManager>> // wait for responses to show up in queue
+//     <<hide_current_bubbles TwoCharacterDisplay>>
+//     <<set_characters_not_idle TwoCharacterDisplay>>
+// <<endif>>
+<<jump GPTResponding>>
+===
+
+
+title: PlayerResponding
+---
+<<RequestInput InputPanel "What would you like to say?">> // accept player input
+-> Submit
+<<SaveAndCloseInput InputPanel "$playerResponse">>
+
+// checks that player actually input something
+<<if $playerResponse is "">>
+    <<jump PlayerResponding>>
+<<endif>>
+
+<<send_player_message WebsocketManager "$playerResponse">> // send player's input to server
+<<jump SendingToServer>>
+===
+title: GPTResponding
+---
+<<run_response WebsocketManager>> // dequeue next response
+<<if $gptResponse != "">>
+    <<if $gptResponse == "ACTION">> 
+        <<jump {$actionNode}>>
+    // <<elseif $gptResponse == "VISUAL">>
+    //     <<run_response WebsocketManager>>
+    //     <<show_visual_aid VisualAidCard "$image_to_display">>
+    //     {$gptResponse} // card comes down with this line
+    //     <<jump GPTResponding>>
+    // <<elseif $gptResponse == "ALBUM_TUTORIAL">>
+    //     <<jump AlbumTutorial>>
+    // <<elseif $gptResponse == "LOG_TUTORIAL">>
+    //    <<jump LogTutorial>>
+    <<else>>
+        {$gptResponse}
+        <<jump GPTResponding>>
+    <<endif>>
+<<else>> 
+    // if there are options to present after, they will be shown to user
+    <<if $gptOption1 != "" || $gptOption2 != "" || $gptOption3 != "" || $gptOption4 != "" || $gptOption5 != "">>
+        -> {$gptOption1} <<if $gptOption1 != "">>
+            <<send_player_message WebsocketManager "$gptOption1">>
+            <<jump SendingToServer>>
+        -> {$gptOption2} <<if $gptOption2 != "">>
+            <<send_player_message WebsocketManager "$gptOption2">>
+            <<jump SendingToServer>>
+        -> {$gptOption3} <<if $gptOption3 != "">>
+            <<send_player_message WebsocketManager "$gptOption3">>
+            <<jump SendingToServer>>
+        -> {$gptOption4} <<if $gptOption4 != "">>
+            <<send_player_message WebsocketManager "$gptOption4">>
+            <<jump SendingToServer>>
+        -> {$gptOption5} <<if $gptOption5 != "">>
+            <<send_player_message WebsocketManager "$gptOption5">>
+            <<jump SendingToServer>>
+    <<endif>>
+    <<jump PlayerResponding>>
+<<endif>>
+===
