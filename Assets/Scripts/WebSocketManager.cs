@@ -270,6 +270,18 @@ public class WebSocketManager : MonoBehaviour {
             case "END_GAME": 
                 nodeName = "RollCredits";
                 break;
+            case "TO_PROTEIN_SYNTHESIS_LAB":
+                nodeName = "ProteinSynthesisLab";
+                break;
+            case "TO_PROTEIN_SYNTHESIS_LAB_ANTIBODIES":
+                nodeName = "ProteinSynthesisLabAntibodies";
+                break;
+            case "TO_PROTEIN_SYNTHESIS_LAB_HORMONES":
+                nodeName = "ProteinSynthesisLabHormones";
+                break;
+            case "TO_PROTEIN_SYNTHESIS_LAB_ENZYMES":
+                nodeName = "ProteinSynthesisLabEnzymes";
+                break;
         }
 
         if (nodeName != "") {

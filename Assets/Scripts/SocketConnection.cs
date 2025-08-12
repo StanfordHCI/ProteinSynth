@@ -16,7 +16,8 @@ namespace OpenAI
     {
         private WebSocket websocket;
         private bool connected = false;
-        private bool remoteServer = false; 
+        // private bool remoteServer = false; 
+        private bool remoteServer = true; 
 
         public delegate void ConnectionStatusChanged(bool isConnected);
         public event ConnectionStatusChanged OnConnectionStatusChanged;

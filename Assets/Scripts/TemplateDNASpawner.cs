@@ -4,22 +4,47 @@ using TMPro;
 
 public class TemplateDNASpawner : MonoBehaviour
 {
+    public bool autoSpawn = false;
     [Header("Template DNA Settings")]
-    public string dnaSequence = "TACGGCATTAGCTACGGC"; // Template strand bases (from 5' to 3')
+    public string defaultDnaSequence = "TACGGCATTAGCTACGGC"; // Template strand bases (from 5' to 3')
     public GameObject basePrefab;
     public List<Transform> spawnPoints; // Match number of letters in sequence
 
+    private Camera camera;
+
     private void Start()
     {
-        SpawnTemplateDNA();
+        // camera = MARSSession.Instance?.sessionCamera;
+        if (camera == null) {
+            camera = Camera.main;
+        }
+
+        if (autoSpawn) {
+            SpawnTemplateDNA();
+        }
     }
 
-    public void SpawnTemplateDNA()
+    void LateUpdate() {
+        // Make sure text is always facing the camera
+        // for (int i = 0; i < spawnPoints.Count; i++) {
+        //     TMP_Text text = spawnPoints[i].GetComponentInChildren<TMP_Text>();
+        //     if (text != null) {
+        //         text.transform.LookAt(camera.transform.position);
+        //         text.transform.rotation *= Quaternion.Euler(0f, 180f, 0f); // need to flip text around
+        //     }
+        // }
+    }
+
+    public void SpawnTemplateDNA() {
+        SpawnTemplateDNA(defaultDnaSequence);
+    }
+
+    public bool SpawnTemplateDNA(string dnaSequence)
     {
         if (spawnPoints.Count != dnaSequence.Length)
         {
             Debug.LogWarning("Spawn point count does not match DNA sequence length!");
-            return;
+            return false;
         }
 
         for (int i = 0; i < dnaSequence.Length; i++)
@@ -51,5 +76,6 @@ public class TemplateDNASpawner : MonoBehaviour
                 rend.material.color = color;
             }
         }
+        return true;
     }
 }

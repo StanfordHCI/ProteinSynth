@@ -14,7 +14,7 @@ tags:
 <<declare $gptOption4 = "" as string>>
 <<declare $gptOption5 = "" as string>>
 
-<<declare $initial_state = "0_intro" as string>>
+<<declare $initial_state = "0_intro_proteinSynthesis" as string>>
 
 // Research study
 <<declare $debug = false as bool>>
@@ -23,10 +23,17 @@ tags:
 <<declare $remote = false as bool>>
 <<declare $grade = "9th" as string>>
 
-Test: test!
+<<declare $protein_synthesis_topic = "" as string>>
+
+Connected!
+-> Start from intro
+-> Jump to lab
+    <<jump ProteinSynthesisLab>>
+
+
 <<connect_to_server WebsocketManager>>
 
-<<set $player_name to "test_player3">>
+<<set $player_name to "Alex">>
 <<send_first_message WebsocketManager "$player_name" "$initial_state" "$participant_id" "$condition" "$grade">>
 <<jump SendingToServer>>
 
@@ -111,3 +118,56 @@ title: GPTResponding
     <<jump PlayerResponding>>
 <<endif>>
 ===
+
+title: ProteinSynthesisLabAntibodies
+---
+<<set $protein_synthesis_topic to "antibodies">>
+<<jump ProteinSynthesisLab>>
+===
+title: ProteinSynthesisLabHormones
+---
+<<set $protein_synthesis_topic to "hormones">>
+<<jump ProteinSynthesisLab>>
+===
+title: ProteinSynthesisLabEnzymes
+---
+<<set $protein_synthesis_topic to "enzymes">>
+<<jump ProteinSynthesisLab>>
+===
+
+title: ProteinSynthesisLab
+---
+<<LoadScene ImageTargetTestCodon>>
+<<hide_background Canvas true>>
+<<toggle_character_position Canvas true>>
+Yari: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
+Yari: First, scan the nucleus of the cell with your camera.
+<<hide_canvas Canvas true>>
+===
+
+title: ProteinSynthesisDNATutorial
+---
+<<hide_canvas Canvas false>>
+Yari: Nice! Do you see the DNA that popped up? 
+Yari: During transcription, a small portion of the DNA unwinds. One of the strands is used as a template to create a new strand of mRNA.
+Yari: Your job is to figure out what the bases of this new mRNA strand should be!
+Yari: Arrange on codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
+Yari: Once you're done, press the "Finish transcription" button to generate your mRNA strand.
+<<hide_canvas Canvas true>>
+===
+
+title: ProteinSynthesisTranscriptionUnsuccessful
+---
+<<hide_canvas Canvas false>>
+Yari: It doesn't look like you've arranged all the codon cards yet. Try again!
+<<hide_canvas Canvas true>>
+===
+
+title: ProteinSynthesisTranscriptionSuccessful
+---
+<<hide_canvas Canvas false>>
+Yari: Nice work! Now that you've generated your mRNA strand, let's move on to translation.
+Yari: Use your finger to drag your mRNA strand to the ribosome.
+<<hide_canvas Canvas true>>
+===
+
