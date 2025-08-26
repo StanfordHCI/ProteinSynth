@@ -5,77 +5,130 @@ using TMPro;
 public class TemplateDNASpawner : MonoBehaviour
 {
     public bool autoSpawn = false;
+
     [Header("Template DNA Settings")]
-    public string defaultDnaSequence = "TACGGCATTAGCTACGGC"; // Template strand bases (from 5' to 3')
-    public GameObject basePrefab;
-    public List<Transform> spawnPoints; // Match number of letters in sequence
+    [Tooltip("Template strand (5' -> 3')")]
+    public string defaultDnaSequence = "TACGGCATTAGCTACGGC"; 
+
+    [Header("DNA Base Prefabs")]
+    public GameObject prefabA;
+    public GameObject prefabT;
+    public GameObject prefabC;
+    public GameObject prefabG;
+    public GameObject prefabA_Reverse;
+    public GameObject prefabT_Reverse;
+    public GameObject prefabC_Reverse;
+    public GameObject prefabG_Reverse;
+
+    [Header("Codon Parents (each should have 3 child spawn points)")]
+    public List<Transform> forwardCodonParents;  
+    public List<Transform> reverseCodonParents;  
 
     private Camera camera;
 
     private void Start()
     {
-        // camera = MARSSession.Instance?.sessionCamera;
-        if (camera == null) {
+        if (camera == null)
             camera = Camera.main;
-        }
 
-        if (autoSpawn) {
+        if (autoSpawn)
             SpawnTemplateDNA();
-        }
     }
 
-    void LateUpdate() {
-        // Make sure text is always facing the camera
-        // for (int i = 0; i < spawnPoints.Count; i++) {
-        //     TMP_Text text = spawnPoints[i].GetComponentInChildren<TMP_Text>();
-        //     if (text != null) {
-        //         text.transform.LookAt(camera.transform.position);
-        //         text.transform.rotation *= Quaternion.Euler(0f, 180f, 0f); // need to flip text around
-        //     }
-        // }
-    }
-
-    public void SpawnTemplateDNA() {
+    public void SpawnTemplateDNA()
+    {
         SpawnTemplateDNA(defaultDnaSequence);
     }
 
     public bool SpawnTemplateDNA(string dnaSequence)
     {
-        if (spawnPoints.Count != dnaSequence.Length)
+        // safety check: sequence must be divisible by 3
+        if (dnaSequence.Length % 3 != 0)
         {
-            Debug.LogWarning("Spawn point count does not match DNA sequence length!");
+            Debug.LogWarning("DNA sequence length must be a multiple of 3 (codons).");
             return false;
         }
 
-        for (int i = 0; i < dnaSequence.Length; i++)
+        int codonCount = dnaSequence.Length / 3;
+
+        if (forwardCodonParents.Count != codonCount || reverseCodonParents.Count != codonCount)
         {
-            char baseChar = dnaSequence[i];
-            Transform spawnPoint = spawnPoints[i];
+            Debug.LogWarning("Codon parent count does not match codon count!");
+            return false;
+        }
 
-            Quaternion fixedRotation = Quaternion.Euler(0f, 90f, -180f);
+        // Loop through codons
+        for (int codonIndex = 0; codonIndex < codonCount; codonIndex++)
+        {
+            string codon = dnaSequence.Substring(codonIndex * 3, 3);
 
-            GameObject newBase = Instantiate(basePrefab, spawnPoint.position, fixedRotation, spawnPoint);
+            // Get the 3 children under each codon parent
+            Transform[] forwardPoints = GetChildSpawnPoints(forwardCodonParents[codonIndex]);
+            Transform[] reversePoints = GetChildSpawnPoints(reverseCodonParents[codonIndex]);
 
-            // Set base letter text
-            TMP_Text text = newBase.GetComponentInChildren<TMP_Text>();
-            if (text != null)
-                text.text = baseChar.ToString();
-
-            // Color the base
-            Renderer rend = newBase.GetComponent<Renderer>();
-            if (rend != null)
+            for (int baseIndex = 0; baseIndex < 3; baseIndex++)
             {
-                Color color = Color.white;
-                switch (baseChar)
+                char baseChar = codon[baseIndex];
+
+                // --- Forward base ---
+                GameObject prefab = GetPrefab(baseChar, false);
+                if (prefab != null && forwardPoints.Length > baseIndex)
                 {
-                    case 'A': color = Color.green; break;
-                    case 'T': color = Color.magenta; break;
-                    case 'C': color = Color.blue; break;
-                    case 'G': color = Color.yellow; break;
+                    Quaternion rotation = Quaternion.Euler(0f, 90f, -180f);
+                    Instantiate(prefab, forwardPoints[baseIndex].position, rotation, forwardPoints[baseIndex]);
                 }
-                rend.material.color = color;
+
+                // --- Reverse base (complement) ---
+                char complement = GetComplement(baseChar);
+                GameObject reversePrefab = GetPrefab(complement, true);
+                if (reversePrefab != null && reversePoints.Length > baseIndex)
+                {
+                    Quaternion rotation = Quaternion.identity; 
+                    Instantiate(reversePrefab, reversePoints[baseIndex].position, rotation, reversePoints[baseIndex]);
+                }
             }
         }
         return true;
+    }
+
+    private Transform[] GetChildSpawnPoints(Transform parent)
+    {
+        List<Transform> children = new List<Transform>();
+        foreach (Transform child in parent)
+        {
+            if (child.name.StartsWith("spawn_point"))
+            {
+                children.Add(child);
+            }
+        }
+
+        // Sort by Unity's default numbering (spawn_point, spawn_point (1), spawn_point (2))
+        children.Sort((a, b) => a.name.CompareTo(b.name));
+
+        return children.ToArray();
+    }
+
+    private GameObject GetPrefab(char baseChar, bool reverse)
+    {
+        switch (baseChar)
+        {
+            case 'A': return reverse ? prefabA_Reverse : prefabA;
+            case 'T': return reverse ? prefabT_Reverse : prefabT;
+            case 'C': return reverse ? prefabC_Reverse : prefabC;
+            case 'G': return reverse ? prefabG_Reverse : prefabG;
+            default: return null;
+        }
+    }
+
+    private char GetComplement(char baseChar)
+    {
+        switch (baseChar)
+        {
+            case 'A': return 'T';
+            case 'T': return 'A';
+            case 'C': return 'G';
+            case 'G': return 'C';
+            default: return 'N';
+        }
     }
 }

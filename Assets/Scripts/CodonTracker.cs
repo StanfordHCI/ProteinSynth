@@ -150,7 +150,7 @@ public class CodonTracker : MonoBehaviour
             floatingObject.transform.position = Vector3.Lerp(floatingObject.transform.position, hoverPosition, Time.deltaTime * 10f);
 
             // Match the mRNA target's rotation with 90-degree correction
-            floatingObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(0f, 90f, 0f);
+            floatingObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(0f, 90f, 90f);
 
             if (!floatingObject.activeSelf)
             {
@@ -214,15 +214,12 @@ public class CodonTracker : MonoBehaviour
 
         mRNA.transform.position = Vector3.Lerp(floatingObject.transform.position, mRNAPosition, Time.deltaTime * 10f);
 
-        // Flip the text on the bases so they can be read
-        for (int i = 0; i < mRNA.spawnPoints.Count; i++) {
-            TMP_Text text = mRNA.spawnPoints[i].GetComponentInChildren<TMP_Text>();
-            if (text != null) {
-                // text.transform.LookAt(camera.transform.position);
-                text.transform.rotation *= Quaternion.Euler(180f, 0f, 0f); 
-            }
+        for (int i = 0; i < mRNA.forwardCodonParents.Count; i++) {
+        TMP_Text text = mRNA.forwardCodonParents[i].GetComponentInChildren<TMP_Text>();
+        if (text != null) {
+            text.transform.rotation *= Quaternion.Euler(180f, 0f, 0f);
         }
-        GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionSuccessful");
+}
     }
 
 
