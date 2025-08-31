@@ -19,10 +19,20 @@ public class CodonTracker : MonoBehaviour
     // Keeps track of the last known codon string to detect changes 
     private string lastCodonString = "";
 
+    [Header("Game Objects")]
     // Assign the game objects in the inspector
     public GameObject floatingObject;
     public GameObject DNATargetObject;   
     public TemplateDNASpawner mRNA;
+
+    [Header("3D Model Transforms")]
+    [SerializeField] private float xOffset;
+    [SerializeField] private float yOffset;
+    [SerializeField] private float zOffset;
+    [SerializeField] private float xRotation;
+    [SerializeField] private float yRotation;
+    [SerializeField] private float zRotation;
+
 
     // Dictionary for codon --> amino acid
     private readonly Dictionary<string, string> codonToAminoAcid = new Dictionary<string, string>()
@@ -40,7 +50,7 @@ public class CodonTracker : MonoBehaviour
         { "UGA", "Stop" }
     };
 
-    // UI stuff
+    [Header("UI -- Text")]
     public TextMeshProUGUI topicTextUI;
     public TextMeshProUGUI codonTextUI;
     public TextMeshProUGUI aminoAcidTextUI;
@@ -135,6 +145,9 @@ public class CodonTracker : MonoBehaviour
 
             if (aminoAcidTextUI != null)
                 aminoAcidTextUI.text = "Amino Acids: " + aminoAcidChain;
+
+            if (mRNA != null)
+                UpdateStrand();
         }
 
         // ----------------------------
@@ -144,13 +157,12 @@ public class CodonTracker : MonoBehaviour
         if (DNATargetObject != null && DNATargetObject.activeInHierarchy)
         {
             // Offset the floating object slightly above the target
-            float yOffset = 0.05f;
-            Vector3 hoverPosition = DNATargetObject.transform.position + new Vector3(0, yOffset, 0);
+            Vector3 hoverPosition = DNATargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
 
             floatingObject.transform.position = Vector3.Lerp(floatingObject.transform.position, hoverPosition, Time.deltaTime * 10f);
 
             // Match the mRNA target's rotation with 90-degree correction
-            floatingObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(0f, 90f, 90f);
+            floatingObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
 
             if (!floatingObject.activeSelf)
             {
@@ -199,35 +211,35 @@ public class CodonTracker : MonoBehaviour
         return string.Join("-", aminoAcids);
     }
 
+    public void UpdateStrand() {
+        mRNA.ClearAllChildren();
+        bool success = mRNA.SpawnTemplateSequence(lastCodonString.Replace("-", string.Empty));
+    }
+
     public void StartTranscription() {
         Debug.Log("Starting transcription");
-        bool success = mRNA.SpawnTemplateDNA(lastCodonString.Replace("-", string.Empty));
+        bool success = mRNA.SpawnTemplateSequence(lastCodonString.Replace("-", string.Empty));
         if (!success) {
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionUnsuccessful");
             return;
         }
 
-        Vector3 mRNAPosition = floatingObject.transform.position + new Vector3(0, 0.05f, 0);
+        // Vector3 mRNAPosition = floatingObject.transform.position + new Vector3(0, 0.05f, 0);
 
-        // Flip the mRNA 180 degrees so it fits on top of the template DNA
-        mRNA.transform.rotation = floatingObject.transform.rotation * Quaternion.Euler(0f, 0f, 180f);
+        // // Flip the mRNA 180 degrees so it fits on top of the template DNA
+        // mRNA.transform.rotation = floatingObject.transform.rotation * Quaternion.Euler(0f, 0f, 180f);
 
-        mRNA.transform.position = Vector3.Lerp(floatingObject.transform.position, mRNAPosition, Time.deltaTime * 10f);
+        // mRNA.transform.position = Vector3.Lerp(floatingObject.transform.position, mRNAPosition, Time.deltaTime * 10f);
 
-        for (int i = 0; i < mRNA.forwardCodonParents.Count; i++) {
-        TMP_Text text = mRNA.forwardCodonParents[i].GetComponentInChildren<TMP_Text>();
-        if (text != null) {
-            text.transform.rotation *= Quaternion.Euler(180f, 0f, 0f);
-        }
-}
+        // for (int i = 0; i < mRNA.forwardCodonParents.Count; i++) {
+        // TMP_Text text = mRNA.forwardCodonParents[i].GetComponentInChildren<TMP_Text>();
+        // if (text != null) {
+        //     text.transform.rotation *= Quaternion.Euler(180f, 0f, 0f);
+        // }
     }
 
 
     public void EnterDNATutorial() {
         GlobalDialogueManager.StartDialogue("ProteinSynthesisDNATutorial");
     }
-
-    // public void EnterTranscriptionTutorial() {
-    //     GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionSuccessful");
-    // }
 }

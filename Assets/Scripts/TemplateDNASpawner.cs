@@ -1,134 +1,205 @@
-using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
+using System.Collections;
 
 public class TemplateDNASpawner : MonoBehaviour
 {
     public bool autoSpawn = false;
 
-    [Header("Template DNA Settings")]
-    [Tooltip("Template strand (5' -> 3')")]
-    public string defaultDnaSequence = "TACGGCATTAGCTACGGC"; 
+    [Header("Template Sequence (A, T, C, G, U)")]
+    [Tooltip("Can be any length. Will only spawn up to the available child spawn points.")]
+    public string defaultSequence = "TACGGCATTAGCTAC"; 
 
-    [Header("DNA Base Prefabs")]
+    [Header("Base Prefabs")]
     public GameObject prefabA;
     public GameObject prefabT;
     public GameObject prefabC;
     public GameObject prefabG;
-    public GameObject prefabA_Reverse;
-    public GameObject prefabT_Reverse;
-    public GameObject prefabC_Reverse;
-    public GameObject prefabG_Reverse;
+    public GameObject prefabU;
 
-    [Header("Codon Parents (each should have 3 child spawn points)")]
-    public List<Transform> forwardCodonParents;  
-    public List<Transform> reverseCodonParents;  
+    [Header("3D Model Transforms (applied relative to spawn point)")]
+    [SerializeField] private float xOffset;
+    [SerializeField] private float yOffset;
+    [SerializeField] private float zOffset;
+    [SerializeField] private float xRotation;
+    [SerializeField] private float yRotation;
+    [SerializeField] private float zRotation;
 
-    private Camera camera;
+    [Header("Spawn Settings")]
+    [SerializeField] private float fadeInDuration = 1f;
+
+    [Header("Parent with Spawn Points")]
+    [Tooltip("Parent that contains spawn points as children")]
+    public Transform spawnParent;
 
     private void Start()
     {
-        if (camera == null)
-            camera = Camera.main;
-
         if (autoSpawn)
-            SpawnTemplateDNA();
+            SpawnTemplateSequence();
     }
 
-    public void SpawnTemplateDNA()
+    public void SpawnTemplateSequence()
     {
-        SpawnTemplateDNA(defaultDnaSequence);
+        SpawnTemplateSequence(defaultSequence);
     }
 
-    public bool SpawnTemplateDNA(string dnaSequence)
+    public bool SpawnTemplateSequence(string sequence)
     {
-        // safety check: sequence must be divisible by 3
-        if (dnaSequence.Length % 3 != 0)
+        if (spawnParent == null)
         {
-            Debug.LogWarning("DNA sequence length must be a multiple of 3 (codons).");
+            Debug.LogWarning("Spawn parent not assigned!");
             return false;
         }
 
-        int codonCount = dnaSequence.Length / 3;
+        int spawnCount = Mathf.Min(sequence.Length, spawnParent.childCount);
 
-        if (forwardCodonParents.Count != codonCount || reverseCodonParents.Count != codonCount)
+        for (int i = 0; i < spawnCount; i++)
         {
-            Debug.LogWarning("Codon parent count does not match codon count!");
-            return false;
-        }
+            char baseChar = sequence[i];
+            Transform spawnPoint = spawnParent.GetChild(i);
 
-        // Loop through codons
-        for (int codonIndex = 0; codonIndex < codonCount; codonIndex++)
-        {
-            string codon = dnaSequence.Substring(codonIndex * 3, 3);
-
-            // Get the 3 children under each codon parent
-            Transform[] forwardPoints = GetChildSpawnPoints(forwardCodonParents[codonIndex]);
-            Transform[] reversePoints = GetChildSpawnPoints(reverseCodonParents[codonIndex]);
-
-            for (int baseIndex = 0; baseIndex < 3; baseIndex++)
+            GameObject prefab = GetPrefab(baseChar);
+            if (prefab != null)
             {
-                char baseChar = codon[baseIndex];
+                Vector3 offset = new Vector3(xOffset, yOffset, zOffset);
+                Vector3 spawnPos = spawnPoint.position + spawnPoint.TransformDirection(offset);
+                Quaternion spawnRot = spawnPoint.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
 
-                // --- Forward base ---
-                GameObject prefab = GetPrefab(baseChar, false);
-                if (prefab != null && forwardPoints.Length > baseIndex)
-                {
-                    Quaternion rotation = Quaternion.Euler(0f, 90f, -180f);
-                    Instantiate(prefab, forwardPoints[baseIndex].position, rotation, forwardPoints[baseIndex]);
-                }
+                GameObject spawned = Instantiate(prefab, spawnPos, spawnRot, spawnPoint);
 
-                // --- Reverse base (complement) ---
-                char complement = GetComplement(baseChar);
-                GameObject reversePrefab = GetPrefab(complement, true);
-                if (reversePrefab != null && reversePoints.Length > baseIndex)
-                {
-                    Quaternion rotation = Quaternion.identity; 
-                    Instantiate(reversePrefab, reversePoints[baseIndex].position, rotation, reversePoints[baseIndex]);
-                }
+                // Start fade-in
+                StartCoroutine(FadeIn(spawned, fadeInDuration));
+            }
+            else
+            {
+                Debug.LogWarning($"No prefab found for base '{baseChar}' at position {i}");
             }
         }
+
         return true;
     }
 
-    private Transform[] GetChildSpawnPoints(Transform parent)
+    private GameObject GetPrefab(char baseChar)
     {
-        List<Transform> children = new List<Transform>();
-        foreach (Transform child in parent)
+        switch (char.ToUpper(baseChar))
         {
-            if (child.name.StartsWith("spawn_point"))
-            {
-                children.Add(child);
-            }
-        }
-
-        // Sort by Unity's default numbering (spawn_point, spawn_point (1), spawn_point (2))
-        children.Sort((a, b) => a.name.CompareTo(b.name));
-
-        return children.ToArray();
-    }
-
-    private GameObject GetPrefab(char baseChar, bool reverse)
-    {
-        switch (baseChar)
-        {
-            case 'A': return reverse ? prefabA_Reverse : prefabA;
-            case 'T': return reverse ? prefabT_Reverse : prefabT;
-            case 'C': return reverse ? prefabC_Reverse : prefabC;
-            case 'G': return reverse ? prefabG_Reverse : prefabG;
+            case 'A': return prefabA;
+            case 'T': return prefabT;
+            case 'C': return prefabC;
+            case 'G': return prefabG;
+            case 'U': return prefabU;
             default: return null;
         }
     }
 
-    private char GetComplement(char baseChar)
+    // 🧹 Delete all spawned children instantly
+    public void ClearAllChildren()
     {
-        switch (baseChar)
+        foreach (Transform spawnPoint in spawnParent)
         {
-            case 'A': return 'T';
-            case 'T': return 'A';
-            case 'C': return 'G';
-            case 'G': return 'C';
-            default: return 'N';
+            for (int i = spawnPoint.childCount - 1; i >= 0; i--)
+            {
+                DestroyImmediate(spawnPoint.GetChild(i).gameObject);
+            }
         }
     }
+
+    // 🌟 Fade in new objects (URP Shader Graph compatible, with debug)
+    private IEnumerator FadeIn(GameObject obj, float duration)
+    {
+        if (obj == null)
+        {
+            Debug.LogWarning("FadeIn: Object is null.");
+            yield break;
+        }
+
+        Renderer renderer = obj.GetComponentInChildren<Renderer>();
+        if (renderer == null)
+        {
+            Debug.LogWarning($"FadeIn: No Renderer found on {obj.name}");
+            yield break;
+        }
+
+        Material[] mats = renderer.materials;
+        Debug.Log($"FadeIn: Found {mats.Length} materials on {obj.name}");
+
+        // Store starting + ending colors
+        Color[] startColors = new Color[mats.Length];
+        Color[] endColors = new Color[mats.Length];
+
+        for (int i = 0; i < mats.Length; i++)
+        {
+            Debug.Log($"FadeIn: Checking material {i}: {mats[i].name}");
+
+            // Just test common color property names
+            string[] possibleProps = { "_BaseColor", "_Color" };
+            string chosenProp = null;
+
+            foreach (var prop in possibleProps)
+            {
+                if (mats[i].HasProperty(prop))
+                {
+                    chosenProp = prop;
+                    break;
+                }
+            }
+
+            if (chosenProp != null)
+            {
+                Debug.Log($"FadeIn: Using {chosenProp} on {mats[i].name}");
+
+                endColors[i] = mats[i].GetColor(chosenProp);
+                startColors[i] = endColors[i];
+                startColors[i].a = 0f; // start transparent
+                mats[i].SetColor(chosenProp, startColors[i]);
+
+                // Store property name in shader keywords for later use
+                mats[i].SetFloat("_FadeInDebug", 1f); // just a debug marker
+            }
+            else
+            {
+                Debug.LogWarning($"FadeIn: No color property found on {mats[i].name}");
+            }
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            float t = Mathf.Clamp01(elapsed / duration);
+
+            for (int i = 0; i < mats.Length; i++)
+            {
+                if (mats[i].HasProperty("_BaseColor"))
+                {
+                    Color newColor = Color.Lerp(startColors[i], endColors[i], t);
+                    mats[i].SetColor("_BaseColor", newColor);
+                    Debug.Log($"Fading {mats[i].name} via _BaseColor: alpha = {newColor.a:F2}");
+                }
+                else if (mats[i].HasProperty("_Color"))
+                {
+                    Color newColor = Color.Lerp(startColors[i], endColors[i], t);
+                    mats[i].SetColor("_Color", newColor);
+                    Debug.Log($"Fading {mats[i].name} via _Color: alpha = {newColor.a:F2}");
+                }
+            }
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // Snap to final color
+        for (int i = 0; i < mats.Length; i++)
+        {
+            if (mats[i].HasProperty("_BaseColor"))
+            {
+                mats[i].SetColor("_BaseColor", endColors[i]);
+                Debug.Log($"FadeIn complete for {mats[i].name} (_BaseColor).");
+            }
+            else if (mats[i].HasProperty("_Color"))
+            {
+                mats[i].SetColor("_Color", endColors[i]);
+                Debug.Log($"FadeIn complete for {mats[i].name} (_Color).");
+            }
+        }
+    }
+
 }
