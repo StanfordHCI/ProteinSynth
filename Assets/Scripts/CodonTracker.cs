@@ -222,9 +222,12 @@ public class CodonTracker : MonoBehaviour
 }
     }
 
-
     public void EnterDNATutorial() {
         GlobalDialogueManager.StartDialogue("ProteinSynthesisDNATutorial");
+    }
+
+    public void EndLab() {
+        GlobalDialogueManager.StartDialogue("ProteinSynthesisReflection");
     }
 
     // public void EnterTranscriptionTutorial() {

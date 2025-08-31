@@ -188,3 +188,15 @@ Yari: Use your finger to drag your mRNA strand to the ribosome.
 <<hide_canvas Canvas true>>
 ===
 
+title: ProteinSynthesisReflection
+---
+<<UnloadScene>>
+<<hide_background Canvas false>>
+<<hide_canvas Canvas false>>
+<<toggle_character_position Canvas false>>
+
+<<set $playerResponse to "">>
+<<send_player_message WebsocketManager "$playerResponse">>
+<<jump SendingToServer>>
+===
+
