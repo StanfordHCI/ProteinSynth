@@ -5,7 +5,7 @@ tags:
 // Misc. string variables
 <<declare $playerResponse = "" as string>>
 <<declare $gptResponse = "" as string>>
-<<declare $player_name = "test_player" as string>>
+<<declare $player_name = "" as string>>
 <<declare $player_intro = "" as string>>
 <<declare $player_answer = "" as string>>
 <<declare $gptOption1 = "" as string>>
@@ -30,10 +30,27 @@ Connected!
 -> Jump to lab
     <<jump ProteinSynthesisLab>>
 
+Narrator: Select the server host.
+-> Remote
+    <<set $remote to true>>
+-> Local
+    <<set $remote to false>>
 
-<<connect_to_server WebsocketManager>>
+<<if $remote == true>>
+    <<connect_to_server WebsocketManager remote>>
+<<else>>
+    <<connect_to_server WebsocketManager>>
+<<endif>>
 
-<<set $player_name to "Alex">>
+<<RequestInput InputPanel "What's your name?">> // accept player input
+-> Submit
+<<SaveAndCloseInput InputPanel "$player_name">>
+
+// checks that player actually input something
+// <<if $player_name is "">>
+//    <<jump PlayerResponding>>
+// <<endif>>
+
 <<send_first_message WebsocketManager "$player_name" "$initial_state" "$participant_id" "$condition" "$grade">>
 <<jump SendingToServer>>
 
