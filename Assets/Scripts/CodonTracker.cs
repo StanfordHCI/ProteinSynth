@@ -250,13 +250,10 @@ public class CodonTracker : MonoBehaviour
         string dnaSequence = templateSpawner.defaultSequence;
 
         // --- Transcribe: DNA (T) → RNA (U)
-        string expectedStrand= dnaSequence.Replace("T", "U");
+        string expectedStrand = dnaSequence.Replace("T", "U");
 
         // --- Student’s current built sequence (strip dashes)
         string studentStrand = lastCodonString.Replace("-", string.Empty);
-
-        Debug.Log(studentStrand);
-        Debug.Log(expectedStrand);
 
         if (studentStrand.Length != expectedStrand.Length) 
         {
@@ -266,7 +263,10 @@ public class CodonTracker : MonoBehaviour
         else if (studentStrand == expectedStrand)
         {
             // ✅ Successful transcription
-            mRNA.transform.SetParent(null); // detach mRNA from DNA
+            if (mRNA != null && mRNA.transform.parent != null)
+            {
+                mRNA.transform.parent.SetParent(null); // detach the parent from its own parent
+            }
             transcriptionFinished = true;
             Debug.Log("Finished transcribing correctly.");
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionSuccessful");
@@ -274,7 +274,7 @@ public class CodonTracker : MonoBehaviour
         else
         {
             // ❌ Incorrect transcription
-             Debug.Log("Not correct. Try again.");
+            Debug.Log("Not correct. Try again.");
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionIncorrect");
         }
     }
