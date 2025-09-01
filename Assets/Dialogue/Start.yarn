@@ -209,9 +209,19 @@ title: ProteinSynthesisReflection
 <<jump SendingToServer>>
 ===
 
+title: ProteinSynthesisAminoAcidInput
+---
+<<ToggleAminoAcidInput CodonManager true>>
+<<hide_canvas Canvas false>>
+Yari: Great! Now let's figure out what amino acids we get from this mRNA strand.
+<<hide_canvas Canvas true>>
+===
+
+
 title: AminoAcidTest
 ---
 <<LoadScene AminoAcidInputTest>>
 <<hide_background Canvas true>>
 <<hide_canvas Canvas true>>
 ===
+
