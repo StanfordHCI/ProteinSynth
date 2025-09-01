@@ -1,12 +1,12 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class TemplateDNASpawner : MonoBehaviour
 {
     public bool autoSpawn = false;
 
     [Header("Template Sequence (A, T, C, G, U)")]
-    [Tooltip("Can be any length. Will only spawn up to the available child spawn points.")]
     public string defaultSequence = "TACGGCATTAGCTAC"; 
 
     [Header("Base Prefabs")]
@@ -25,11 +25,14 @@ public class TemplateDNASpawner : MonoBehaviour
     [SerializeField] private float zRotation;
 
     [Header("Spawn Settings")]
+    [SerializeField] private bool useFadeIn = true;
     [SerializeField] private float fadeInDuration = 1f;
 
     [Header("Parent with Spawn Points")]
-    [Tooltip("Parent that contains spawn points as children")]
     public Transform spawnParent;
+
+    private Coroutine activeCoroutine;                // spawning coroutine
+    private readonly List<Coroutine> fadeCoroutines = new(); // track all fade-ins
 
     private void Start()
     {
@@ -37,27 +40,47 @@ public class TemplateDNASpawner : MonoBehaviour
             SpawnTemplateSequence();
     }
 
-    public void SpawnTemplateSequence()
+    public bool SpawnTemplateSequence()
     {
-        SpawnTemplateSequence(defaultSequence);
+        return SpawnTemplateSequence(defaultSequence);
     }
 
     public bool SpawnTemplateSequence(string sequence)
     {
-        if (spawnParent == null)
+        if (spawnParent == null) return false;
+
+        // cancel previous spawns
+        if (activeCoroutine != null)
         {
-            Debug.LogWarning("Spawn parent not assigned!");
-            return false;
+            StopCoroutine(activeCoroutine);
+            activeCoroutine = null;
         }
 
+        // cancel any running fades
+        foreach (var fade in fadeCoroutines)
+        {
+            if (fade != null) StopCoroutine(fade);
+        }
+        fadeCoroutines.Clear();
+
+        // wipe before spawning fresh
+        ClearAllChildren();
+
+        // start new coroutine
+        activeCoroutine = StartCoroutine(SpawnSequenceCoroutine(sequence));
+        return true;
+    }
+
+    private IEnumerator SpawnSequenceCoroutine(string sequence)
+    {
         int spawnCount = Mathf.Min(sequence.Length, spawnParent.childCount);
 
         for (int i = 0; i < spawnCount; i++)
         {
             char baseChar = sequence[i];
             Transform spawnPoint = spawnParent.GetChild(i);
-
             GameObject prefab = GetPrefab(baseChar);
+
             if (prefab != null)
             {
                 Vector3 offset = new Vector3(xOffset, yOffset, zOffset);
@@ -66,16 +89,17 @@ public class TemplateDNASpawner : MonoBehaviour
 
                 GameObject spawned = Instantiate(prefab, spawnPos, spawnRot, spawnPoint);
 
-                // Start fade-in
-                StartCoroutine(FadeIn(spawned, fadeInDuration));
-            }
-            else
-            {
-                Debug.LogWarning($"No prefab found for base '{baseChar}' at position {i}");
+                if (useFadeIn)
+                {
+                    Coroutine fade = StartCoroutine(FadeIn(spawned, fadeInDuration));
+                    fadeCoroutines.Add(fade);
+                    yield return fade; // wait until finished before next object
+                    fadeCoroutines.Remove(fade);
+                }
             }
         }
 
-        return true;
+        activeCoroutine = null; // finished
     }
 
     private GameObject GetPrefab(char baseChar)
@@ -91,50 +115,31 @@ public class TemplateDNASpawner : MonoBehaviour
         }
     }
 
-    // 🧹 Delete all spawned children instantly
     public void ClearAllChildren()
     {
         foreach (Transform spawnPoint in spawnParent)
         {
             for (int i = spawnPoint.childCount - 1; i >= 0; i--)
-            {
                 DestroyImmediate(spawnPoint.GetChild(i).gameObject);
-            }
         }
     }
 
-    // 🌟 Fade in new objects (URP Shader Graph compatible, with debug)
     private IEnumerator FadeIn(GameObject obj, float duration)
     {
-        if (obj == null)
-        {
-            Debug.LogWarning("FadeIn: Object is null.");
-            yield break;
-        }
+        if (obj == null) yield break;
 
         Renderer renderer = obj.GetComponentInChildren<Renderer>();
-        if (renderer == null)
-        {
-            Debug.LogWarning($"FadeIn: No Renderer found on {obj.name}");
-            yield break;
-        }
+        if (renderer == null) yield break;
 
         Material[] mats = renderer.materials;
-        Debug.Log($"FadeIn: Found {mats.Length} materials on {obj.name}");
-
-        // Store starting + ending colors
         Color[] startColors = new Color[mats.Length];
         Color[] endColors = new Color[mats.Length];
+        string[] props = { "_BaseColor", "_Color" };
 
         for (int i = 0; i < mats.Length; i++)
         {
-            Debug.Log($"FadeIn: Checking material {i}: {mats[i].name}");
-
-            // Just test common color property names
-            string[] possibleProps = { "_BaseColor", "_Color" };
             string chosenProp = null;
-
-            foreach (var prop in possibleProps)
+            foreach (var prop in props)
             {
                 if (mats[i].HasProperty(prop))
                 {
@@ -145,19 +150,10 @@ public class TemplateDNASpawner : MonoBehaviour
 
             if (chosenProp != null)
             {
-                Debug.Log($"FadeIn: Using {chosenProp} on {mats[i].name}");
-
                 endColors[i] = mats[i].GetColor(chosenProp);
                 startColors[i] = endColors[i];
-                startColors[i].a = 0f; // start transparent
+                startColors[i].a = 0f;
                 mats[i].SetColor(chosenProp, startColors[i]);
-
-                // Store property name in shader keywords for later use
-                mats[i].SetFloat("_FadeInDebug", 1f); // just a debug marker
-            }
-            else
-            {
-                Debug.LogWarning($"FadeIn: No color property found on {mats[i].name}");
             }
         }
 
@@ -165,41 +161,31 @@ public class TemplateDNASpawner : MonoBehaviour
         while (elapsed < duration)
         {
             float t = Mathf.Clamp01(elapsed / duration);
-
             for (int i = 0; i < mats.Length; i++)
             {
-                if (mats[i].HasProperty("_BaseColor"))
+                foreach (var prop in props)
                 {
-                    Color newColor = Color.Lerp(startColors[i], endColors[i], t);
-                    mats[i].SetColor("_BaseColor", newColor);
-                    Debug.Log($"Fading {mats[i].name} via _BaseColor: alpha = {newColor.a:F2}");
-                }
-                else if (mats[i].HasProperty("_Color"))
-                {
-                    Color newColor = Color.Lerp(startColors[i], endColors[i], t);
-                    mats[i].SetColor("_Color", newColor);
-                    Debug.Log($"Fading {mats[i].name} via _Color: alpha = {newColor.a:F2}");
+                    if (mats[i].HasProperty(prop))
+                    {
+                        mats[i].SetColor(prop, Color.Lerp(startColors[i], endColors[i], t));
+                        break;
+                    }
                 }
             }
-
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        // Snap to final color
         for (int i = 0; i < mats.Length; i++)
         {
-            if (mats[i].HasProperty("_BaseColor"))
+            foreach (var prop in props)
             {
-                mats[i].SetColor("_BaseColor", endColors[i]);
-                Debug.Log($"FadeIn complete for {mats[i].name} (_BaseColor).");
-            }
-            else if (mats[i].HasProperty("_Color"))
-            {
-                mats[i].SetColor("_Color", endColors[i]);
-                Debug.Log($"FadeIn complete for {mats[i].name} (_Color).");
+                if (mats[i].HasProperty(prop))
+                {
+                    mats[i].SetColor(prop, endColors[i]);
+                    break;
+                }
             }
         }
     }
-
 }

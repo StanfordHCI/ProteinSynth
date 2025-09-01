@@ -1584,6 +1584,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47ddd1536dec2e14fb4a412321156c23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  transcriptionFinished: 0
   floatingObject: {fileID: 805768485}
   DNATargetObject: {fileID: 1071713365}
   mRNA: {fileID: 1633486545}
@@ -1990,7 +1991,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 405934927}
         m_TargetAssemblyTypeName: CodonTracker, Assembly-CSharp
-        m_MethodName: StartTranscription
+        m_MethodName: FinishTranscription
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4569,7 +4570,8 @@ MonoBehaviour:
   xRotation: 270
   yRotation: 0
   zRotation: 270
-  fadeInDuration: 5
+  useFadeIn: 1
+  fadeInDuration: 0.25
   spawnParent: {fileID: 1633486544}
 --- !u!1 &1699630421
 GameObject:
@@ -4714,6 +4716,7 @@ MonoBehaviour:
   xRotation: 270
   yRotation: 0
   zRotation: 270
+  useFadeIn: 0
   fadeInDuration: 1
   spawnParent: {fileID: 1716260201}
 --- !u!1 &1717003958
@@ -5706,7 +5709,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2059794762
 MonoBehaviour:
   m_ObjectHideFlags: 0

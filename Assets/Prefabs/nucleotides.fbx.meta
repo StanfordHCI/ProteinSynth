@@ -3,7 +3,47 @@ guid: c7bed18391831f4428c9555e3a284c29
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: A
+    second: {fileID: 2100000, guid: 58c17cb1007bede4b8ce0eaa79436432, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: C
+    second: {fileID: 2100000, guid: e0d613ddeefe16942892a37de0d61930, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: G
+    second: {fileID: 2100000, guid: 4fd68113c4d83964b92a8510682830dd, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_DNAPBR
+    second: {fileID: 2100000, guid: bc46fb35cb577214db19e4fdd7c56326, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_DNAPBR.004
+    second: {fileID: 2100000, guid: 9367f4813a1a2a5439a624be9bc2ede8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_DNAPBR.006
+    second: {fileID: 2100000, guid: f73d37f7064e18545bcb8083f9ba6848, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_DNAPBR.009
+    second: {fileID: 2100000, guid: a97fcb55507fdf64998131ded5326813, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: U_T
+    second: {fileID: 2100000, guid: 3ba019afd5d089e4996675f8a1946bb0, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

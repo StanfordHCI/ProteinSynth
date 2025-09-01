@@ -176,7 +176,14 @@ Yari: Once you're done, press the "Finish transcription" button to generate your
 title: ProteinSynthesisTranscriptionUnsuccessful
 ---
 <<hide_canvas Canvas false>>
-Yari: It doesn't look like you've arranged all the codon cards yet. Try again!
+Yari: It doesn't look like you've arranged all the codon cards yet. Make sure that your camera is tracking all the cards correctly. Let's try again!
+<<hide_canvas Canvas true>>
+===
+
+title: ProteinSynthesisTranscriptionIncorrect
+---
+<<hide_canvas Canvas false>>
+Yari: Hmmm... I don't think you've transcribed the DNA correctly. Let's try again! 
 <<hide_canvas Canvas true>>
 ===
 
