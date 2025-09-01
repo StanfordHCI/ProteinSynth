@@ -29,6 +29,8 @@ Connected!
 -> Start from intro
 -> Jump to lab
     <<jump ProteinSynthesisLab>>
+-> amino acid test
+    <<jump AminoAcidTest>>
 
 Narrator: Select the server host.
 -> Remote
@@ -207,3 +209,9 @@ title: ProteinSynthesisReflection
 <<jump SendingToServer>>
 ===
 
+title: AminoAcidTest
+---
+<<LoadScene AminoAcidInputTest>>
+<<hide_background Canvas true>>
+<<hide_canvas Canvas true>>
+===
