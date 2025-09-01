@@ -8,9 +8,7 @@ public class AminoAcidDropdownInput : MonoBehaviour
 {
     [Header("UI Components")]
     [SerializeField] private TMP_Dropdown[] aminoAcidDropdowns = new TMP_Dropdown[5];
-    [SerializeField] private Button validateButton;
     [SerializeField] private TextMeshProUGUI feedbackText;
-    [SerializeField] private Image validationIndicator;
     [SerializeField] private TextMeshProUGUI sequenceDisplayText;
     
     [Header("Visual Feedback")]
@@ -42,7 +40,6 @@ public class AminoAcidDropdownInput : MonoBehaviour
     void Start()
     {
         SetupDropdowns();
-        SetupValidationButton();
         UpdateDisplay();
     }
     
@@ -77,14 +74,6 @@ public class AminoAcidDropdownInput : MonoBehaviour
                 // Initialize array
                 selectedAminoAcids[i] = "";
             }
-        }
-    }
-    
-    void SetupValidationButton()
-    {
-        if (validateButton != null)
-        {
-            validateButton.onClick.AddListener(ValidateSelection);
         }
     }
     
@@ -188,17 +177,6 @@ public class AminoAcidDropdownInput : MonoBehaviour
         {
             feedbackText.text = message;
             feedbackText.color = valid ? validColor : invalidColor;
-        }
-        
-        if (validationIndicator != null)
-        {
-            validationIndicator.color = valid ? validColor : 
-                (selectedAminoAcids.Any(x => !string.IsNullOrEmpty(x)) ? neutralColor : invalidColor);
-        }
-        
-        if (validateButton != null)
-        {
-            validateButton.interactable = selectedAminoAcids.Any(x => !string.IsNullOrEmpty(x));
         }
     }
     
