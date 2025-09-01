@@ -7,6 +7,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Yarn.Compiler;
+using Yarn.Unity;
 
 public class CodonTracker : MonoBehaviour
 {
@@ -26,6 +28,7 @@ public class CodonTracker : MonoBehaviour
     public GameObject floatingObject;
     public GameObject DNATargetObject;   
     public TemplateDNASpawner mRNA;
+    public GameObject aminoAcidInput;
 
     [Header("3D Model Transforms")]
     [SerializeField] private float xOffset;
@@ -65,6 +68,7 @@ public class CodonTracker : MonoBehaviour
     void Awake()
     {
         instance = this;
+        aminoAcidInput.SetActive(false);
 
         // GlobalInMemoryVariableStorage.Instance.TryGetValue("$protein_synthesis_topic", out string topic);
         // if (topic != null)
@@ -285,5 +289,18 @@ public class CodonTracker : MonoBehaviour
 
     public void EndLab() {
         GlobalDialogueManager.StartDialogue("ProteinSynthesisReflection");
+    }
+
+    public void StartAminoAcidInput() {
+        GlobalDialogueManager.StartDialogue("ProteinSynthesisAminoAcidInput");
+    }
+
+    [YarnCommand("ToggleAminoAcidInput")]
+    public void ToggleAminoAcidInput(bool show) {
+        if (show) {
+            aminoAcidInput.SetActive(true);
+        } else {
+            aminoAcidInput.SetActive(false);
+        }
     }
 }
