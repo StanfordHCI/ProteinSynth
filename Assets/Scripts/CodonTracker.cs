@@ -314,6 +314,9 @@ public class CodonTracker : MonoBehaviour
             yield return null;
         }
         animationDone = true;
+        
+        // Start amino acid input when animation is complete
+        StartAminoAcidInput();
     }
 
     public void EnterDNATutorial() {
