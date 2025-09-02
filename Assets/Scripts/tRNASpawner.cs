@@ -52,12 +52,16 @@ public class tRNASpawner : MonoBehaviour
                     codon = sequence.Substring(i - 1, 3);
                 }
 
-                // Pass codon to TemplateDNASpawner and start spawning immediately
-                TemplateDNASpawner dnaSpawner = spawned.GetComponent<TemplateDNASpawner>();
-                if (dnaSpawner != null)
+                // 🔹 Look for the child named "trna spawner" and get the component there
+                Transform childSpawner = spawned.transform.Find("trna spawner");
+                if (childSpawner != null)
                 {
-                    dnaSpawner.defaultSequence = codon;
-                    dnaSpawner.SpawnTemplateSequence();
+                    TemplateDNASpawner dnaSpawner = childSpawner.GetComponent<TemplateDNASpawner>();
+                    if (dnaSpawner != null)
+                    {
+                        dnaSpawner.defaultSequence = codon;
+                        dnaSpawner.SpawnTemplateSequence();
+                    }
                 }
 
                 Debug.Log("Spawning tRNA:" + codon);

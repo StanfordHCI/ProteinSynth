@@ -168,7 +168,7 @@ PrefabInstance:
     - target: {fileID: 5375429031310914499, guid: 4a7122ffe16332d45aa82235192822fd,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.804
       objectReference: {fileID: 0}
     - target: {fileID: 5375429031310914499, guid: 4a7122ffe16332d45aa82235192822fd,
         type: 3}
@@ -261,7 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoSpawn: 1
-  defaultSequence: AUG
+  defaultSequence: 
   prefabA: {fileID: 270517918700869792, guid: e707ad0d718277441a80c69838a72da0, type: 3}
   prefabT: {fileID: 2767040199463719958, guid: 0966b374b1f93054bb48fd6a0c9bc0e9, type: 3}
   prefabC: {fileID: 1618297241014648564, guid: 9edade5b5c9766743862b2748d9889db, type: 3}
