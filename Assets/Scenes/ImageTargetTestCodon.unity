@@ -9961,7 +9961,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoSpawn: 1
-  defaultSequence: TACGGCATTAGCTAC
+  defaultSequence: TACATGACGAGACCT
   prefabA: {fileID: 8444328924386386700, guid: 7280233d33c48514eb059b573ce95d43, type: 3}
   prefabT: {fileID: 2916709675557778869, guid: 0a75b446050726d46a981fe05a5fc714, type: 3}
   prefabC: {fileID: 5482154809621987578, guid: 083bd18a195c0d64f93e64b835bdcb81, type: 3}
@@ -12980,6 +12980,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2113700118848507835, guid: 6257fa1821b22f14dac72559c7cab9d2,
+        type: 3}
+      propertyPath: defaultSequence
+      value: ATGTACTGCTCTGGA
+      objectReference: {fileID: 0}
     - target: {fileID: 6591720297909164846, guid: 6257fa1821b22f14dac72559c7cab9d2,
         type: 3}
       propertyPath: m_Name
