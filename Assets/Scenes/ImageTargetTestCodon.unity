@@ -2847,7 +2847,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transcriptionFinished: 0
-  floatingObject: {fileID: 805768485}
+  animationDone: 0
+  DNAObject: {fileID: 805768485}
+  mRNAObject: {fileID: 1569246835}
   DNATargetObject: {fileID: 1071713365}
   RibosomeTargetObject: {fileID: 1130165643}
   mRNA: {fileID: 1633486545}
