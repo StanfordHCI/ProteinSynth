@@ -25,7 +25,6 @@ tags:
 
 <<declare $protein_synthesis_topic = "" as string>>
 
-Connected!
 -> Start from intro
 -> Jump to lab
     <<jump ProteinSynthesisLab>>
@@ -213,9 +212,17 @@ title: ProteinSynthesisAminoAcidInput
 <<ToggleAminoAcidInput CodonManager true>>
 <<hide_canvas Canvas false>>
 Yari: Great! Now let's figure out what amino acids we get from this mRNA strand.
+Yari: Grab your codon chart and use it to figure out which amino acids correspond to each codon.
+Yari: Once you're done, press the "Check amino acids" button to see if your amino acid sequence matches the codon sequence.
 <<hide_canvas Canvas true>>
 ===
 
+title: ProteinSynthesisAminoAcidInputSuccessful
+---
+<<hide_canvas Canvas false>>
+Yari: Nice work! Now let's watch how the tRNA come in to form the amino acid sequence you created.
+<<hide_canvas Canvas true>>
+===
 
 title: AminoAcidTest
 ---

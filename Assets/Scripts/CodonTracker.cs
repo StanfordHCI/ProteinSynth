@@ -62,6 +62,7 @@ public class CodonTracker : MonoBehaviour
     public TextMeshProUGUI topicTextUI;
     public TextMeshProUGUI codonTextUI;
     public TextMeshProUGUI aminoAcidTextUI;
+    public TextMeshProUGUI aminoAcidInputCodonTextUI;
 
 
     /**
@@ -373,6 +374,9 @@ public class CodonTracker : MonoBehaviour
     }
 
     public void StartAminoAcidInput() {
+        // TODO: Hardcoded for testing only
+        lastCodonString = "AUG-UAC-UGC-UCU-GGU";
+        aminoAcidInputCodonTextUI.text = lastCodonString;
         GlobalDialogueManager.StartDialogue("ProteinSynthesisAminoAcidInput");
     }
 

@@ -8,8 +8,12 @@ public class AminoAcidDropdownInput : MonoBehaviour
 {
     [Header("UI Components")]
     [SerializeField] private TMP_Dropdown[] aminoAcidDropdowns = new TMP_Dropdown[5];
+    [SerializeField] private Button validateButton;
+    [SerializeField] private Button checkCodonButton;
     [SerializeField] private TextMeshProUGUI feedbackText;
+    [SerializeField] private Image validationIndicator;
     [SerializeField] private TextMeshProUGUI sequenceDisplayText;
+    [SerializeField] private TextMeshProUGUI codonText;
     
     [Header("Visual Feedback")]
     [SerializeField] private Color validColor = Color.green;
@@ -30,16 +34,33 @@ public class AminoAcidDropdownInput : MonoBehaviour
         { "THR", "Threonine" }, { "TRP", "Tryptophan" }, { "TYR", "Tyrosine" }, { "VAL", "Valine" }
     };
     
+    // Dictionary for codon --> amino acid (matching CodonTracker)
+    private readonly Dictionary<string, string> codonToAminoAcid = new Dictionary<string, string>()
+    {
+        { "AUG", "MET" }, // Start codon
+        { "UGC", "CYS" },
+        { "UAC", "TYR" },
+        { "UCU", "SER" },
+        { "GGU", "GLY" },
+        { "ACA", "THR" },
+        { "UAA", "Stop" },
+        { "UAG", "Stop" },
+        { "UGA", "Stop" }
+    };
+    
     private string[] selectedAminoAcids = new string[5];
     private bool isValid = false;
     
     // Events
     public System.Action<string[]> OnValidSequenceEntered;
     public System.Action<string> OnSelectionChanged;
+    public System.Action<bool> OnCodonMatchResult;
     
     void Start()
     {
         SetupDropdowns();
+        SetupValidationButton();
+        UpdateCodonCheckButton();
         UpdateDisplay();
     }
     
@@ -77,6 +98,28 @@ public class AminoAcidDropdownInput : MonoBehaviour
         }
     }
     
+    void SetupValidationButton()
+    {
+        if (validateButton != null)
+        {
+            validateButton.interactable = selectedAminoAcids.Any(x => !string.IsNullOrEmpty(x));
+        }
+    }
+    
+    void UpdateCodonCheckButton()
+    {
+        if (checkCodonButton != null)
+        {
+            // Enable button only when all 5 amino acids are selected
+            bool allSelected = selectedAminoAcids.All(x => !string.IsNullOrEmpty(x));
+            checkCodonButton.interactable = allSelected;
+            
+            // Add listener if not already added
+            checkCodonButton.onClick.RemoveAllListeners();
+            checkCodonButton.onClick.AddListener(CheckCodonMatch);
+        }
+    }
+    
     void OnDropdownChanged(int dropdownIndex, int selectedValue)
     {
         // Get the selected amino acid code
@@ -92,6 +135,7 @@ public class AminoAcidDropdownInput : MonoBehaviour
         }
         
         UpdateDisplay();
+        UpdateCodonCheckButton();
         
         // Auto-validate if enabled
         if (autoValidate)
@@ -162,7 +206,7 @@ public class AminoAcidDropdownInput : MonoBehaviour
             }
         }
         
-        string successMessage = "Valid sequence!";
+        string successMessage = "All five amino acids selected! Now press the \"Check amino acids\" button.";
         UpdateVisualFeedback(true, successMessage);
         
         // Trigger success event
@@ -221,6 +265,101 @@ public class AminoAcidDropdownInput : MonoBehaviour
         }
         UpdateDisplay();
         ValidateSelection();
+    }
+    
+    public void CheckCodonMatch()
+    {
+        if (codonText == null)
+        {
+            Debug.LogWarning("CodonText is not assigned!");
+            return;
+        }
+        
+        // Get codon sequence from the text component
+        string codonSequence = codonText.text.Trim().ToUpper();
+        
+        // Parse codons (assuming format like "AUG-UGC-UAC-UCU-GGU" or "AUGUGCUACUCUGGU")
+        string[] codons = ParseCodonSequence(codonSequence);
+        
+        if (codons.Length != 5)
+        {
+            if (feedbackText != null)
+            {
+                feedbackText.text = $"Expected 5 codons, found {codons.Length}";
+                feedbackText.color = invalidColor;
+            }
+            OnCodonMatchResult?.Invoke(false);
+            return;
+        }
+        
+        // Check if selected amino acids match the codons
+        bool isMatch = true;
+        List<string> mismatches = new List<string>();
+        
+        for (int i = 0; i < 5; i++)
+        {
+            string expectedAminoAcid = GetAminoAcidFromCodon(codons[i]);
+            string selectedAminoAcid = selectedAminoAcids[i];
+            
+            if (expectedAminoAcid != selectedAminoAcid)
+            {
+                isMatch = false;
+                mismatches.Add($"Position {i + 1}: Expected {expectedAminoAcid} (from {codons[i]}), got {selectedAminoAcid}");
+            }
+        }
+        
+        // Update feedback
+        if (feedbackText != null)
+        {
+            if (isMatch)
+            {
+                feedbackText.text = "Perfect match! Your amino acid sequence matches the codon sequence.";
+                feedbackText.color = validColor;
+                GlobalDialogueManager.StartDialogue("ProteinSynthesisAminoAcidInputSuccessful");
+            }
+            else
+            {
+                // feedbackText.text = "Mismatch found:\n" + string.Join("\n", mismatches);
+                feedbackText.text = "The amino acids don't match the codons. Double check your codon chart and try again!";
+                feedbackText.color = invalidColor;
+            }
+        }
+        
+        OnCodonMatchResult?.Invoke(isMatch);
+    }
+    
+    string[] ParseCodonSequence(string codonSequence)
+    {
+        // Remove any spaces and convert to uppercase
+        codonSequence = codonSequence.Replace(" ", "").ToUpper();
+        
+        // Try parsing with hyphens first
+        if (codonSequence.Contains("-"))
+        {
+            return codonSequence.Split('-');
+        }
+        
+        // If no hyphens, assume continuous string and split into 3-character chunks
+        List<string> codons = new List<string>();
+        for (int i = 0; i < codonSequence.Length; i += 3)
+        {
+            if (i + 2 < codonSequence.Length)
+            {
+                codons.Add(codonSequence.Substring(i, 3));
+            }
+        }
+        
+        return codons.ToArray();
+    }
+    
+    string GetAminoAcidFromCodon(string codon)
+    {
+        if (codonToAminoAcid.TryGetValue(codon, out string aminoAcid))
+        {
+            return aminoAcid;
+        }
+        
+        return "Unknown";
     }
     
     // Helper method to get all available amino acid codes
