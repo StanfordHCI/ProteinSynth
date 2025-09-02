@@ -192,8 +192,7 @@ Yari: Hmmm... I don't think you've transcribed the DNA correctly. Let's try agai
 title: ProteinSynthesisTranscriptionSuccessful
 ---
 <<hide_canvas Canvas false>>
-Yari: Nice work! Now that you've generated your mRNA strand, let's move on to translation.
-Yari: Use your finger to drag your mRNA strand to the ribosome.
+Yari: Nice work! After the mRNA strand is made, it exits the nucleus and moves to a ribosome, where translation happens.
 <<hide_canvas Canvas true>>
 ===
 

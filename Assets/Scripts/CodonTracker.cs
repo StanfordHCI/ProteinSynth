@@ -22,11 +22,14 @@ public class CodonTracker : MonoBehaviour
     private string lastCodonString = "";
     
     public bool transcriptionFinished = false;
+    public bool animationDone = false;
 
     [Header("Game Objects")]
     // Assign the game objects in the inspector
-    public GameObject floatingObject;
+    public GameObject DNAObject;
+    public GameObject mRNAObject; 
     public GameObject DNATargetObject;   
+    public GameObject RibosomeTargetObject;   
     public TemplateDNASpawner mRNA;
     public GameObject aminoAcidInput;
 
@@ -87,8 +90,13 @@ public class CodonTracker : MonoBehaviour
         {
             UpdateCodonStringIfChanged();
         }
-    }
+        if (transcriptionFinished && animationDone)
+        {
+            mRNAonRibosome();
+        }
+        DNAonNucleus();
 
+    }
 
     /** 
         Function: RegisterCodon
@@ -158,9 +166,12 @@ public class CodonTracker : MonoBehaviour
             if (mRNA != null)
                 UpdateStrand();
         }
+    }
 
+    private void DNAonNucleus() 
+    {
         // ----------------------------
-        // FOLLOW THE mRNA TRACKER
+        // FOLLOW THE NUCLEUS
         // ----------------------------
 
         if (DNATargetObject != null && DNATargetObject.activeInHierarchy)
@@ -168,24 +179,44 @@ public class CodonTracker : MonoBehaviour
             // Offset the floating object slightly above the target
             Vector3 hoverPosition = DNATargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
 
-            floatingObject.transform.position = Vector3.Lerp(floatingObject.transform.position, hoverPosition, Time.deltaTime * 10f);
+            DNAObject.transform.position = Vector3.Lerp(DNAObject.transform.position, hoverPosition, Time.deltaTime * 10f);
+            DNAObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
 
-            // Match the mRNA target's rotation with 90-degree correction
-            floatingObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
-
-            if (!floatingObject.activeSelf)
+            if (!DNAObject.activeSelf)
             {
-                floatingObject.SetActive(true);
+                DNAObject.SetActive(true);
             }
         }
         else
         {
-            if (floatingObject.activeSelf)
-                floatingObject.SetActive(false);
+            if (DNAObject.activeSelf)
+                DNAObject.SetActive(false);
         }
     }
 
+    private void mRNAonRibosome() 
+    {
+        if (RibosomeTargetObject != null && RibosomeTargetObject.activeInHierarchy && mRNAObject != null)
+        {
+            // Offset the mRNA slightly above the ribosome target
+            Vector3 hoverPosition = RibosomeTargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
 
+            mRNAObject.transform.position = Vector3.Lerp(mRNAObject.transform.position, hoverPosition, Time.deltaTime * 10f);
+            mRNAObject.transform.rotation = RibosomeTargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
+
+            if (!mRNAObject.activeSelf)
+            {
+                mRNAObject.SetActive(true);
+            }
+        }
+        else
+        {
+            if (mRNAObject != null && mRNAObject.activeSelf)
+            {
+                mRNAObject.SetActive(false);
+            }
+        }
+    }
 
     /** 
         Function: TranslateToAnimoAcid
@@ -226,62 +257,112 @@ public class CodonTracker : MonoBehaviour
     }
 
     public void FinishTranscription()
+{
+    Debug.Log("Finished Transcription");
+
+    if (DNAObject == null || mRNA == null)
     {
-        Debug.Log("Finished Transcription");
+        Debug.LogWarning("Could not find 3-5 strand under DNA target.");
+        return;
+    }
+    
+    // --- Always use the 3-5 template strand
+    Transform threeToFive = DNAObject.transform.Find("3-5");
+    if (threeToFive == null)
+    {
+        Debug.LogWarning("Could not find 3-5 strand under DNA target.");
+        return;
+    }
 
-        if (floatingObject == null || mRNA == null)
+    TemplateDNASpawner templateSpawner = threeToFive.GetComponent<TemplateDNASpawner>();
+    if (templateSpawner == null)
+    {
+        Debug.LogWarning("3-5 strand missing TemplateDNASpawner.");
+        return;
+    }
+
+    // --- Get DNA sequence from the template strand
+    string dnaSequence = templateSpawner.defaultSequence;
+
+    // --- Transcribe: DNA (T) → RNA (U)
+    string expectedStrand = dnaSequence.Replace("T", "U");
+
+    // --- Student’s current built sequence (strip dashes)
+    string studentStrand = lastCodonString.Replace("-", string.Empty);
+
+    if (studentStrand.Length != expectedStrand.Length) 
+    {
+        // ❌ Incomplete transcription
+        Debug.Log("Not finished transcribing all cards.");
+        GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionUnsuccessful");
+    }
+    else if (studentStrand == expectedStrand)
+    {
+        // ✅ Successful transcription
+        if (mRNA != null && mRNAObject != null)
         {
-            Debug.LogWarning("Could not find 3-5 strand under DNA target.");
-            return;
+            // --- Preserve world transform before detaching
+            Vector3 worldPos = mRNAObject.transform.position;
+            Quaternion worldRot = mRNAObject.transform.rotation;
+            Vector3 worldScale = mRNAObject.transform.lossyScale;
+
+            // --- Detach from DNA while preserving world transform
+            mRNAObject.transform.SetParent(null, true);
+
+            // --- Reapply preserved transform to prevent shrinking
+            mRNAObject.transform.position = worldPos;
+            mRNAObject.transform.rotation = worldRot;
+            mRNAObject.transform.localScale = worldScale;
         }
-        
-        // --- Always use the 3-5 template strand
-        Transform threeToFive = floatingObject.transform.Find("3-5");
-        if (threeToFive == null)
-        {
-            Debug.LogWarning("Could not find 3-5 strand under DNA target.");
-            return;
-        }
 
-        TemplateDNASpawner templateSpawner = threeToFive.GetComponent<TemplateDNASpawner>();
-        if (templateSpawner == null)
-        {
-            Debug.LogWarning("3-5 strand missing TemplateDNASpawner.");
-            return;
-        }
+        transcriptionFinished = true;
+        Debug.Log("Finished transcribing correctly.");
+        MoveToRibosome();
+    }
+    else
+    {
+        // ❌ Incorrect transcription
+        Debug.Log("Not correct. Try again.");
+        GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionIncorrect");
+    }
+}
 
-        // --- Get DNA sequence from the template strand
-        string dnaSequence = templateSpawner.defaultSequence;
-
-        // --- Transcribe: DNA (T) → RNA (U)
-        string expectedStrand = dnaSequence.Replace("T", "U");
-
-        // --- Student’s current built sequence (strip dashes)
-        string studentStrand = lastCodonString.Replace("-", string.Empty);
-
-        if (studentStrand.Length != expectedStrand.Length) 
+    public void MoveToRibosome()
+    {
+        if (mRNAObject != null && RibosomeTargetObject != null)
         {
-            Debug.Log("Not finished transcribing all cards.");
-            GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionUnsuccessful");
-        }
-        else if (studentStrand == expectedStrand)
-        {
-            // ✅ Successful transcription
-            if (mRNA != null && mRNA.transform.parent != null)
-            {
-                mRNA.transform.parent.SetParent(null); // detach the parent from its own parent
-            }
-            transcriptionFinished = true;
-            Debug.Log("Finished transcribing correctly.");
-            GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionSuccessful");
-        }
-        else
-        {
-            // ❌ Incorrect transcription
-            Debug.Log("Not correct. Try again.");
-            GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionIncorrect");
+            Debug.Log("Moving");
+            StartCoroutine(MoveMRNAToRibosome());
         }
     }
+
+    private System.Collections.IEnumerator MoveMRNAToRibosome()
+    {
+        float duration = 8f; // how long the movement takes
+        float elapsed = 0f;
+
+        Vector3 startPos = mRNAObject.transform.position;
+        Quaternion startRot = mRNAObject.transform.rotation;
+
+        // Apply the same offset and rotation adjustments as mRNAonRibosome
+        Vector3 targetPos = RibosomeTargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
+        Quaternion targetRot = RibosomeTargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+
+            mRNAObject.transform.position = Vector3.Lerp(startPos, targetPos, t);
+            mRNAObject.transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
+
+            Debug.Log(mRNAObject.transform.position);
+
+            yield return null;
+        }
+        animationDone = true;
+    }
+
 
     public void EnterDNATutorial() {
         GlobalDialogueManager.StartDialogue("ProteinSynthesisDNATutorial");
