@@ -23,14 +23,15 @@ public class CodonTracker : MonoBehaviour
     
     public bool transcriptionFinished = false;
     public bool animationDone = false;
+    public bool translationDone = false;
 
     [Header("Game Objects")]
-    // Assign the game objects in the inspector
     public GameObject DNAObject;
     public GameObject mRNAObject; 
     public GameObject DNATargetObject;   
     public GameObject RibosomeTargetObject;   
     public TemplateDNASpawner mRNA;
+    public tRNASpawner tRNASpawner;
     public GameObject aminoAcidInput;
 
     [Header("3D Model Transforms")]
@@ -65,26 +66,12 @@ public class CodonTracker : MonoBehaviour
     public TextMeshProUGUI aminoAcidInputCodonTextUI;
 
 
-    /**
-        Function: Awake
-        - Unity function to set up instance 
-    */
     void Awake()
     {
         instance = this;
         aminoAcidInput.SetActive(false);
-
-        // GlobalInMemoryVariableStorage.Instance.TryGetValue("$protein_synthesis_topic", out string topic);
-        // if (topic != null)
-        // {
-        //     topicTextUI.text = "Topic: " + topic;
-        // }
     }
 
-    /**
-        Function: Update
-        - Unity function to check if codon string is changed every frame
-    */
     void Update()
     {
         if (!transcriptionFinished) 
@@ -94,15 +81,26 @@ public class CodonTracker : MonoBehaviour
         if (transcriptionFinished && animationDone)
         {
             mRNAonRibosome();
-        }
-        DNAonNucleus();
 
+            if (!translationDone) {
+                translationDone = true;
+                Transform threeToFive = DNAObject.transform.Find("3-5");
+                if (threeToFive != null)
+                {
+                    TemplateDNASpawner dnaSpawner = threeToFive.GetComponent<TemplateDNASpawner>();
+                    if (dnaSpawner != null)
+                    {
+                        string dnaSequence = dnaSpawner.defaultSequence;
+                        string mRNAComp = dnaSequence.Replace("T", "U");
+                        tRNASpawner.StartSpawning(mRNAComp);
+                    }
+                }
+            }
+        }
+
+        DNAonNucleus();
     }
 
-    /** 
-        Function: RegisterCodon
-        - ImageTarget is tracked, add codon to activeCodons dictionary
-    */
     public void RegisterCodon(string codonName, GameObject obj)
     {
         if (!activeCodons.ContainsKey(codonName))
@@ -111,11 +109,6 @@ public class CodonTracker : MonoBehaviour
         }
     }
 
-
-    /** 
-        Function: UnregisterCodon
-        - ImageTarget is no longer tracked, remove codon to activeCodons dictionary
-    */
     public void UnregisterCodon(string codonName)
     {
         if (activeCodons.ContainsKey(codonName))
@@ -124,20 +117,11 @@ public class CodonTracker : MonoBehaviour
         }
     }
 
-
-    /** 
-        Function: UpdateCodonStringIfChanged
-        - Sorts tracked codons from left to right 
-        - Makes a list of codons that are currently tracked 
-        - If there is an update to the tracking, then print the codon string and amino acid string (call TranslatetoAminoAcid function)
-    */
     private void UpdateCodonStringIfChanged()
     {
-        // Sort codons by horizontal (x) position
         List<GameObject> sorted = new List<GameObject>(activeCodons.Values);
         sorted.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
 
-        // Build codon string
         string fullCodon = "";
         foreach (GameObject obj in sorted)
         {
@@ -148,7 +132,6 @@ public class CodonTracker : MonoBehaviour
 
         fullCodon = fullCodon.TrimEnd('-');
 
-        // Only update if the string has changed
         if (fullCodon != lastCodonString)
         {
             lastCodonString = fullCodon;
@@ -171,13 +154,8 @@ public class CodonTracker : MonoBehaviour
 
     private void DNAonNucleus() 
     {
-        // ----------------------------
-        // FOLLOW THE NUCLEUS
-        // ----------------------------
-
         if (DNATargetObject != null && DNATargetObject.activeInHierarchy)
         {
-            // Offset the floating object slightly above the target
             Vector3 hoverPosition = DNATargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
 
             DNAObject.transform.position = Vector3.Lerp(DNAObject.transform.position, hoverPosition, Time.deltaTime * 10f);
@@ -199,7 +177,6 @@ public class CodonTracker : MonoBehaviour
     {
         if (RibosomeTargetObject != null && RibosomeTargetObject.activeInHierarchy && mRNAObject != null)
         {
-            // Offset the mRNA slightly above the ribosome target
             Vector3 hoverPosition = RibosomeTargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
 
             mRNAObject.transform.position = Vector3.Lerp(mRNAObject.transform.position, hoverPosition, Time.deltaTime * 10f);
@@ -219,12 +196,6 @@ public class CodonTracker : MonoBehaviour
         }
     }
 
-    /** 
-        Function: TranslateToAnimoAcid
-        - Accepts the codon stirng (i.e AUG-UGC-XXX) and returns a string of amino acids 
-          in the form (Met-Cys-XXX). 
-        - Translation stops at a stop codon if one is encountered. 
-    */
     private string TranslateToAminoAcids(string codonString)
     {
         string[] codons = codonString.Split('-');
@@ -232,23 +203,19 @@ public class CodonTracker : MonoBehaviour
 
         foreach (var codon in codons)
         {
-            // looks for codon in codonToAminoAcid dictionary
             if (codonToAminoAcid.TryGetValue(codon, out string aminoAcid))
             {
-                // adds corresponding amino acid to list
                 aminoAcids.Add(aminoAcid);
 
-                // found a stop codon --> stop translating!
                 if (aminoAcid == "Stop")
                     break;
             }
             else
             {
-                aminoAcids.Add("???"); // no codon found in dict.
+                aminoAcids.Add("???");
             }
         }
 
-        // returns string of amino acids separated by "-"
         return string.Join("-", aminoAcids);
     }
 
@@ -258,75 +225,63 @@ public class CodonTracker : MonoBehaviour
     }
 
     public void FinishTranscription()
-{
-    Debug.Log("Finished Transcription");
-
-    if (DNAObject == null || mRNA == null)
     {
-        Debug.LogWarning("Could not find 3-5 strand under DNA target.");
-        return;
-    }
-    
-    // --- Always use the 3-5 template strand
-    Transform threeToFive = DNAObject.transform.Find("3-5");
-    if (threeToFive == null)
-    {
-        Debug.LogWarning("Could not find 3-5 strand under DNA target.");
-        return;
-    }
+        Debug.Log("Finished Transcription");
 
-    TemplateDNASpawner templateSpawner = threeToFive.GetComponent<TemplateDNASpawner>();
-    if (templateSpawner == null)
-    {
-        Debug.LogWarning("3-5 strand missing TemplateDNASpawner.");
-        return;
-    }
-
-    // --- Get DNA sequence from the template strand
-    string dnaSequence = templateSpawner.defaultSequence;
-
-    // --- Transcribe: DNA (T) → RNA (U)
-    string expectedStrand = dnaSequence.Replace("T", "U");
-
-    // --- Student’s current built sequence (strip dashes)
-    string studentStrand = lastCodonString.Replace("-", string.Empty);
-
-    if (studentStrand.Length != expectedStrand.Length) 
-    {
-        // ❌ Incomplete transcription
-        Debug.Log("Not finished transcribing all cards.");
-        GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionUnsuccessful");
-    }
-    else if (studentStrand == expectedStrand)
-    {
-        // ✅ Successful transcription
-        if (mRNA != null && mRNAObject != null)
+        if (DNAObject == null || mRNA == null)
         {
-            // --- Preserve world transform before detaching
-            Vector3 worldPos = mRNAObject.transform.position;
-            Quaternion worldRot = mRNAObject.transform.rotation;
-            Vector3 worldScale = mRNAObject.transform.lossyScale;
-
-            // --- Detach from DNA while preserving world transform
-            mRNAObject.transform.SetParent(null, true);
-
-            // --- Reapply preserved transform to prevent shrinking
-            mRNAObject.transform.position = worldPos;
-            mRNAObject.transform.rotation = worldRot;
-            mRNAObject.transform.localScale = worldScale;
+            Debug.LogWarning("Could not find 3-5 strand under DNA target.");
+            return;
+        }
+        
+        Transform threeToFive = DNAObject.transform.Find("3-5");
+        if (threeToFive == null)
+        {
+            Debug.LogWarning("Could not find 3-5 strand under DNA target.");
+            return;
         }
 
-        transcriptionFinished = true;
-        Debug.Log("Finished transcribing correctly.");
-        MoveToRibosome();
+        TemplateDNASpawner dnaSpawner = threeToFive.GetComponent<TemplateDNASpawner>();
+        if (dnaSpawner == null)
+        {
+            Debug.LogWarning("3-5 strand missing TemplateDNASpawner.");
+            return;
+        }
+
+        string dnaSequence = dnaSpawner.defaultSequence;
+        string expectedStrand = dnaSequence.Replace("T", "U");
+        string studentStrand = lastCodonString.Replace("-", string.Empty);
+
+        if (studentStrand.Length != expectedStrand.Length) 
+        {
+            Debug.Log("Not finished transcribing all cards.");
+            GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionUnsuccessful");
+        }
+        else if (studentStrand == expectedStrand)
+        {
+            if (mRNA != null && mRNAObject != null)
+            {
+                Vector3 worldPos = mRNAObject.transform.position;
+                Quaternion worldRot = mRNAObject.transform.rotation;
+                Vector3 worldScale = mRNAObject.transform.lossyScale;
+
+                mRNAObject.transform.SetParent(null, true);
+
+                mRNAObject.transform.position = worldPos;
+                mRNAObject.transform.rotation = worldRot;
+                mRNAObject.transform.localScale = worldScale;
+            }
+
+            transcriptionFinished = true;
+            Debug.Log("Finished transcribing correctly.");
+            MoveToRibosome();
+        }
+        else
+        {
+            Debug.Log("Not correct. Try again.");
+            GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionIncorrect");
+        }
     }
-    else
-    {
-        // ❌ Incorrect transcription
-        Debug.Log("Not correct. Try again.");
-        GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionIncorrect");
-    }
-}
 
     public void MoveToRibosome()
     {
@@ -339,13 +294,12 @@ public class CodonTracker : MonoBehaviour
 
     private System.Collections.IEnumerator MoveMRNAToRibosome()
     {
-        float duration = 8f; // how long the movement takes
+        float duration = 8f;
         float elapsed = 0f;
 
         Vector3 startPos = mRNAObject.transform.position;
         Quaternion startRot = mRNAObject.transform.rotation;
 
-        // Apply the same offset and rotation adjustments as mRNAonRibosome
         Vector3 targetPos = RibosomeTargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
         Quaternion targetRot = RibosomeTargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
 
@@ -357,13 +311,10 @@ public class CodonTracker : MonoBehaviour
             mRNAObject.transform.position = Vector3.Lerp(startPos, targetPos, t);
             mRNAObject.transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
 
-            Debug.Log(mRNAObject.transform.position);
-
             yield return null;
         }
         animationDone = true;
     }
-
 
     public void EnterDNATutorial() {
         GlobalDialogueManager.StartDialogue("ProteinSynthesisDNATutorial");
@@ -374,7 +325,6 @@ public class CodonTracker : MonoBehaviour
     }
 
     public void StartAminoAcidInput() {
-        // TODO: Hardcoded for testing only
         lastCodonString = "AUG-UAC-UGC-UCU-GGU";
         aminoAcidInputCodonTextUI.text = lastCodonString;
         GlobalDialogueManager.StartDialogue("ProteinSynthesisAminoAcidInput");
@@ -382,10 +332,6 @@ public class CodonTracker : MonoBehaviour
 
     [YarnCommand("ToggleAminoAcidInput")]
     public void ToggleAminoAcidInput(bool show) {
-        if (show) {
-            aminoAcidInput.SetActive(true);
-        } else {
-            aminoAcidInput.SetActive(false);
-        }
+        aminoAcidInput.SetActive(show);
     }
 }

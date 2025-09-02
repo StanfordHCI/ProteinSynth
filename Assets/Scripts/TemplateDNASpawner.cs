@@ -85,6 +85,11 @@ public class TemplateDNASpawner : MonoBehaviour
             {
                 Vector3 offset = new Vector3(xOffset, yOffset, zOffset);
                 Vector3 spawnPos = spawnPoint.position + spawnPoint.TransformDirection(offset);
+                if (i == 0) {
+                    Debug.Log("spawnPoint.position" + spawnPoint.position);
+                    Debug.Log("offset" + spawnPoint.TransformDirection(offset));
+                    Debug.Log("spawnPos" + spawnPos);
+                }
                 Quaternion spawnRot = spawnPoint.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
 
                 GameObject spawned = Instantiate(prefab, spawnPos, spawnRot, spawnPoint);
