@@ -29,7 +29,7 @@ tags:
 -> Jump to lab
     <<jump ProteinSynthesisLab>>
 
-Narrator: Select the server host.
+Select the server host.
 -> Remote
     <<set $remote to true>>
 -> Local
@@ -41,7 +41,8 @@ Narrator: Select the server host.
     <<connect_to_server WebsocketManager>>
 <<endif>>
 
-<<RequestInput InputPanel "What's your name?">> // accept player input
+What's your name?
+<<RequestInput InputPanel "Type in your name!">> // accept player input
 -> Submit
 <<SaveAndCloseInput InputPanel "$player_name">>
 
