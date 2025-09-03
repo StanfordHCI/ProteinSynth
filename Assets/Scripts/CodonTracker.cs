@@ -25,9 +25,14 @@ public class CodonTracker : MonoBehaviour
     public bool animationDone = false;
     public bool translationDone = false;
 
+    [Header("Animation Settings")]
+    [SerializeField] private Vector3 targetScaleMultiplier = new Vector3(1.5f, 1.5f, 1.5f);
+
     [Header("Game Objects")]
     public GameObject DNAObject;
     public GameObject mRNAObject; 
+    public GameObject mRNAReversePrefab;
+    public GameObject mRNAReverseObject;
     public GameObject DNATargetObject;   
     public GameObject RibosomeTargetObject;   
     public TemplateDNASpawner mRNA;
@@ -41,7 +46,6 @@ public class CodonTracker : MonoBehaviour
     [SerializeField] private float xRotation;
     [SerializeField] private float yRotation;
     [SerializeField] private float zRotation;
-
 
     // Dictionary for codon --> amino acid
     private readonly Dictionary<string, string> codonToAminoAcid = new Dictionary<string, string>()
@@ -64,7 +68,6 @@ public class CodonTracker : MonoBehaviour
     public TextMeshProUGUI codonTextUI;
     public TextMeshProUGUI aminoAcidTextUI;
     public TextMeshProUGUI aminoAcidInputCodonTextUI;
-
 
     void Awake()
     {
@@ -97,7 +100,6 @@ public class CodonTracker : MonoBehaviour
                 }
             }
         }
-
         DNAonNucleus();
     }
 
@@ -175,23 +177,23 @@ public class CodonTracker : MonoBehaviour
 
     private void mRNAonRibosome() 
     {
-        if (RibosomeTargetObject != null && RibosomeTargetObject.activeInHierarchy && mRNAObject != null)
+        GameObject strand = mRNAReverseObject != null ? mRNAReverseObject : mRNAObject;
+
+        if (RibosomeTargetObject != null && RibosomeTargetObject.activeInHierarchy && strand != null)
         {
             Vector3 hoverPosition = RibosomeTargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
 
-            mRNAObject.transform.position = Vector3.Lerp(mRNAObject.transform.position, hoverPosition, Time.deltaTime * 10f);
-            mRNAObject.transform.rotation = RibosomeTargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
+            strand.transform.position = Vector3.Lerp(strand.transform.position, hoverPosition, Time.deltaTime * 10f);
+            strand.transform.rotation = RibosomeTargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
 
-            if (!mRNAObject.activeSelf)
-            {
-                mRNAObject.SetActive(true);
-            }
+            if (!strand.activeSelf)
+                strand.SetActive(true);
         }
         else
         {
-            if (mRNAObject != null && mRNAObject.activeSelf)
+            if (strand != null && strand.activeSelf)
             {
-                mRNAObject.SetActive(false);
+                strand.SetActive(false);
             }
         }
     }
@@ -259,19 +261,6 @@ public class CodonTracker : MonoBehaviour
         }
         else if (studentStrand == expectedStrand)
         {
-            if (mRNA != null && mRNAObject != null)
-            {
-                Vector3 worldPos = mRNAObject.transform.position;
-                Quaternion worldRot = mRNAObject.transform.rotation;
-                Vector3 worldScale = mRNAObject.transform.lossyScale;
-
-                mRNAObject.transform.SetParent(null, true);
-
-                mRNAObject.transform.position = worldPos;
-                mRNAObject.transform.rotation = worldRot;
-                mRNAObject.transform.localScale = worldScale;
-            }
-
             transcriptionFinished = true;
             Debug.Log("Finished transcribing correctly.");
             MoveToRibosome();
@@ -285,11 +274,62 @@ public class CodonTracker : MonoBehaviour
 
     public void MoveToRibosome()
     {
-        if (mRNAObject != null && RibosomeTargetObject != null)
+        if (mRNAObject != null) {
+            FlipAndResizeMRNA();
+        }
+
+        if (mRNAReverseObject != null && RibosomeTargetObject != null)
         {
-            Debug.Log("Moving");
+            Debug.Log("Moving reverse mRNA strand");
             StartCoroutine(MoveMRNAToRibosome());
         }
+    }
+
+    private void FlipAndResizeMRNA() 
+    {
+        if (mRNAObject == null || mRNAReversePrefab == null) {
+            Debug.LogWarning("mRNAObject or mRNAReversePrefab missing!");
+            return;
+        }
+
+        // Save world transform of mRNA
+        Vector3 pos = mRNAObject.transform.position;
+        Quaternion rot = mRNAObject.transform.rotation;
+        Vector3 scale = mRNAObject.transform.lossyScale;
+
+        // Destroy immediately and null reference
+        DestroyImmediate(mRNAObject);
+        mRNAObject = null;
+
+        // Spawn reverse strand
+        mRNAReverseObject = Instantiate(mRNAReversePrefab, pos, rot);
+        mRNAReverseObject.transform.localScale = scale;
+        mRNAReverseObject.transform.SetParent(null, true);
+
+        // Find the child "mRNA spawner"
+        Transform spawnerChild = mRNAReverseObject.transform.Find("mRNA spawner");
+        if (spawnerChild != null) {
+            // Update TemplateDNASpawner
+            TemplateDNASpawner reverseSpawner = spawnerChild.GetComponent<TemplateDNASpawner>();
+            if (reverseSpawner != null) {
+                reverseSpawner.defaultSequence = lastCodonString.Replace("-", string.Empty);
+                reverseSpawner.ClearAllChildren();
+                reverseSpawner.SpawnTemplateSequence(reverseSpawner.defaultSequence);
+                Debug.Log("Set reverse mRNA defaultSequence to " + reverseSpawner.defaultSequence);
+            }
+
+            // Reassign tRNASpawner to the one attached to this child
+            tRNASpawner = spawnerChild.GetComponent<tRNASpawner>();
+            if (tRNASpawner != null) {
+                Debug.Log("tRNASpawner reassigned to reverse strand.");
+            } else {
+                Debug.LogWarning("mRNA spawner child has no tRNASpawner component.");
+            }
+        } else {
+            Debug.LogWarning("mRNAReverseObject missing child 'mRNA spawner'.");
+        }
+
+        Debug.Log("Spawned mRNA reverse strand.");
     }
 
     private System.Collections.IEnumerator MoveMRNAToRibosome()
@@ -297,24 +337,28 @@ public class CodonTracker : MonoBehaviour
         float duration = 8f;
         float elapsed = 0f;
 
-        Vector3 startPos = mRNAObject.transform.position;
-        Quaternion startRot = mRNAObject.transform.rotation;
+        Vector3 startPos = mRNAReverseObject.transform.position;
+        Quaternion startRot = mRNAReverseObject.transform.rotation;
+        Vector3 startScale = mRNAReverseObject.transform.localScale;
 
         Vector3 targetPos = RibosomeTargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
         Quaternion targetRot = RibosomeTargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
+        Vector3 targetScale = Vector3.Scale(startScale, targetScaleMultiplier);
 
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
 
-            mRNAObject.transform.position = Vector3.Lerp(startPos, targetPos, t);
-            mRNAObject.transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
+            mRNAReverseObject.transform.position = Vector3.Lerp(startPos, targetPos, t);
+            mRNAReverseObject.transform.rotation = Quaternion.Slerp(startRot, targetRot, t);
+            mRNAReverseObject.transform.localScale = Vector3.Lerp(startScale, targetScale, t);
 
             yield return null;
         }
+
         animationDone = true;
-        
+
         // Start amino acid input when animation is complete
         StartAminoAcidInput();
     }
