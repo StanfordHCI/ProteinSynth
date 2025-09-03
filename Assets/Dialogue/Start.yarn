@@ -196,6 +196,7 @@ Yari: Nice work! After the mRNA strand is made, it exits the nucleus and moves t
 
 title: ProteinSynthesisReflection
 ---
+Yari: Congrats! You just made a protein!
 <<UnloadScene>>
 <<hide_background Canvas false>>
 <<hide_canvas Canvas false>>
