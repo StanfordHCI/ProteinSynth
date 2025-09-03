@@ -87,10 +87,10 @@ public class CodonTracker : MonoBehaviour
 
             if (!translationDone) {
                 translationDone = true;
-                Transform threeToFive = DNAObject.transform.Find("3-5");
-                if (threeToFive != null)
+                Transform fiveToThree = DNAObject.transform.Find("5-3");
+                if (fiveToThree != null)
                 {
-                    TemplateDNASpawner dnaSpawner = threeToFive.GetComponent<TemplateDNASpawner>();
+                    TemplateDNASpawner dnaSpawner = fiveToThree.GetComponent<TemplateDNASpawner>();
                     if (dnaSpawner != null)
                     {
                         string dnaSequence = dnaSpawner.defaultSequence;

@@ -233,9 +233,9 @@ MonoBehaviour:
   spawnParent: {fileID: 5459221582741483883}
   tRNAPrefab: {fileID: 5024986216856351854, guid: 75592fcc0872e5a45863dc703d8bce90,
     type: 3}
-  xOffset: 0.05
+  xOffset: 0.089
   yOffset: 0
-  zOffset: 0
+  zOffset: -0.003
   xRotation: 0
   yRotation: 0
   zRotation: 0
