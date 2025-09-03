@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class tRNASpawner : MonoBehaviour
@@ -6,6 +7,7 @@ public class tRNASpawner : MonoBehaviour
     [Header("References")]
     public Transform spawnParent;
     public GameObject tRNAPrefab;
+    public Transform aminoAcidHolder; // drag your AminoAcidHolder (under mRNA) here
 
     [Header("Offsets")]
     public float xOffset;
@@ -15,64 +17,115 @@ public class tRNASpawner : MonoBehaviour
     public float yRotation;
     public float zRotation;
 
+    [Header("Queue Settings")]
+    public int maxVisibleTRNAs = 3;
+
+    [Header("Timing Settings")]
+    public float spawnDelay = 2.0f;
+    public float hideDelay = 1.0f;
+
+    [Header("Animation Settings")]
+    public float enterAnimDuration = 2.0f; // how long the Enter animation lasts
+    public float exitAnimDuration = 2.0f;  // how long the Exit animation lasts
+
     private Coroutine activeCoroutine;
+    private readonly Queue<GameObject> activeTRNAs = new Queue<GameObject>();
 
     public void StartSpawning(string sequence)
     {
-        Debug.Log("Spawning tRNA");
         if (activeCoroutine != null)
-        {
             StopCoroutine(activeCoroutine);
-        }
+
         activeCoroutine = StartCoroutine(SpawnSequenceCoroutine(sequence));
     }
 
     private IEnumerator SpawnSequenceCoroutine(string sequence)
     {
+        if (aminoAcidHolder == null)
+            Debug.LogWarning("[tRNASpawner] AminoAcidHolder is not assigned.");
+
         int spawnCount = Mathf.Min(sequence.Length, spawnParent.childCount);
 
         for (int i = 0; i < spawnCount; i++)
         {
-            // ✅ Only spawn at the 2nd char of each group of 3 (i = 1, 4, 7, ...)
-            if (i % 3 == 1)
+            // Only spawn at the middle of each codon (i = 1, 4, 7, ...)
+            if (i % 3 != 1) continue;
+
+            Transform spawnPoint = spawnParent.GetChild(i);
+
+            Vector3 spawnPos = spawnPoint.position +
+                               spawnPoint.TransformDirection(new Vector3(xOffset, yOffset, zOffset));
+            Quaternion spawnRot = spawnPoint.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
+
+            GameObject spawned = Instantiate(tRNAPrefab, spawnPos, spawnRot, spawnPoint);
+
+            // Configure the tRNA’s internal spawner with the codon (i-1,i,i+1)
+            string codon = (i - 1 >= 0 && i + 1 < sequence.Length) ? sequence.Substring(i - 1, 3) : "";
+            Transform childSpawner = spawned.transform.Find("Model/trna spawner");
+            if (childSpawner != null)
             {
-                Transform spawnPoint = spawnParent.GetChild(i);
-
-                Vector3 offset = new Vector3(xOffset, yOffset, zOffset);
-                Vector3 spawnPos = spawnPoint.position + spawnPoint.TransformDirection(offset);
-                Quaternion spawnRot = spawnPoint.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
-
-                // Spawn prefab
-                GameObject spawned = Instantiate(tRNAPrefab, spawnPos, spawnRot, spawnPoint);
-
-                // 🔹 Grab codon triplet (i-1, i, i+1) safely
-                string codon = "";
-                if (i - 1 >= 0 && i + 1 < sequence.Length)
+                TemplateDNASpawner dnaSpawner = childSpawner.GetComponent<TemplateDNASpawner>();
+                if (dnaSpawner != null)
                 {
-                    codon = sequence.Substring(i - 1, 3);
+                    dnaSpawner.defaultSequence = codon;
+                    dnaSpawner.SpawnTemplateSequence();
                 }
-
-                // 🔹 Look for the child named "trna spawner" and get the component there
-                Transform childSpawner = spawned.transform.Find("trna spawner");
-                if (childSpawner != null)
-                {
-                    TemplateDNASpawner dnaSpawner = childSpawner.GetComponent<TemplateDNASpawner>();
-                    if (dnaSpawner != null)
-                    {
-                        dnaSpawner.defaultSequence = codon;
-                        dnaSpawner.SpawnTemplateSequence();
-                    }
-                }
-
-                Debug.Log("Spawning tRNA:" + codon);
-
-                // 👉 TODO: Trigger animation if needed
-                // spawned.GetComponent<Animator>()?.SetTrigger("Play");
-
-                yield return new WaitForSeconds(1.0f); // wait before spawning next
             }
+
+            // Play Enter animation
+            Animator animator = spawned.GetComponent<Animator>();
+            if (animator != null)
+                animator.Play("Enter");
+
+            // Wait for Enter animation to finish
+            yield return new WaitForSeconds(enterAnimDuration + 0.1f);
+
+            // After animation, move its amino acid to the holder
+            Transform aminoAcid = spawned.transform.Find("Model/AminoAcid");
+            if (aminoAcid != null && aminoAcidHolder != null)
+            {
+                aminoAcid.SetParent(aminoAcidHolder, true);
+            }
+
+            // Add new tRNA to the queue
+            activeTRNAs.Enqueue(spawned);
+
+            // If we exceed max visible, off-board oldest immediately
+            if (activeTRNAs.Count > maxVisibleTRNAs)
+            {
+                GameObject oldest = activeTRNAs.Dequeue();
+                yield return StartCoroutine(OffboardTRNA(oldest));
+            }
+
+            // Delay before spawning next tRNA
+            yield return new WaitForSeconds(spawnDelay);
         }
 
-        activeCoroutine = null; // finished
+        // After all spawns, off-board any leftovers one by one
+        while (activeTRNAs.Count > 0)
+        {
+            GameObject tRNA = activeTRNAs.Dequeue();
+            yield return StartCoroutine(OffboardTRNA(tRNA));
+            yield return new WaitForSeconds(hideDelay);
+        }
+
+        activeCoroutine = null;
+    }
+
+    private IEnumerator OffboardTRNA(GameObject tRNA)
+    {
+        if (tRNA == null) yield break;
+
+        // Play Exit animation
+        Animator animator = tRNA.GetComponent<Animator>();
+        if (animator != null)
+            animator.Play("Exit");
+
+        // Wait for Exit animation to finish
+        yield return new WaitForSeconds(exitAnimDuration);
+
+        // Hide after animation
+        if (tRNA != null)
+            tRNA.SetActive(false);
     }
 }
