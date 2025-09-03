@@ -23,7 +23,9 @@ public class CodonTracker : MonoBehaviour
     
     public bool transcriptionFinished = false;
     public bool animationDone = false;
+    private bool shouldStartTranslation = false;
     public bool translationDone = false;
+
 
     [Header("Animation Settings")]
     [SerializeField] private Vector3 targetScaleMultiplier = new Vector3(1.5f, 1.5f, 1.5f);
@@ -81,7 +83,7 @@ public class CodonTracker : MonoBehaviour
         {
             UpdateCodonStringIfChanged();
         }
-        if (transcriptionFinished && animationDone)
+        if (transcriptionFinished && shouldStartTranslation)
         {
             mRNAonRibosome();
 
@@ -380,5 +382,10 @@ public class CodonTracker : MonoBehaviour
     [YarnCommand("ToggleAminoAcidInput")]
     public void ToggleAminoAcidInput(bool show) {
         aminoAcidInput.SetActive(show);
+    }
+
+    [YarnCommand("StartTranslation")]
+    public void StartTranslation() {
+        shouldStartTranslation = true;
     }
 }

@@ -223,4 +223,5 @@ title: ProteinSynthesisAminoAcidInputSuccessful
 Yari: Nice work! Now let's watch how the tRNA come in to form the amino acid sequence you created.
 <<hide_canvas Canvas true>>
 <<ToggleAminoAcidInput CodonManager false>>
+<<StartTranslation CodonManager>>
 ===
