@@ -9,6 +9,12 @@
         "com.unity.nuget.newtonsoft-json": "3.2.1"
       }
     },
+    "com.unity.2d.sprite": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
     "com.unity.ar-companion-core": {
       "version": "3.0.0-exp.3",
       "depth": 0,
