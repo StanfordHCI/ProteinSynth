@@ -328,9 +328,15 @@ MonoBehaviour:
   spawnParent: {fileID: 4256416378905150553}
   tRNAPrefab: {fileID: 5024986216856351854, guid: 75592fcc0872e5a45863dc703d8bce90,
     type: 3}
+  aminoAcidHolder: {fileID: 0}
   xOffset: 0.05
   yOffset: 0
   zOffset: 0
   xRotation: 0
   yRotation: 0
   zRotation: 0
+  maxVisibleTRNAs: 2
+  spawnDelay: 2
+  hideDelay: 1
+  enterAnimDuration: 2
+  exitAnimDuration: 2
