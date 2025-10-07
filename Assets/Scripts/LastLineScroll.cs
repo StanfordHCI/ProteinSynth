@@ -97,14 +97,14 @@ public class LastLineScroll : MonoBehaviour
 
         // Disable buttons when they reach very beginning or very end of messages, otherwise enable
         if (index == messageList.Count - 1) {
-            incrementButton.GetComponent<CanvasGroup>().alpha = 0;
+            incrementButton.GetComponent<CanvasGroup>().alpha = 0.05f;
             incrementButton.GetComponent<Button>().enabled = false;
         } else {
             incrementButton.GetComponent<CanvasGroup>().alpha = 1;
             incrementButton.GetComponent<Button>().enabled = true;
         }
         if (index == 0) {
-            decrementButton.GetComponent<CanvasGroup>().alpha = 0;
+            decrementButton.GetComponent<CanvasGroup>().alpha = 0.05f;
             decrementButton.GetComponent<Button>().enabled = false;
         } else {
             decrementButton.GetComponent<CanvasGroup>().alpha = 1;

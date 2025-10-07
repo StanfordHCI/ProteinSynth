@@ -72,7 +72,9 @@ title: SendingToServer
 // <<else>>
 //     <<show_current_bubbles TwoCharacterDisplay>>
 //     <<set_characters_idle TwoCharacterDisplay>>
+    <<show_thinking_indicator Canvas>>
     <<wait_for_message WebsocketManager>> // wait for responses to show up in queue
+    <<hide_thinking_indicator Canvas>>
 //     <<hide_current_bubbles TwoCharacterDisplay>>
 //     <<set_characters_not_idle TwoCharacterDisplay>>
 // <<endif>>
