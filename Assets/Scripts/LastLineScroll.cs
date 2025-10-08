@@ -45,43 +45,45 @@ public class LastLineScroll : MonoBehaviour
             }
             while (tempQueue.Count > 0) {
                 string thisLine = tempQueue.Dequeue(); 
-                if (!thisLine.Contains("VISUAL")) {
-                    messageList.Add(thisLine); 
-                }
+                // if (!thisLine.Contains("VISUAL")) {
+                messageList.Add(thisLine); 
+                // }
                 messageQueue.Enqueue(thisLine); 
             }
-            // Get last index of last message
+            // Get index of last message
             if (messageList.Count > 0) {
                 index = messageList.Count - 1; 
                 Debug.Log("index of the last message is " + index.ToString()); 
             }
-            // MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<CanvasGroup>().alpha = 0); 
-            // MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<Button>().enabled = false); 
-            Debug.Log("finished setting messageList"); 
+            MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<CanvasGroup>().alpha = 0.05f); 
+            MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<Button>().enabled = false); 
+            Debug.Log("finished setting messageList, disabling increment button"); 
         }
     }
 
     // Scroll forwards to the next message, up to last line
-    public void incrementScroll() {
-        Debug.Log("Attempting increment scroll");
+    public void incrementScroll() {        
         if (index + 1 < messageList.Count) {
             index += 1; 
             displayThisLine(); 
+        } else {
+            Debug.Log("cannot increment, already at last message");
         }
     }
 
     // Scroll backwards to the last message, up to first line
     public void decrementScroll() {
-        Debug.Log("Attempting decrement scroll");
         if (index - 1 >= 0) {
             index -= 1; 
             displayThisLine();
+        } else {
+            Debug.Log("cannot decrement, already at first message");
         }
     }
 
-    private void displayThisLine() {
+    private void displayThisLine() {       
         string responseLine = messageList[index]; 
-        Debug.Log("Incrementing scroll, showing next line " + responseLine);
+        Debug.Log("displaying line " + index + " of " + (messageList.Count - 1) + ": " + responseLine);
         // Parse out elements of string
         var lineParts = responseLine.Split(":", 2); 
         string thisName = lineParts[0]; 
@@ -97,14 +99,14 @@ public class LastLineScroll : MonoBehaviour
 
         // Disable buttons when they reach very beginning or very end of messages, otherwise enable
         if (index == messageList.Count - 1) {
-            incrementButton.GetComponent<CanvasGroup>().alpha = 0;
+            incrementButton.GetComponent<CanvasGroup>().alpha = 0.05f;
             incrementButton.GetComponent<Button>().enabled = false;
         } else {
             incrementButton.GetComponent<CanvasGroup>().alpha = 1;
             incrementButton.GetComponent<Button>().enabled = true;
         }
         if (index == 0) {
-            decrementButton.GetComponent<CanvasGroup>().alpha = 0;
+            decrementButton.GetComponent<CanvasGroup>().alpha = 0.05f;
             decrementButton.GetComponent<Button>().enabled = false;
         } else {
             decrementButton.GetComponent<CanvasGroup>().alpha = 1;
