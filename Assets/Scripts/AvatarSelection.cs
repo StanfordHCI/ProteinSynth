@@ -18,20 +18,21 @@ public class AvatarSelection : MonoBehaviour
     private bool isAnimating = false;
 
     private string[] names = {
-        "Yari", 
-        "Benji",
+        "Yari",
+        "Alex",
         "Jessica", 
-        "Alex"
+        "Benji",
     };
 
     private string[] descriptions = {
         "A vibrant 9th grader who proudly identifies as Afro-Latina, with Dominican and Puerto Rican roots. She's charismatic and can make any dry biology lesson come alive!",
 
-        "A lively 9th grader who proudly wears his Singaporean heritage on his sleeve. His energy pulls everyone in, and he’s on a mission to make learning feel like an epic team project.",
+        "A thoughtful 9th grader who reps his roots as a first-gen Mexican American. He doesn’t talk a lot during lessons, but when it comes time to help a classmate he’s all in.",
 
         "A thoughtful 9th grader who confidently reps her South Korean roots. She remembers feeling lost at first, so now she makes sure no one else feels left behind.",
+        
+        "A lively 9th grader who proudly wears his Singaporean heritage on his sleeve. His energy pulls everyone in, and he’s on a mission to make learning feel like an epic team project.",
 
-        "A thoughtful 9th grader who reps his roots as a first-gen Mexican American. He doesn’t talk a lot during lessons, but when it comes time to help a classmate he’s all in.",
     };
 
 
@@ -55,6 +56,19 @@ public class AvatarSelection : MonoBehaviour
         // Change text content to match next avatar
         nameText.text = names[index];
         descriptionText.text = descriptions[index];
+
+        // Highlight this avatar in the carousel 
+        for (int i = 0; i < avatars.Count; i++) {
+            CanvasGroup group = avatars[i].GetComponent<CanvasGroup>();
+            if (i != index)
+            {
+                group.alpha = 0.2f;
+            }
+            else
+            {
+                group.alpha = 1.0f;
+            }
+        }
 
         // Disable buttons when they reach very beginning or very end of avatar list
         if (index == avatars.Count - 1) {
