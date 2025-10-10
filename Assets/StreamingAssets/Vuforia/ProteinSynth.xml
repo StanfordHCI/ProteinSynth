@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="GAG" size="0.075000 0.056250" />
+    <ImageTarget name="ACU" size="0.075000 0.056250" />
+    <ImageTarget name="CAC" size="0.075000 0.056250" />
+    <ImageTarget name="GUG" size="0.075000 0.056250" />
+    <ImageTarget name="UGG" size="0.075000 0.056250" />
+    <ImageTarget name="CUG" size="0.075000 0.056250" />
+    <ImageTarget name="AUG" size="0.075000 0.056250" />
+    <ImageTarget name="GCC" size="0.075000 0.056250" />
+    <ImageTarget name="UCU" size="0.075000 0.056250" />
     <ImageTarget name="ribosome" size="0.075000 0.077284" />
     <ImageTarget name="nucleus" size="0.075000 0.074524" />
     <ImageTarget name="UGC" size="0.075000 0.056250" />
-    <ImageTarget name="UCU" size="0.075000 0.056250" />
     <ImageTarget name="UAC" size="0.075000 0.056250" />
     <ImageTarget name="GGU" size="0.075000 0.056250" />
     <ImageTarget name="ACA" size="0.075000 0.056250" />
-    <ImageTarget name="AUG" size="0.075000 0.056250" />
     <ImageTarget name="adenine-test" size="0.070000 0.056757" />
     <ImageTarget name="cytosine-test" size="0.070000 0.060265" />
     <ImageTarget name="guanine-test" size="0.070000 0.052691" />
