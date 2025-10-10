@@ -46,10 +46,20 @@ What's your name?
 -> Submit
 <<SaveAndCloseInput InputPanel "$player_name">>
 
+// select peer tutor
+Select your peer tutor! 
+<<LoadScene AvatarSelection>>
+<<hide_static_elements Canvas true>>
+-> Confirm
+<<UnloadScene>>
+<<hide_static_elements Canvas false>>
+
+
 // checks that player actually input something
 // <<if $player_name is "">>
 //    <<jump PlayerResponding>>
 // <<endif>>
+
 
 <<send_first_message WebsocketManager "$player_name" "$initial_state" "$participant_id" "$condition" "$grade">>
 <<jump SendingToServer>>

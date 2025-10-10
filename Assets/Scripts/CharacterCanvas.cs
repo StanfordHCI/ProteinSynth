@@ -12,6 +12,7 @@ public class CharacterCanvas : MonoBehaviour
 {
     public Image background;
     public Transform character;
+    public Transform optionListView;
 
     private Vector3 originalCharacterPos;
 
@@ -81,6 +82,30 @@ public class CharacterCanvas : MonoBehaviour
         if (thinkingIndicator != null) {
             thinkingIndicator.GetComponent<Image>().color = new Color(1, 1, 1, 0); 
             thinkingText.text = "";
+        }
+    }
+
+    // Hide everything except for the option buttons
+    [YarnCommand("hide_static_elements")]
+    public void hide_static_elements(bool hidden) {
+        if (hidden) {
+            background.enabled = false;
+            character.GetComponent<CanvasGroup>().alpha = 0;
+            foreach (Transform child in optionListView)
+            {
+                if (child.name != "Black Option View(Clone)") { // name of the option buton component
+                    child.GetComponent<CanvasGroup>().alpha = 0;
+                } 
+            }
+        } else {
+            background.enabled = true;
+            character.GetComponent<CanvasGroup>().alpha = 1;
+            foreach (Transform child in optionListView)
+            {
+                if (child.name != "Black Option View(Clone)") { // name of the option buton component
+                    child.GetComponent<CanvasGroup>().alpha = 1;
+                } 
+            }
         }
     }
 }
