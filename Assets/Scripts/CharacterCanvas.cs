@@ -60,9 +60,11 @@ public class CharacterCanvas : MonoBehaviour
     public void toggle_character_position(bool corner) {
         if (corner) {
             // character.position = 
-            character.Translate(new Vector3(420.0f, -950.0f, 0f));
+            character.Translate(new Vector3(-725.0f, -1250.0f, 0f));
+            character.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f); 
         } else {
             character.position = originalCharacterPos;
+            character.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f); 
         }
     }
 
@@ -85,11 +87,11 @@ public class CharacterCanvas : MonoBehaviour
         }
     }
 
-    // Hide everything except for the option buttons
+    // Hide everything except for the option buttons + darken background
     [YarnCommand("hide_static_elements")]
     public void hide_static_elements(bool hidden) {
         if (hidden) {
-            background.enabled = false;
+            background.color = new Color(0.45f, 0.45f, 0.45f, 1f);
             character.GetComponent<CanvasGroup>().alpha = 0;
             foreach (Transform child in optionListView)
             {
@@ -98,7 +100,7 @@ public class CharacterCanvas : MonoBehaviour
                 } 
             }
         } else {
-            background.enabled = true;
+            background.color = Color.white;
             character.GetComponent<CanvasGroup>().alpha = 1;
             foreach (Transform child in optionListView)
             {
