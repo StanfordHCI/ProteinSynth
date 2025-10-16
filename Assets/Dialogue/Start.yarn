@@ -24,6 +24,7 @@ tags:
 <<declare $grade = "9th" as string>>
 
 <<declare $protein_synthesis_topic = "" as string>>
+<<declare $peer_tutor = "Yari" as string>>
 
 -> Start from intro
 -> Jump to lab
@@ -53,6 +54,7 @@ Select your peer tutor!
 -> Confirm
 <<UnloadScene>>
 <<hide_static_elements Canvas false>>
+{$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
 
 
 // checks that player actually input something
@@ -169,46 +171,46 @@ title: ProteinSynthesisLab
 <<LoadScene ImageTargetTestCodon>>
 <<hide_background Canvas true>>
 <<toggle_character_position Canvas true>>
-Yari: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
-Yari: First, scan the nucleus of the cell with your camera.
+{$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
+{$peer_tutor}: First, scan the nucleus of the cell with your camera.
 <<hide_canvas Canvas true>>
 ===
 
 title: ProteinSynthesisDNATutorial
 ---
 <<hide_canvas Canvas false>>
-Yari: Nice! Do you see the DNA that popped up? 
-Yari: During transcription, a small portion of the DNA unwinds. One of the strands is used as a template to create a new strand of mRNA.
-Yari: Your job is to figure out what the bases of this new mRNA strand should be!
-Yari: Arrange on codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
-Yari: Once you're done, press the "Finish transcription" button to generate your mRNA strand.
+{$peer_tutor}: Nice! Do you see the DNA that popped up? 
+{$peer_tutor}: During transcription, a small portion of the DNA unwinds. One of the strands is used as a template to create a new strand of mRNA.
+{$peer_tutor}: Your job is to figure out what the bases of this new mRNA strand should be!
+{$peer_tutor}: Arrange on codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
+{$peer_tutor}: Once you're done, press the "Finish transcription" button to generate your mRNA strand.
 <<hide_canvas Canvas true>>
 ===
 
 title: ProteinSynthesisTranscriptionUnsuccessful
 ---
 <<hide_canvas Canvas false>>
-Yari: It doesn't look like you've arranged all the codon cards yet. Make sure that your camera is tracking all the cards correctly. Let's try again!
+{$peer_tutor}: It doesn't look like you've arranged all the codon cards yet. Make sure that your camera is tracking all the cards correctly. Let's try again!
 <<hide_canvas Canvas true>>
 ===
 
 title: ProteinSynthesisTranscriptionIncorrect
 ---
 <<hide_canvas Canvas false>>
-Yari: Hmmm... I don't think you've transcribed the DNA correctly. Let's try again! 
+{$peer_tutor}: Hmmm... I don't think you've transcribed the DNA correctly. Let's try again! 
 <<hide_canvas Canvas true>>
 ===
 
 title: ProteinSynthesisTranscriptionSuccessful
 ---
 <<hide_canvas Canvas false>>
-Yari: Nice work! After the mRNA strand is made, it exits the nucleus and moves to a ribosome, where translation happens.
+{$peer_tutor}: Nice work! After the mRNA strand is made, it exits the nucleus and moves to a ribosome, where translation happens.
 <<hide_canvas Canvas true>>
 ===
 
 title: ProteinSynthesisReflection
 ---
-Yari: Congrats! You just made a protein!
+{$peer_tutor}: Congrats! You just made a protein!
 <<UnloadScene>>
 <<hide_background Canvas false>>
 <<hide_canvas Canvas false>>
@@ -222,9 +224,9 @@ Yari: Congrats! You just made a protein!
 title: ProteinSynthesisAminoAcidInput
 ---
 <<hide_canvas Canvas false>>
-Yari: Great! Now let's figure out what amino acids we get from this mRNA strand.
-Yari: Grab your codon chart and use it to figure out which amino acids correspond to each codon.
-Yari: Once you're done, press the "Check amino acids" button to see if your amino acid sequence matches the codon sequence.
+{$peer_tutor}: Great! Now let's figure out what amino acids we get from this mRNA strand.
+{$peer_tutor}: Grab your codon chart and use it to figure out which amino acids correspond to each codon.
+{$peer_tutor}: Once you're done, press the "Check amino acids" button to see if your amino acid sequence matches the codon sequence.
 <<hide_canvas Canvas true>>
 <<ToggleAminoAcidInput CodonManager true>>
 ===
@@ -232,7 +234,7 @@ Yari: Once you're done, press the "Check amino acids" button to see if your amin
 title: ProteinSynthesisAminoAcidInputSuccessful
 ---
 <<hide_canvas Canvas false>>
-Yari: Nice work! Now let's watch how the tRNA come in to form the amino acid sequence you created.
+{$peer_tutor}: Nice work! Now let's watch how the tRNA come in to form the amino acid sequence you created.
 <<hide_canvas Canvas true>>
 <<ToggleAminoAcidInput CodonManager false>>
 <<StartTranslation CodonManager>>

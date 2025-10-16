@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; 
 using TMPro; 
+using Yarn.Unity;
 
 public class AvatarSelection : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class AvatarSelection : MonoBehaviour
         "Jessica", 
         "Benji",
     };
+
+    private GlobalInMemoryVariableStorage storage; // syncing with Yarn
 
     private string[] descriptions = {
         "A vibrant 9th grader who proudly identifies as Afro-Latina, with Dominican and Puerto Rican roots. She's charismatic and can make any dry biology lesson come alive!",
@@ -46,9 +49,14 @@ public class AvatarSelection : MonoBehaviour
         foreach (Transform child in containerRect) {
                 avatars.Add(child.gameObject);
         }     
-        changeAvatarChoice();   
     }
 
+    void Start()
+    {
+        storage = GlobalInMemoryVariableStorage.Instance;
+        changeAvatarChoice();   
+    }
+    
     public void changeAvatarChoice() {
         // Update carousel to show this avatar
         StartCoroutine(AnimateScroll());
@@ -56,6 +64,9 @@ public class AvatarSelection : MonoBehaviour
         // Change text content to match next avatar
         nameText.text = names[index];
         descriptionText.text = descriptions[index];
+
+        // Update character in Yarn
+        storage.SetValue("$peer_tutor", names[index]);
 
         // Highlight this avatar in the carousel 
         for (int i = 0; i < avatars.Count; i++) {
