@@ -25,11 +25,11 @@ tags:
 
 <<declare $protein_synthesis_topic = "" as string>>
 <<declare $peer_tutor = "Yari" as string>>
-
 -> Start from intro
 -> Jump to lab
     <<jump ProteinSynthesisLab>>
 
+<<hide_scroll WebsocketManager true>>
 Select the server host.
 -> Remote
     <<set $remote to true>>
@@ -54,6 +54,7 @@ Select your peer tutor!
 -> Confirm
 <<UnloadScene>>
 <<hide_static_elements Canvas false>>
+<<hide_scroll WebsocketManager false>>
 {$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
 
 
@@ -63,7 +64,7 @@ Select your peer tutor!
 // <<endif>>
 
 
-<<send_first_message WebsocketManager "$player_name" "$initial_state" "$participant_id" "$condition" "$grade">>
+<<send_first_message WebsocketManager "$player_name" "$initial_state" "$participant_id" "$condition" "$grade" "$peer_tutor">>
 <<jump SendingToServer>>
 
 ===

@@ -173,23 +173,23 @@ public class WebSocketManager : MonoBehaviour {
         lastLineScroll.SetMessageList(yarnQueue); 
         
         // Run photo album tutorial after the first photo has been shown
-        if (seenImage == 1 && yarnQueue.Peek() == "VISUAL") { 
-            if (displayedAlbumTutorial == false) {
-                Queue<string> temp = new Queue<string>(); 
-                while (yarnQueue.Count > 1) {
-                    temp.Enqueue(yarnQueue.Dequeue()); 
-                }
-                string lastQuestion = yarnQueue.Dequeue(); 
-                while (temp.Count > 0) {
-                    yarnQueue.Enqueue(temp.Dequeue()); 
-                }
+        // if (seenImage == 1 && yarnQueue.Peek() == "VISUAL") { 
+        //     if (displayedAlbumTutorial == false) {
+        //         Queue<string> temp = new Queue<string>(); 
+        //         while (yarnQueue.Count > 1) {
+        //             temp.Enqueue(yarnQueue.Dequeue()); 
+        //         }
+        //         string lastQuestion = yarnQueue.Dequeue(); 
+        //         while (temp.Count > 0) {
+        //             yarnQueue.Enqueue(temp.Dequeue()); 
+        //         }
 
-                yarnQueue.Enqueue(lastQuestion); 
-                yarnQueue.Enqueue("ALBUM_TUTORIAL"); 
-                yarnQueue.Enqueue(lastQuestion); 
-                displayedAlbumTutorial = true; 
-            }
-        }
+        //         yarnQueue.Enqueue(lastQuestion); 
+        //         yarnQueue.Enqueue("ALBUM_TUTORIAL"); 
+        //         yarnQueue.Enqueue(lastQuestion); 
+        //         displayedAlbumTutorial = true; 
+        //     }
+        // }
         
         // Run log tutorial as 1st line of 2nd message in state 0_intro
         // if (next_state_id == "0_intro" && introMessageCount == 2) {
@@ -316,8 +316,8 @@ public class WebSocketManager : MonoBehaviour {
 
     // Sends first message containing username + initial state to server
     [YarnCommand("send_first_message")]
-    public void SendFirstMessage(string usernameVar, string initialStateVar, string participantIdVar, string conditionVar, string gradeVar) { 
-        string user, state, pid, condition, grade;
+    public void SendFirstMessage(string usernameVar, string initialStateVar, string participantIdVar, string conditionVar, string gradeVar, string tutorVar) { 
+        string user, state, pid, condition, grade, peer_tutor;
         GlobalInMemoryVariableStorage.Instance.TryGetValue(usernameVar, out user);
         
         Debug.Log("Username variable: " + usernameVar);
@@ -333,11 +333,14 @@ public class WebSocketManager : MonoBehaviour {
             pid = "";
             getGeneratedPid = true; 
         }
+
         GlobalInMemoryVariableStorage.Instance.TryGetValue(conditionVar, out condition);
         GlobalInMemoryVariableStorage.Instance.TryGetValue(gradeVar, out grade);
-        Debug.Log("Initial message - User: " + user + ", Initial state: " + state + ", Participant ID: " + pid + "Condition: " + condition + ", Grade: " + grade); 
+        GlobalInMemoryVariableStorage.Instance.TryGetValue(tutorVar, out peer_tutor);
 
-        socketConnection.SendFirstMessageToServer(user, state, pid, condition, grade); 
+        Debug.Log("Initial message - User: " + user + ", Initial state: " + state + ", Participant ID: " + pid + "Condition: " + condition + ", Grade: " + grade + ", Peer tutor: " + peer_tutor); 
+
+        socketConnection.SendFirstMessageToServer(user, state, pid, condition, grade, peer_tutor); 
     }
 
     public void SendImage(byte[] bytes) {
