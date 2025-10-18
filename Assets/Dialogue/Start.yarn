@@ -27,6 +27,10 @@ tags:
 <<declare $peer_tutor = "Yari" as string>>
 <<declare $finished_scanning_nucleus = false as bool>>
 
+
+-> Start
+<<hide_cover Cover>>
+
 -> Start from intro
 -> Jump to lab
     <<jump ProteinSynthesisLab>>
