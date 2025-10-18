@@ -25,6 +25,10 @@ tags:
 
 <<declare $protein_synthesis_topic = "" as string>>
 <<declare $peer_tutor = "Yari" as string>>
+
+-> Start
+<<hide_cover Cover>>
+
 -> Start from intro
 -> Jump to lab
     <<jump ProteinSynthesisLab>>
