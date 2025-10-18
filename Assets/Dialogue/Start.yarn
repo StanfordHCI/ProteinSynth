@@ -123,6 +123,7 @@ title: GPTResponding
     // <<elseif $gptResponse == "LOG_TUTORIAL">>
     //    <<jump LogTutorial>>
     <<else>>
+        <<wait_for_audio WebsocketManager>>
         <<play_voiceover WebsocketManager>>
         {$gptResponse}
         <<jump GPTResponding>>

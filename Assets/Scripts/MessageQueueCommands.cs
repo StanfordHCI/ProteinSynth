@@ -59,6 +59,12 @@ public class MessageQueueCommands : MonoBehaviour
         Debug.Log($"Ready to process: {messagesQueue.Count} text messages, {audioQueue.Count} audio clips");
     }
 
+    // waits for audio chunk 
+    [YarnCommand("wait_for_audio")]
+    public IEnumerator WaitForAudio() {
+        yield return new WaitUntil(() => audioQueue.Count > 0);
+    }
+
     [YarnCommand("play_voiceover")]
     public IEnumerator PlayVoiceover() {
         Debug.Log($"Audio queue count: {audioQueue.Count}, Messages queue count: {messagesQueue.Count}");
