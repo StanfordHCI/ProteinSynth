@@ -150,19 +150,19 @@ title: GPTResponding
 <<endif>>
 ===
 
-title: ProteinSynthesisLabAntibodies
+title: ProteinSynthesisLabInsulin
 ---
-<<set $protein_synthesis_topic to "antibodies">>
+<<set $protein_synthesis_topic to "insulin">>
 <<jump ProteinSynthesisLab>>
 ===
-title: ProteinSynthesisLabHormones
+title: ProteinSynthesisLabLactase
 ---
-<<set $protein_synthesis_topic to "hormones">>
+<<set $protein_synthesis_topic to "lactase">>
 <<jump ProteinSynthesisLab>>
 ===
-title: ProteinSynthesisLabEnzymes
+title: ProteinSynthesisLabHemoglobin
 ---
-<<set $protein_synthesis_topic to "enzymes">>
+<<set $protein_synthesis_topic to "hemoglobin">>
 <<jump ProteinSynthesisLab>>
 ===
 
