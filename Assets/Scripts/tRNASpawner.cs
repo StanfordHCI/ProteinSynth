@@ -18,7 +18,7 @@ public class tRNASpawner : MonoBehaviour
     public float zRotation;
 
     [Header("Queue Settings")]
-    public int maxVisibleTRNAs = 3;
+    public int maxVisibleTRNAs = 2;
 
     [Header("Timing Settings")]
     public float spawnDelay = 2.0f;

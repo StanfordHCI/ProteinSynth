@@ -3,7 +3,7 @@ using TMPro;
 
 public class AminoAcidGenerator : MonoBehaviour
 {
-    [SerializeField] private AminoAcidData aminoAcidData;
+    private AminoAcidData aminoAcidData;
     private TemplateDNASpawner dnaSpawner;
 
     void Start()
@@ -12,16 +12,25 @@ public class AminoAcidGenerator : MonoBehaviour
 
         if (dnaSpawner == null)
         {
-            Debug.LogError("No TemplateDNASpawner found on this object!");
+            Debug.LogError("[AminoAcidGenerator] No TemplateDNASpawner found on this object!");
             return;
         }
 
+        GameObject codonManagerObj = GameObject.Find("CodonManager");
+        if (codonManagerObj == null)
+        {
+            Debug.LogError("[AminoAcidGenerator] Could not find GameObject named 'CodonManager' in the scene!");
+            return;
+        }
+
+        aminoAcidData = codonManagerObj.GetComponent<AminoAcidData>();
         if (aminoAcidData == null)
         {
-            Debug.LogError("AminoAcidData reference not assigned in the Inspector!");
+            Debug.LogError("[AminoAcidGenerator] 'CodonManager' GameObject does not have an AminoAcidData component!");
             return;
         }
 
+        // Now generate the amino acid
         GenerateAminoAcid();
     }
 
@@ -30,20 +39,19 @@ public class AminoAcidGenerator : MonoBehaviour
         string anticodon = dnaSpawner.defaultSequence;
         if (string.IsNullOrEmpty(anticodon) || anticodon.Length != 3)
         {
-            Debug.LogWarning("defaultSequence must be exactly 3 letters (an anticodon).");
+            Debug.LogWarning("[AminoAcidGenerator] defaultSequence must be exactly 3 letters (an anticodon).");
             return;
         }
 
-        // Use helper function from AminoAcidData
         var (aminoAcid, color) = aminoAcidData.GetAminoAcidFromAnticodon(anticodon);
 
         if (aminoAcid != null)
         {
-            // Find AminoAcid child of this spawner’s parent
+            // Find AminoAcid child under this spawner’s parent
             Transform aaTransform = transform.parent.Find("AminoAcid");
             if (aaTransform == null)
             {
-                Debug.LogWarning("No AminoAcid child found under parent of tRNA spawner.");
+                Debug.LogWarning("[AminoAcidGenerator] No 'AminoAcid' child found under parent of tRNA spawner.");
                 return;
             }
 
@@ -52,16 +60,16 @@ public class AminoAcidGenerator : MonoBehaviour
             if (sphereRenderer != null)
                 sphereRenderer.material.color = color;
 
-            // Change text on the TMP label
+            // Update TMP text
             TextMeshPro label = aaTransform.GetComponentInChildren<TextMeshPro>();
             if (label != null)
                 label.text = aminoAcid;
 
-            Debug.Log($"Anticodon {anticodon} → {aminoAcid}");
+            Debug.Log($"[AminoAcidGenerator] Anticodon {anticodon} → {aminoAcid}");
         }
         else
         {
-            Debug.LogWarning($"Unknown anticodon: {anticodon}");
+            Debug.LogWarning($"[AminoAcidGenerator] Unknown anticodon: {anticodon}");
         }
     }
 }
