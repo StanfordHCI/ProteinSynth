@@ -33,20 +33,12 @@ public class AminoAcidDropdownInput : MonoBehaviour
         { "MET", "Methionine" }, { "PHE", "Phenylalanine" }, { "PRO", "Proline" }, { "SER", "Serine" },
         { "THR", "Threonine" }, { "TRP", "Tryptophan" }, { "TYR", "Tyrosine" }, { "VAL", "Valine" }
     };
-    
-    // Dictionary for codon --> amino acid (matching CodonTracker)
-    private readonly Dictionary<string, string> codonToAminoAcid = new Dictionary<string, string>()
-    {
-        { "AUG", "MET" }, // Start codon
-        { "UGC", "CYS" },
-        { "UAC", "TYR" },
-        { "UCU", "SER" },
-        { "GGU", "GLY" },
-        { "ACA", "THR" },
-        { "UAA", "Stop" },
-        { "UAG", "Stop" },
-        { "UGA", "Stop" }
-    };
+
+    // Dictionary for codon --> amino acid
+    [SerializeField] private AminoAcidData aminoAcidCodonData;
+
+    // Dictionary for codon --> amino acid
+    [SerializeField] private CodonTracker codonTracker ;
     
     private string[] selectedAminoAcids = new string[5];
     private bool isValid = false;
@@ -352,16 +344,20 @@ public class AminoAcidDropdownInput : MonoBehaviour
         return codons.ToArray();
     }
     
-    string GetAminoAcidFromCodon(string codon)
+    private string GetAminoAcidFromCodon(string codon)
     {
-        if (codonToAminoAcid.TryGetValue(codon, out string aminoAcid))
+        if (aminoAcidCodonData == null)
         {
-            return aminoAcid;
+            Debug.LogWarning("AminoAcidData reference not assigned!");
+            return "UNKNOWN";
         }
-        
-        return "Unknown";
+
+        string aminoAcid = aminoAcidCodonData.GetAminoAcidNameFromCodon(codon);
+
+        // Return uppercase, or "UNKNOWN" if not found
+        return (aminoAcid ?? "Unknown").ToUpper();
     }
-    
+
     // Helper method to get all available amino acid codes
     public List<string> GetAvailableAminoAcids() => aminoAcidData.Keys.ToList();
     

@@ -1192,7 +1192,7 @@ GameObject:
   - component: {fileID: 194800047}
   - component: {fileID: 194800046}
   - component: {fileID: 194800045}
-  - component: {fileID: 194800044}
+  - component: {fileID: 194800049}
   m_Layer: 0
   m_Name: ImageTarget_CAC
   m_TagString: Untagged
@@ -1200,25 +1200,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &194800044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 194800043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 194800046}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: CAC
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 194800046}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &194800045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1289,7 +1270,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 194800044}
+  mPreview: {fileID: 194800049}
 --- !u!114 &194800047
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1318,6 +1299,25 @@ Transform:
   - {fileID: 1748474862}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &194800049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 194800043}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 194800046}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: CAC
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 194800046}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1001 &206633972
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2771,6 +2771,7 @@ GameObject:
   m_Component:
   - component: {fileID: 405934928}
   - component: {fileID: 405934927}
+  - component: {fileID: 405934929}
   m_Layer: 0
   m_Name: CodonManager
   m_TagString: Untagged
@@ -2811,6 +2812,7 @@ MonoBehaviour:
   xRotation: 0
   yRotation: -90
   zRotation: 90
+  aminoAcidData: {fileID: 405934929}
   topicTextUI: {fileID: 476583432}
   codonTextUI: {fileID: 1717003960}
   aminoAcidTextUI: {fileID: 280338881}
@@ -2830,6 +2832,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &405934929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405934926}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f55770bd3be13ef4ea866182bb7d6258, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &417145171
 GameObject:
   m_ObjectHideFlags: 0
@@ -3481,7 +3495,7 @@ GameObject:
   - component: {fileID: 568466111}
   - component: {fileID: 568466110}
   - component: {fileID: 568466109}
-  - component: {fileID: 568466108}
+  - component: {fileID: 568466113}
   m_Layer: 0
   m_Name: ImageTarget_GUG
   m_TagString: Untagged
@@ -3489,25 +3503,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &568466108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 568466107}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 568466110}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: GUG
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 568466110}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &568466109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3578,7 +3573,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 568466108}
+  mPreview: {fileID: 568466113}
 --- !u!114 &568466111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3607,6 +3602,25 @@ Transform:
   - {fileID: 1916340966}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &568466113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 568466107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 568466110}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: GUG
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 568466110}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &568681310
 GameObject:
   m_ObjectHideFlags: 0
@@ -3800,7 +3814,7 @@ GameObject:
   - component: {fileID: 589503614}
   - component: {fileID: 589503613}
   - component: {fileID: 589503612}
-  - component: {fileID: 589503611}
+  - component: {fileID: 589503616}
   m_Layer: 0
   m_Name: ImageTarget_GAG
   m_TagString: Untagged
@@ -3808,25 +3822,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &589503611
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 589503610}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 589503613}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: GAG
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 589503613}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &589503612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3897,7 +3892,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 589503611}
+  mPreview: {fileID: 589503616}
 --- !u!114 &589503614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3926,6 +3921,25 @@ Transform:
   - {fileID: 499218995}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &589503616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 589503610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 589503613}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: GAG
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 589503613}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &634183428
 GameObject:
   m_ObjectHideFlags: 0
@@ -4044,7 +4058,7 @@ GameObject:
   - component: {fileID: 637865920}
   - component: {fileID: 637865919}
   - component: {fileID: 637865918}
-  - component: {fileID: 637865917}
+  - component: {fileID: 637865922}
   m_Layer: 0
   m_Name: ImageTarget_UGG
   m_TagString: Untagged
@@ -4052,25 +4066,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &637865917
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 637865916}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 637865919}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: UGG
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 637865919}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &637865918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4141,7 +4136,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 637865917}
+  mPreview: {fileID: 637865922}
 --- !u!114 &637865920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4170,6 +4165,25 @@ Transform:
   - {fileID: 29245935}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &637865922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 637865916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 637865919}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: UGG
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 637865919}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &642039460
 GameObject:
   m_ObjectHideFlags: 0
@@ -4293,112 +4307,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 120}
   m_Pivot: {x: 0.5, y: 1}
---- !u!1 &684183624
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 684183625}
-  - component: {fileID: 684183628}
-  - component: {fileID: 684183627}
-  - component: {fileID: 684183626}
-  m_Layer: 0
-  m_Name: Border
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &684183625
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 684183624}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.0010000002}
-  m_LocalScale: {x: 1.1, y: 1.1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1827793413}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!64 &684183626
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 684183624}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &684183627
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 684183624}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 569ac39691a704d32af8271efbce1077, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &684183628
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 684183624}
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &703752104
 GameObject:
   m_ObjectHideFlags: 0
@@ -5236,6 +5144,8 @@ MonoBehaviour:
   neutralColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   autoValidate: 1
   showFullNames: 1
+  aminoAcidCodonData: {fileID: 405934929}
+  codonTracker: {fileID: 0}
 --- !u!1 &898206058
 GameObject:
   m_ObjectHideFlags: 0
@@ -6183,7 +6093,7 @@ GameObject:
   - component: {fileID: 1005194530}
   - component: {fileID: 1005194529}
   - component: {fileID: 1005194528}
-  - component: {fileID: 1005194527}
+  - component: {fileID: 1005194532}
   m_Layer: 0
   m_Name: ImageTarget_CUG
   m_TagString: Untagged
@@ -6191,25 +6101,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1005194527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1005194526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 1005194529}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: CUG
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 1005194529}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &1005194528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6280,7 +6171,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 1005194527}
+  mPreview: {fileID: 1005194532}
 --- !u!114 &1005194530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6309,6 +6200,25 @@ Transform:
   - {fileID: 1030176337}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1005194532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1005194526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 1005194529}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: CUG
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 1005194529}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &1010193775
 GameObject:
   m_ObjectHideFlags: 0
@@ -9145,7 +9055,7 @@ GameObject:
   - component: {fileID: 1311090983}
   - component: {fileID: 1311090982}
   - component: {fileID: 1311090981}
-  - component: {fileID: 1311090980}
+  - component: {fileID: 1311090985}
   m_Layer: 0
   m_Name: ImageTarget_GCC
   m_TagString: Untagged
@@ -9153,25 +9063,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1311090980
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1311090979}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 1311090982}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: GCC
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 1311090982}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &1311090981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9242,7 +9133,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 1311090980}
+  mPreview: {fileID: 1311090985}
 --- !u!114 &1311090983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9271,6 +9162,25 @@ Transform:
   - {fileID: 1953018769}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1311090985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1311090979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 1311090982}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: GCC
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 1311090982}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &1315569487
 GameObject:
   m_ObjectHideFlags: 0
@@ -10566,7 +10476,7 @@ GameObject:
   - component: {fileID: 1452722705}
   - component: {fileID: 1452722704}
   - component: {fileID: 1452722703}
-  - component: {fileID: 1452722702}
+  - component: {fileID: 1452722707}
   m_Layer: 0
   m_Name: ImageTarget_ACU
   m_TagString: Untagged
@@ -10574,25 +10484,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1452722702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1452722701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 1452722704}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: ACU
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 1452722704}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &1452722703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10663,7 +10554,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 1452722702}
+  mPreview: {fileID: 1452722707}
 --- !u!114 &1452722705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10692,6 +10583,25 @@ Transform:
   - {fileID: 496668865}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1452722707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452722701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 1452722704}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: ACU
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 1452722704}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &1460772122
 GameObject:
   m_ObjectHideFlags: 0
@@ -11892,7 +11802,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   autoSpawn: 1
-  defaultSequence: TACATGACGAGACCA
+  defaultSequence: TACCACGTGGACTGA
   prefabA: {fileID: 8444328924386386700, guid: 7280233d33c48514eb059b573ce95d43, type: 3}
   prefabT: {fileID: 2916709675557778869, guid: 0a75b446050726d46a981fe05a5fc714, type: 3}
   prefabC: {fileID: 5482154809621987578, guid: 083bd18a195c0d64f93e64b835bdcb81, type: 3}
@@ -13072,144 +12982,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
---- !u!1 &1782105299
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1782105304}
-  - component: {fileID: 1782105303}
-  - component: {fileID: 1782105302}
-  - component: {fileID: 1782105301}
-  - component: {fileID: 1782105300}
-  m_Layer: 0
-  m_Name: ImageTarget_AUG
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1782105300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1782105299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 1782105302}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: AUG
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 1782105302}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
---- !u!114 &1782105301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1782105299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 886328de6a5c14cbb85854fdf1a5085b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StatusFilter: 0
-  UsePoseSmoothing: 1
-  AnimationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 3.3333333
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.3
-      value: 1
-      inSlope: 3.3333333
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  OnTargetFound:
-    m_PersistentCalls:
-      m_Calls: []
-  OnTargetLost:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1782105302
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1782105299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1631628248, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  PreviewVisible: 1
-  RuntimeOcclusion: 0
-  RuntimeCollider: 0
-  mTrackableName: AUG
-  mInitializedInEditor: 1
-  mDataSetPath: Vuforia/ProteinSynth.xml
-  mAspectRatio: 0.74999994
-  mImageTargetType: 0
-  mWidth: 0.075
-  mHeight: 0.05625
-  mRuntimeTexture: {fileID: 0}
-  mMotionHint: 1
-  mTrackingOptimization: 0
-  mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 1782105300}
---- !u!114 &1782105303
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1782105299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2473b084150628b4a93b7ec617a5cf7a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!4 &1782105304
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1782105299}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.0849, y: 0.0143, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1827793413}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1793302451
 GameObject:
   m_ObjectHideFlags: 0
@@ -13496,113 +13268,6 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1798966391}
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1827793412
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1827793413}
-  - component: {fileID: 1827793416}
-  - component: {fileID: 1827793415}
-  - component: {fileID: 1827793414}
-  m_Layer: 0
-  m_Name: Sprite
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1827793413
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1827793412}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.07, y: 0.05, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 684183625}
-  m_Father: {fileID: 1782105304}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!64 &1827793414
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1827793412}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &1827793415
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1827793412}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 200d8144117c7fe48920144a23a744ea, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1827793416
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1827793412}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1844305001
 GameObject:
@@ -15043,7 +14708,7 @@ GameObject:
   - component: {fileID: 2046885245}
   - component: {fileID: 2046885244}
   - component: {fileID: 2046885243}
-  - component: {fileID: 2046885242}
+  - component: {fileID: 2046885247}
   m_Layer: 0
   m_Name: ImageTarget_UCU
   m_TagString: Untagged
@@ -15051,25 +14716,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2046885242
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2046885241}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 2046885244}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: UCU
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 2046885244}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &2046885243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15140,7 +14786,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 2046885242}
+  mPreview: {fileID: 2046885247}
 --- !u!114 &2046885245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15169,6 +14815,25 @@ Transform:
   - {fileID: 1088516009}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2046885247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2046885241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 2046885244}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: UCU
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 2046885244}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &2059794760
 GameObject:
   m_ObjectHideFlags: 0
@@ -15186,7 +14851,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2059794762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15590,10 +15255,45 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 919858066413039818, guid: 6257fa1821b22f14dac72559c7cab9d2,
+        type: 3}
+      propertyPath: m_Name
+      value: template
+      objectReference: {fileID: 0}
+    - target: {fileID: 2113700118848507835, guid: 6257fa1821b22f14dac72559c7cab9d2,
+        type: 3}
+      propertyPath: prefabA
+      value: 
+      objectReference: {fileID: 270517918700869792, guid: 54611a685ccdcc64d8dee8c7a324b34d,
+        type: 3}
+    - target: {fileID: 2113700118848507835, guid: 6257fa1821b22f14dac72559c7cab9d2,
+        type: 3}
+      propertyPath: prefabC
+      value: 
+      objectReference: {fileID: 1618297241014648564, guid: ac0a46e573a598d49a784622b8ccf4e7,
+        type: 3}
+    - target: {fileID: 2113700118848507835, guid: 6257fa1821b22f14dac72559c7cab9d2,
+        type: 3}
+      propertyPath: prefabG
+      value: 
+      objectReference: {fileID: 4250605276108502293, guid: 642a93010abc94c42a4c7ccc460956db,
+        type: 3}
+    - target: {fileID: 2113700118848507835, guid: 6257fa1821b22f14dac72559c7cab9d2,
+        type: 3}
+      propertyPath: prefabT
+      value: 
+      objectReference: {fileID: 2767040199463719958, guid: 191aca3e7256a4846bfe57fecfe0eebf,
+        type: 3}
+    - target: {fileID: 2113700118848507835, guid: 6257fa1821b22f14dac72559c7cab9d2,
+        type: 3}
+      propertyPath: prefabU
+      value: 
+      objectReference: {fileID: 4145791801292011122, guid: 8fb68b72728d3e24d9dedafd5da38898,
+        type: 3}
     - target: {fileID: 2113700118848507835, guid: 6257fa1821b22f14dac72559c7cab9d2,
         type: 3}
       propertyPath: defaultSequence
-      value: ATGTACTGCTCTGGT
+      value: ATGGTGCACCTGACT
       objectReference: {fileID: 0}
     - target: {fileID: 6591720297909164846, guid: 6257fa1821b22f14dac72559c7cab9d2,
         type: 3}
@@ -15604,6 +15304,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7315299038710407318, guid: 6257fa1821b22f14dac72559c7cab9d2,
+        type: 3}
+      propertyPath: m_Name
+      value: coding
       objectReference: {fileID: 0}
     - target: {fileID: 7979601269496979806, guid: 6257fa1821b22f14dac72559c7cab9d2,
         type: 3}
@@ -15689,7 +15394,6 @@ SceneRoots:
   - {fileID: 1452722706}
   - {fileID: 589503615}
   - {fileID: 2046885246}
-  - {fileID: 1782105304}
   - {fileID: 841204122}
   - {fileID: 333190631}
   - {fileID: 1084038127}

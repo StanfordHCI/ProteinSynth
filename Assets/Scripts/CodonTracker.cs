@@ -48,20 +48,7 @@ public class CodonTracker : MonoBehaviour
     [SerializeField] private float zRotation;
 
     // Dictionary for codon --> amino acid
-    private readonly Dictionary<string, string> codonToAminoAcid = new Dictionary<string, string>()
-    {
-        { "AUG", "Met" }, // Start codon
-        { "UGC", "Cys" },
-        { "UAC", "Tyr" },
-        { "UCU", "Ser" },
-        { "GGU", "Gly" },
-        { "ACA", "Thr" },
-
-        /* Stop codons */
-        { "UAA", "Stop" },
-        { "UAG", "Stop" },
-        { "UGA", "Stop" }
-    };
+    [SerializeField] private AminoAcidData aminoAcidData;
 
     [Header("UI -- Text")]
     public TextMeshProUGUI topicTextUI;
@@ -84,23 +71,43 @@ public class CodonTracker : MonoBehaviour
         if (transcriptionFinished && animationDone)
         {
             mRNAonRibosome();
-
-            if (!translationDone) {
-                translationDone = true;
-                Transform fiveToThree = DNAObject.transform.Find("5-3");
-                if (fiveToThree != null)
-                {
-                    TemplateDNASpawner dnaSpawner = fiveToThree.GetComponent<TemplateDNASpawner>();
-                    if (dnaSpawner != null)
-                    {
-                        string dnaSequence = dnaSpawner.defaultSequence;
-                        string mRNAComp = dnaSequence.Replace("T", "U");
-                        tRNASpawner.StartSpawning(mRNAComp);
-                    }
-                }
-            }
         }
         DNAonNucleus();
+    }
+
+    [YarnCommand("start_trna")]
+    public void StartTRNA()
+    {
+        Transform fiveToThree = DNAObject.transform.Find("template");
+        if (fiveToThree != null)
+        {
+            TemplateDNASpawner dnaSpawner = fiveToThree.GetComponent<TemplateDNASpawner>();
+            if (dnaSpawner != null)
+            {
+                string dnaSequence = dnaSpawner.defaultSequence;
+
+                // Convert DNA to mRNA (replace all T with U)
+                string mRNAComp = dnaSequence.Replace('T', 'U');
+
+                // Make sure tRNASpawner is assigned before calling it
+                if (tRNASpawner != null)
+                {
+                    tRNASpawner.StartSpawning(mRNAComp);
+                }
+                else
+                {
+                    Debug.LogWarning("tRNASpawner reference is missing!");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("TemplateDNASpawner component not found on 'template'.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("'template' Transform not found under DNAObject.");
+        }
     }
 
     public void RegisterCodon(string codonName, GameObject obj)
@@ -200,12 +207,20 @@ public class CodonTracker : MonoBehaviour
 
     private string TranslateToAminoAcids(string codonString)
     {
+        if (aminoAcidData == null)
+        {
+            Debug.LogWarning("AminoAcidData reference not assigned!");
+            return "";
+        }
+
         string[] codons = codonString.Split('-');
         List<string> aminoAcids = new List<string>();
 
         foreach (var codon in codons)
         {
-            if (codonToAminoAcid.TryGetValue(codon, out string aminoAcid))
+            string aminoAcid = aminoAcidData.GetAminoAcidNameFromCodon(codon);
+
+            if (aminoAcid != null)
             {
                 aminoAcids.Add(aminoAcid);
 
@@ -232,21 +247,21 @@ public class CodonTracker : MonoBehaviour
 
         if (DNAObject == null || mRNA == null)
         {
-            Debug.LogWarning("Could not find 3-5 strand under DNA target.");
+            Debug.LogWarning("Could not find template strand under DNA target.");
             return;
         }
         
-        Transform threeToFive = DNAObject.transform.Find("3-5");
+        Transform threeToFive = DNAObject.transform.Find("coding");
         if (threeToFive == null)
         {
-            Debug.LogWarning("Could not find 3-5 strand under DNA target.");
+            Debug.LogWarning("Could not find template strand under DNA target.");
             return;
         }
 
         TemplateDNASpawner dnaSpawner = threeToFive.GetComponent<TemplateDNASpawner>();
         if (dnaSpawner == null)
         {
-            Debug.LogWarning("3-5 strand missing TemplateDNASpawner.");
+            Debug.LogWarning("template strand missing TemplateDNASpawner.");
             return;
         }
 
@@ -372,7 +387,6 @@ public class CodonTracker : MonoBehaviour
     }
 
     public void StartAminoAcidInput() {
-        lastCodonString = "AUG-UAC-UGC-UCU-GGU";
         aminoAcidInputCodonTextUI.text = lastCodonString;
         GlobalDialogueManager.StartDialogue("ProteinSynthesisAminoAcidInput");
     }
