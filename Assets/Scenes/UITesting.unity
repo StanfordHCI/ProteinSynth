@@ -2314,6 +2314,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84c1075b690b649e4b2c311b92e8e705, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  audioSource: {fileID: 7778558436155328542}
 --- !u!114 &1506667588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4596,7 +4597,7 @@ MonoBehaviour:
   onPauseEnded:
     m_PersistentCalls:
       m_Calls: []
-  typewriterEffectSpeed: 120
+  typewriterEffectSpeed: 85
   continueButton: {fileID: 7778558436021695549}
   holdTime: 1
   autoAdvance: 0

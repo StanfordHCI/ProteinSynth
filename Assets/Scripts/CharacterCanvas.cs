@@ -87,7 +87,7 @@ public class CharacterCanvas : MonoBehaviour
         }
     }
 
-    // Hide everything except for the option buttons + darken background
+    // Hide everything except for the option buttons + darken background3
     [YarnCommand("hide_static_elements")]
     public void hide_static_elements(bool hidden) {
         if (hidden) {
@@ -109,5 +109,11 @@ public class CharacterCanvas : MonoBehaviour
                 } 
             }
         }
+    }
+
+    // Change character art to match student's selected persona
+    [YarnCommand("update_character")]
+    public void update_character(string character) {
+        
     }
 }

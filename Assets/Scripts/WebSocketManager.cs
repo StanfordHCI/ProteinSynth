@@ -9,7 +9,6 @@ using Yarn.Unity;
 using Yarn.Compiler; 
 using static System.String;
 
-
 using OpenAI;
 
 // IMPORTANT: This interface should match the response passed down from
@@ -25,6 +24,13 @@ public class ResponseData
     public string participant_id; 
 }
 
+public class AudioData 
+{
+    public string type; 
+    public string text; 
+    public string audio; 
+}
+
 // TODO: not sure if this should be a MonoBehaviour
 public class WebSocketManager : MonoBehaviour {
     private static WebSocketManager instance = null;
@@ -38,7 +44,8 @@ public class WebSocketManager : MonoBehaviour {
     private SocketConnection socketConnection;
 
     // Queue of messages to be run through dialogue runner
-    private Queue<string> yarnQueue; 
+    private Queue<string> yarnQueue;  // text
+    private Queue<AudioClip> audioQueue;  // corresponding audio 
     private string lastState; 
     private string[] lastStateCharacters; 
     public bool acceptResponse;
@@ -63,6 +70,7 @@ public class WebSocketManager : MonoBehaviour {
         socketConnection = GetComponent<SocketConnection>();
         socketConnection.OnMessageReceived += HandleResponse;
         yarnQueue = GetComponent<MessageQueueCommands>().messagesQueue;
+        audioQueue= GetComponent<MessageQueueCommands>().audioQueue;
         acceptResponse = true; 
         condition = GetComponent<SocketConnection>().condition; 
         lastLineScroll = GetComponent<LastLineScroll>(); 
@@ -76,6 +84,13 @@ public class WebSocketManager : MonoBehaviour {
         if (acceptResponse == false) {
             acceptResponse = true; 
             return; 
+        }
+
+        // If this is an audio packet, process it so it can played 
+        if (response.Contains("tts_chunk")) {
+            AudioData audioData = JsonUtility.FromJson<AudioData>(response);
+            processAudio(audioData.audio);
+            return;
         }
 
         // Parse the JSON string to an object
@@ -301,6 +316,50 @@ public class WebSocketManager : MonoBehaviour {
     private void processPid(string pid) {
         if (getGeneratedPid && !IsNullOrWhiteSpace(pid)) {
             GlobalInMemoryVariableStorage.Instance.SetValue("$participant_id", pid);
+        }
+    }
+
+    private static int audioChunkCount = 0; // Track chunk count for debugging
+
+    private void processAudio(string base64String) {
+        try
+        {
+            audioChunkCount++;
+            Debug.Log($"Processing audio chunk #{audioChunkCount}");
+            
+            // Decode the Base64 string to raw byte data
+            byte[] audioData = Convert.FromBase64String(base64String);
+            
+            // Validate decoded data
+            if (audioData == null || audioData.Length == 0)
+            {
+                Debug.LogError("Failed to decode base64 audio data or data is empty");
+                return;
+            }
+
+            Debug.Log($"Decoded audio data: {audioData.Length} bytes");
+            
+            MainThreadDispatcher.Enqueue(() =>
+            {
+                try
+                {
+                    AudioClip clip = WavUtility.ToAudioClip(audioData, $"tts_line_{audioChunkCount}");
+                    audioQueue.Enqueue(clip);
+                    Debug.Log($"Successfully queued audio clip: {clip.name} (Duration: {clip.length:F2}s, Total audio clips in queue: {audioQueue.Count})");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Error creating AudioClip: " + e);
+                }
+            });
+        }
+        catch (FormatException ex)
+        {
+            Debug.LogError($"Invalid base64 format: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error processing audio: {ex.Message}");
         }
     }
 
