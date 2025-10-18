@@ -27,6 +27,7 @@ public class CharacterCanvas : MonoBehaviour
     };
 
     public Image characterImage; 
+    public Canvas characterCanvas;
     public Dictionary<string, Sprite> portraits = new Dictionary<string, Sprite>();
 
     void Start() {
@@ -69,12 +70,13 @@ public class CharacterCanvas : MonoBehaviour
     [YarnCommand("toggle_character_position")]
     public void toggle_character_position(bool corner) {
         if (corner) {
-            // character.position = 
-            character.Translate(new Vector3(-725.0f, -1250.0f, 0f));
+            character.Translate(new Vector3(-600.0f, -1000.0f, 0f));
             character.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f); 
+            characterCanvas.overrideSorting = true;
         } else {
             character.position = originalCharacterPos;
             character.transform.localScale = new Vector3(1.0f, 1.0f, 1.0f); 
+            characterCanvas.overrideSorting = false;
         }
     }
 
