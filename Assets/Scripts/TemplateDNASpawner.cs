@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 public class TemplateDNASpawner : MonoBehaviour
 {
-    public bool autoSpawn = false;
-
     [Header("Template Sequence (A, T, C, G, U)")]
     public string defaultSequence = "TACGGCATTAGCTAC"; 
 
@@ -33,12 +31,6 @@ public class TemplateDNASpawner : MonoBehaviour
 
     private Coroutine activeCoroutine;                // spawning coroutine
     private readonly List<Coroutine> fadeCoroutines = new(); // track all fade-ins
-
-    private void Start()
-    {
-        if (autoSpawn)
-            SpawnTemplateSequence();
-    }
 
     public bool SpawnTemplateSequence()
     {

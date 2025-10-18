@@ -153,16 +153,19 @@ title: GPTResponding
 title: ProteinSynthesisLabInsulin
 ---
 <<set $protein_synthesis_topic to "insulin">>
-<<jump ProteinSynthesisLab>>
-===
-title: ProteinSynthesisLabLactase
----
-<<set $protein_synthesis_topic to "lactase">>
+<<set_sequence CodonManager "TACCCGGAGACCGAC">>
 <<jump ProteinSynthesisLab>>
 ===
 title: ProteinSynthesisLabHemoglobin
 ---
 <<set $protein_synthesis_topic to "hemoglobin">>
+<<set_sequence CodonManager "TACCACGTGGACTGA">>
+<<jump ProteinSynthesisLab>>
+===
+title: ProteinSynthesisLabLactase
+---
+<<set $protein_synthesis_topic to "lactase">>
+<<set_sequence CodonManager "TACCTCGACAGAACC">>
 <<jump ProteinSynthesisLab>>
 ===
 
@@ -172,6 +175,7 @@ title: ProteinSynthesisLab
 <<hide_background Canvas true>>
 <<toggle_character_position Canvas true>>
 {$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
+{$peer_tutor}: Your chosen topic is {$protein_synthesis_topic}. Let's figure out how {$protein_synthesis_topic} is synthesized.
 {$peer_tutor}: First, scan the nucleus of the cell with your camera.
 <<hide_canvas Canvas true>>
 ===

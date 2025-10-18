@@ -30,7 +30,9 @@ public class CodonTracker : MonoBehaviour
 
     [Header("Game Objects")]
     public GameObject DNAObject;
-    public GameObject mRNAObject; 
+    public GameObject TemplateStrand; 
+    public GameObject CodingStrand;
+    public GameObject mRNAObject;
     public GameObject mRNAReversePrefab;
     public GameObject mRNAReverseObject;
     public GameObject DNATargetObject;   
@@ -75,13 +77,46 @@ public class CodonTracker : MonoBehaviour
         DNAonNucleus();
     }
 
+   [YarnCommand("set_sequence")]
+    public void SetSequence(string templateSequence)
+    {
+        TemplateDNASpawner templateStrand = TemplateStrand.GetComponent<TemplateDNASpawner>();
+        TemplateDNASpawner codingStrand = CodingStrand.GetComponent<TemplateDNASpawner>();
+
+        // Set the template sequence
+        templateStrand.defaultSequence = templateSequence.ToUpper();
+
+        // Build the complementary (coding) strand
+        char[] codingChars = new char[templateSequence.Length];
+        for (int i = 0; i < templateSequence.Length; i++)
+        {
+            switch (templateSequence[i])
+            {
+                case 'A': codingChars[i] = 'T'; break;
+                case 'T': codingChars[i] = 'A'; break;
+                case 'C': codingChars[i] = 'G'; break;
+                case 'G': codingChars[i] = 'C'; break;
+                default: codingChars[i] = 'N'; break; // unknown base
+            }
+        }
+
+        string codingSequence = new string(codingChars);
+
+        // Assign to coding strand
+        codingStrand.defaultSequence = codingSequence;
+
+        // Spawn the nucleotides
+        templateStrand.SpawnTemplateSequence();
+        codingStrand.SpawnTemplateSequence();
+    }
+
     [YarnCommand("start_trna")]
     public void StartTRNA()
     {
-        Transform fiveToThree = DNAObject.transform.Find("template");
-        if (fiveToThree != null)
+        Transform templateStand = TemplateStrand.transform
+        if (templateStrand != null)
         {
-            TemplateDNASpawner dnaSpawner = fiveToThree.GetComponent<TemplateDNASpawner>();
+            TemplateDNASpawner dnaSpawner = templateStrand.GetComponent<TemplateDNASpawner>();
             if (dnaSpawner != null)
             {
                 string dnaSequence = dnaSpawner.defaultSequence;
@@ -247,18 +282,17 @@ public class CodonTracker : MonoBehaviour
 
         if (DNAObject == null || mRNA == null)
         {
-            Debug.LogWarning("Could not find template strand under DNA target.");
+            Debug.LogWarning("Could not find coding strand under DNA target.");
             return;
         }
-        
-        Transform threeToFive = DNAObject.transform.Find("coding");
-        if (threeToFive == null)
+        Transform codingStrand = CodingStrand.transform;
+        if (codingStrand == null)
         {
-            Debug.LogWarning("Could not find template strand under DNA target.");
+            Debug.LogWarning("Could not find coding strand under DNA target.");
             return;
         }
 
-        TemplateDNASpawner dnaSpawner = threeToFive.GetComponent<TemplateDNASpawner>();
+        TemplateDNASpawner dnaSpawner = codingStrand.GetComponent<TemplateDNASpawner>();
         if (dnaSpawner == null)
         {
             Debug.LogWarning("template strand missing TemplateDNASpawner.");
