@@ -2796,6 +2796,8 @@ MonoBehaviour:
   translationDone: 0
   targetScaleMultiplier: {x: 1.5, y: 1.5, z: 1.5}
   DNAObject: {fileID: 805768485}
+  TemplateStrand: {fileID: 1716260200}
+  CodingStrand: {fileID: 1616914422}
   mRNAObject: {fileID: 1569246835}
   mRNAReversePrefab: {fileID: 3067396067647724119, guid: 76cad4b54955e3f48a0fb01afd3abc29,
     type: 3}
@@ -11221,6 +11223,12 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1588975186}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1616914422 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7315299038710407318, guid: 6257fa1821b22f14dac72559c7cab9d2,
+    type: 3}
+  m_PrefabInstance: {fileID: 7874409843789017210}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1621515920
 GameObject:
   m_ObjectHideFlags: 0
