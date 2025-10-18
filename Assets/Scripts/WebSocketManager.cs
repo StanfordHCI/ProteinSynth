@@ -288,13 +288,13 @@ public class WebSocketManager : MonoBehaviour {
             case "TO_PROTEIN_SYNTHESIS_LAB":
                 nodeName = "ProteinSynthesisLab";
                 break;
-            case "TO_PROTEIN_SYNTHESIS_LAB_ANTIBODIES":
+            case "TO_PROTEIN_SYNTHESIS_LAB_INSULIN":
                 nodeName = "ProteinSynthesisLabAntibodies";
                 break;
-            case "TO_PROTEIN_SYNTHESIS_LAB_HORMONES":
+            case "TO_PROTEIN_SYNTHESIS_LAB_LACTASE":
                 nodeName = "ProteinSynthesisLabHormones";
                 break;
-            case "TO_PROTEIN_SYNTHESIS_LAB_ENZYMES":
+            case "TO_PROTEIN_SYNTHESIS_LAB_HEMOGLOBIN":
                 nodeName = "ProteinSynthesisLabEnzymes";
                 break;
         }

@@ -55,9 +55,7 @@ Select your peer tutor!
 <<UnloadScene>>
 <<hide_static_elements Canvas false>>
 <<hide_scroll WebsocketManager false>>
-{$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
-
-
+<<update_character Canvas "$peer_tutor">>
 // checks that player actually input something
 // <<if $player_name is "">>
 //    <<jump PlayerResponding>>

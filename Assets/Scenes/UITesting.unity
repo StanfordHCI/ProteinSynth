@@ -2502,6 +2502,7 @@ MonoBehaviour:
   optionListView: {fileID: 2066132253}
   thinkingIndicator: {fileID: 1056691753}
   thinkingText: {fileID: 1991968203}
+  characterImage: {fileID: 688496058}
 --- !u!225 &1628618965
 CanvasGroup:
   m_ObjectHideFlags: 0
