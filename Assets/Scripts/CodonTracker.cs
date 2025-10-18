@@ -113,7 +113,7 @@ public class CodonTracker : MonoBehaviour
     [YarnCommand("start_trna")]
     public void StartTRNA()
     {
-        Transform templateStand = TemplateStrand.transform
+        Transform templateStrand = TemplateStrand.transform;
         if (templateStrand != null)
         {
             TemplateDNASpawner dnaSpawner = templateStrand.GetComponent<TemplateDNASpawner>();
