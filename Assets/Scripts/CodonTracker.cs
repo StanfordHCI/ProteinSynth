@@ -106,8 +106,8 @@ public class CodonTracker : MonoBehaviour
         codingStrand.defaultSequence = codingSequence;
 
         // Spawn the nucleotides
-        templateStrand.SpawnTemplateSequence();
-        codingStrand.SpawnTemplateSequence();
+        templateStrand.SpawnTemplateSequenceInstant();
+        codingStrand.SpawnTemplateSequenceInstant();
     }
 
     [YarnCommand("start_trna")]
