@@ -412,8 +412,9 @@ public class CodonTracker : MonoBehaviour
         StartAminoAcidInput();
     }
 
-    public void EnterDNATutorial() {
-        GlobalDialogueManager.StartDialogue("ProteinSynthesisDNATutorial");
+    public void EnterDNATutorial() 
+    {
+        GlobalDialogueManager.runner.VariableStorage.SetValue("$finished_scanning_nucleus", true);
     }
 
     public void EndLab() {

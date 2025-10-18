@@ -25,6 +25,8 @@ tags:
 
 <<declare $protein_synthesis_topic = "" as string>>
 <<declare $peer_tutor = "Yari" as string>>
+<<declare $finished_scanning_nucleus = false as bool>>
+
 -> Start from intro
 -> Jump to lab
     <<jump ProteinSynthesisLab>>
@@ -175,23 +177,27 @@ title: ProteinSynthesisLabLactase
 
 title: ProteinSynthesisLab
 ---
+<<LoadScene ImageTargetTestCodon>> // comment this out if needed
 <<hide_background Canvas true>>
 <<toggle_character_position Canvas true>>
 {$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
 {$peer_tutor}: Your chosen topic is {$protein_synthesis_topic}. Let's figure out how {$protein_synthesis_topic} is synthesized.
 {$peer_tutor}: First, scan the nucleus of the cell with your camera.
 <<hide_canvas Canvas true>>
+<<jump ProteinSynthesisDNATutorial>>
 ===
 
 title: ProteinSynthesisDNATutorial
 ---
-<<hide_canvas Canvas false>>
-{$peer_tutor}: Nice! Do you see the DNA that popped up? 
-{$peer_tutor}: During transcription, a small portion of the DNA unwinds. One of the strands is used as a template to create a new strand of mRNA.
-{$peer_tutor}: Your job is to figure out what the bases of this new mRNA strand should be!
-{$peer_tutor}: Arrange on codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
-{$peer_tutor}: Once you're done, press the "Finish transcription" button to generate your mRNA strand.
-<<hide_canvas Canvas true>>
+<<if $finished_scanning_nucleus == true>>
+    <<hide_canvas "Canvas" false>>
+    {$peer_tutor}: Nice! Do you see the DNA that popped up? 
+    {$peer_tutor}: During transcription, a small portion of the DNA unwinds. One of the strands is used as a template to create a new strand of mRNA.
+    {$peer_tutor}: Your job is to figure out what the bases of this new mRNA strand should be!
+    {$peer_tutor}: Arrange the codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
+    {$peer_tutor}: Once you're done, press the "Finish transcription" button to generate your mRNA strand.
+    <<hide_canvas "Canvas" true>>
+<<endif>>
 ===
 
 title: ProteinSynthesisTranscriptionUnsuccessful
