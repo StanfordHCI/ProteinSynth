@@ -24,6 +24,7 @@ public class MessageQueueCommands : MonoBehaviour
         // reset gptResponse to empty to signal that all messages have been said
         if (messagesQueue.Count == 0) {
             GlobalInMemoryVariableStorage.Instance.SetValue("$gptResponse", "");
+            audioQueue.Clear(); 
             return; 
         }
         
