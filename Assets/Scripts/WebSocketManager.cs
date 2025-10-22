@@ -373,6 +373,24 @@ public class WebSocketManager : MonoBehaviour {
         socketConnection.SendMessageToServer(playerResponse); 
     }
 
+    // Generate audio for a hard-coded line
+    [YarnCommand("generate_audio")]
+    public void GenerateAudio(string line) { 
+        // Only proceed if server is connected
+        if (socketConnection != null && socketConnection.condition == "Connected")
+        {
+            // Manually construct JSON string
+            string jsonMessage = "{\"message\":\"" + "AUDIO:" + line + "\"}";
+            Debug.Log("Sending JSON: " + jsonMessage); 
+            socketConnection.SendMessageToServer(jsonMessage); 
+            GetComponent<MessageQueueCommands>().WaitForAudio(); 
+        }
+        else
+        {
+            Debug.Log("Server not connected — skipping audio generation.");
+        }
+    }
+
     // Sends first message containing username + initial state to server
     [YarnCommand("send_first_message")]
     public void SendFirstMessage(string usernameVar, string initialStateVar, string participantIdVar, string conditionVar, string gradeVar, string tutorVar) { 
