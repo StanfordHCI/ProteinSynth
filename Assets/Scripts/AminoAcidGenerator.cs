@@ -1,37 +1,36 @@
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
 public class AminoAcidGenerator : MonoBehaviour
 {
+    private AminoAcidData aminoAcidData;
     private TemplateDNASpawner dnaSpawner;
-
-    // Anticodon (tRNA) → (amino acid abbreviation, color)
-    private readonly Dictionary<string, (string abbreviation, Color color)> anticodonToAminoAcid =
-        new Dictionary<string, (string, Color)>()
-    {
-        { "UAC", ("Met", Color.green) },   // Matches mRNA AUG
-        { "ACG", ("Cys", Color.yellow) },  // Matches mRNA UGC
-        { "AUG", ("Tyr", Color.magenta) }, // Matches mRNA UAC
-        { "AGA", ("Ser", Color.cyan) },    // Matches mRNA UCU
-        { "CCA", ("Gly", Color.blue) },    // Matches mRNA GGU
-        { "UGU", ("Thr", Color.red) },     // Matches mRNA ACA
-
-        // Stop codons (mRNA UAA, UAG, UGA → anticodons AUU, AUC, ACU)
-        { "AUU", ("Stop", Color.black) },
-        { "AUC", ("Stop", Color.black) },
-        { "ACU", ("Stop", Color.black) }
-    };
 
     void Start()
     {
         dnaSpawner = GetComponent<TemplateDNASpawner>();
+
         if (dnaSpawner == null)
         {
-            Debug.LogError("No TemplateDNASpawner found on this object!");
+            Debug.LogError("[AminoAcidGenerator] No TemplateDNASpawner found on this object!");
             return;
         }
 
+        GameObject codonManagerObj = GameObject.Find("CodonManager");
+        if (codonManagerObj == null)
+        {
+            Debug.LogError("[AminoAcidGenerator] Could not find GameObject named 'CodonManager' in the scene!");
+            return;
+        }
+
+        aminoAcidData = codonManagerObj.GetComponent<AminoAcidData>();
+        if (aminoAcidData == null)
+        {
+            Debug.LogError("[AminoAcidGenerator] 'CodonManager' GameObject does not have an AminoAcidData component!");
+            return;
+        }
+
+        // Now generate the amino acid
         GenerateAminoAcid();
     }
 
@@ -40,39 +39,37 @@ public class AminoAcidGenerator : MonoBehaviour
         string anticodon = dnaSpawner.defaultSequence;
         if (string.IsNullOrEmpty(anticodon) || anticodon.Length != 3)
         {
-            Debug.LogWarning("defaultSequence must be exactly 3 letters (an anticodon).");
+            Debug.LogWarning("[AminoAcidGenerator] defaultSequence must be exactly 3 letters (an anticodon).");
             return;
         }
 
-        if (anticodonToAminoAcid.TryGetValue(anticodon, out var aaInfo))
+        var (aminoAcid, color) = aminoAcidData.GetAminoAcidFromAnticodon(anticodon);
+
+        if (aminoAcid != null)
         {
-            // Find AminoAcid child of this spawner's parent
+            // Find AminoAcid child under this spawner’s parent
             Transform aaTransform = transform.parent.Find("AminoAcid");
             if (aaTransform == null)
             {
-                Debug.LogWarning("No AminoAcid child found under parent of tRNA spawner.");
+                Debug.LogWarning("[AminoAcidGenerator] No 'AminoAcid' child found under parent of tRNA spawner.");
                 return;
             }
 
             // Change sphere color
             Renderer sphereRenderer = aaTransform.GetComponent<Renderer>();
             if (sphereRenderer != null)
-            {
-                sphereRenderer.material.color = aaInfo.color;
-            }
+                sphereRenderer.material.color = color;
 
-            // Change text on the TMP label
+            // Update TMP text
             TextMeshPro label = aaTransform.GetComponentInChildren<TextMeshPro>();
             if (label != null)
-            {
-                label.text = aaInfo.abbreviation;
-            }
+                label.text = aminoAcid;
 
-            Debug.Log($"Anticodon {anticodon} → {aaInfo.abbreviation}");
+            Debug.Log($"[AminoAcidGenerator] Anticodon {anticodon} → {aminoAcid}");
         }
         else
         {
-            Debug.LogWarning($"Unknown anticodon: {anticodon}");
+            Debug.LogWarning($"[AminoAcidGenerator] Unknown anticodon: {anticodon}");
         }
     }
 }

@@ -25,11 +25,17 @@ tags:
 
 <<declare $protein_synthesis_topic = "" as string>>
 <<declare $peer_tutor = "Yari" as string>>
+<<declare $finished_scanning_nucleus = false as bool>>
+
+
+-> Start
+<<hide_cover Cover>>
 
 -> Start from intro
 -> Jump to lab
     <<jump ProteinSynthesisLab>>
 
+<<hide_scroll WebsocketManager true>>
 Select the server host.
 -> Remote
     <<set $remote to true>>
@@ -54,16 +60,15 @@ Select your peer tutor!
 -> Confirm
 <<UnloadScene>>
 <<hide_static_elements Canvas false>>
-{$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
-
-
+<<hide_scroll WebsocketManager false>>
+<<update_character Canvas "$peer_tutor">>
 // checks that player actually input something
 // <<if $player_name is "">>
 //    <<jump PlayerResponding>>
 // <<endif>>
 
 
-<<send_first_message WebsocketManager "$player_name" "$initial_state" "$participant_id" "$condition" "$grade">>
+<<send_first_message WebsocketManager "$player_name" "$initial_state" "$participant_id" "$condition" "$grade" "$peer_tutor">>
 <<jump SendingToServer>>
 
 ===
@@ -124,6 +129,8 @@ title: GPTResponding
     // <<elseif $gptResponse == "LOG_TUTORIAL">>
     //    <<jump LogTutorial>>
     <<else>>
+        <<wait_for_audio WebsocketManager>>
+        <<play_voiceover WebsocketManager>>
         {$gptResponse}
         <<jump GPTResponding>>
     <<endif>>
@@ -150,41 +157,51 @@ title: GPTResponding
 <<endif>>
 ===
 
-title: ProteinSynthesisLabAntibodies
+title: ProteinSynthesisLabInsulin
 ---
-<<set $protein_synthesis_topic to "antibodies">>
+<<LoadScene ImageTargetTestCodon>>
+<<set $protein_synthesis_topic to "insulin">>
+<<set_sequence CodonManager "TACCCGGAGACCGAC">>
 <<jump ProteinSynthesisLab>>
 ===
-title: ProteinSynthesisLabHormones
+title: ProteinSynthesisLabHemoglobin
 ---
-<<set $protein_synthesis_topic to "hormones">>
+<<LoadScene ImageTargetTestCodon>>
+<<set $protein_synthesis_topic to "hemoglobin">>
+<<set_sequence CodonManager "TACCACGTGGACTGA">>
 <<jump ProteinSynthesisLab>>
 ===
-title: ProteinSynthesisLabEnzymes
+title: ProteinSynthesisLabLactase
 ---
-<<set $protein_synthesis_topic to "enzymes">>
+<<LoadScene ImageTargetTestCodon>>
+<<set $protein_synthesis_topic to "lactase">>
+<<set_sequence CodonManager "TACCTCGACAGAACC">>
 <<jump ProteinSynthesisLab>>
 ===
 
 title: ProteinSynthesisLab
 ---
-<<LoadScene ImageTargetTestCodon>>
+<<LoadScene ImageTargetTestCodon>> // comment this out if needed
 <<hide_background Canvas true>>
 <<toggle_character_position Canvas true>>
 {$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
+{$peer_tutor}: Your chosen topic is {$protein_synthesis_topic}. Let's figure out how {$protein_synthesis_topic} is synthesized.
 {$peer_tutor}: First, scan the nucleus of the cell with your camera.
 <<hide_canvas Canvas true>>
+<<jump ProteinSynthesisDNATutorial>>
 ===
 
 title: ProteinSynthesisDNATutorial
 ---
-<<hide_canvas Canvas false>>
-{$peer_tutor}: Nice! Do you see the DNA that popped up? 
-{$peer_tutor}: During transcription, a small portion of the DNA unwinds. One of the strands is used as a template to create a new strand of mRNA.
-{$peer_tutor}: Your job is to figure out what the bases of this new mRNA strand should be!
-{$peer_tutor}: Arrange on codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
-{$peer_tutor}: Once you're done, press the "Finish transcription" button to generate your mRNA strand.
-<<hide_canvas Canvas true>>
+<<if $finished_scanning_nucleus == true>>
+    <<hide_canvas "Canvas" false>>
+    {$peer_tutor}: Nice! Do you see the DNA that popped up? 
+    {$peer_tutor}: During transcription, a small portion of the DNA unwinds. One of the strands is used as a template to create a new strand of mRNA.
+    {$peer_tutor}: Your job is to figure out what the bases of this new mRNA strand should be!
+    {$peer_tutor}: Arrange the codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
+    {$peer_tutor}: Once you're done, press the "Finish transcription" button to generate your mRNA strand.
+    <<hide_canvas "Canvas" true>>
+<<endif>>
 ===
 
 title: ProteinSynthesisTranscriptionUnsuccessful
@@ -237,5 +254,9 @@ title: ProteinSynthesisAminoAcidInputSuccessful
 {$peer_tutor}: Nice work! Now let's watch how the tRNA come in to form the amino acid sequence you created.
 <<hide_canvas Canvas true>>
 <<ToggleAminoAcidInput CodonManager false>>
+<<<<<<< HEAD
 <<StartTranslation CodonManager>>
+=======
+<<start_trna CodonManager>>
+>>>>>>> 943359b7800a821f21383653074461ee1cf39e5b
 ===

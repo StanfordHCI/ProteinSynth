@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI; 
 using TMPro; 
+using Yarn.Unity;
+
 
 public class LastLineScroll : MonoBehaviour
 {
@@ -54,9 +56,9 @@ public class LastLineScroll : MonoBehaviour
             if (messageList.Count > 0) {
                 index = messageList.Count - 1; 
                 Debug.Log("index of the last message is " + index.ToString()); 
-            }
-            MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<CanvasGroup>().alpha = 0.05f); 
-            MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<Button>().enabled = false); 
+            }  
+
+            hideScroll(false); // Show scroll buttons
             Debug.Log("finished setting messageList, disabling increment button"); 
         }
     }
@@ -111,6 +113,21 @@ public class LastLineScroll : MonoBehaviour
         } else {
             decrementButton.GetComponent<CanvasGroup>().alpha = 1;
             decrementButton.GetComponent<Button>().enabled = true;
+        }
+    }
+
+    [YarnCommand("hide_scroll")]
+    public void hideScroll(bool hidden) {
+        if (hidden) {
+            MainThreadDispatcher.Enqueue(() => decrementButton.GetComponent<CanvasGroup>().alpha = 0f); 
+            MainThreadDispatcher.Enqueue(() => decrementButton.GetComponent<Button>().enabled = false); 
+            MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<CanvasGroup>().alpha = 0f); 
+            MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<Button>().enabled = false); 
+        } else {
+            MainThreadDispatcher.Enqueue(() => decrementButton.GetComponent<CanvasGroup>().alpha = 1.0f); 
+            MainThreadDispatcher.Enqueue(() => decrementButton.GetComponent<Button>().enabled = true); 
+            MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<CanvasGroup>().alpha = 0.05f); 
+            MainThreadDispatcher.Enqueue(() => incrementButton.GetComponent<Button>().enabled = false); 
         }
     }
 }

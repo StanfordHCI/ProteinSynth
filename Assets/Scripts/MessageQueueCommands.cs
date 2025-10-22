@@ -11,6 +11,8 @@ using OpenAI;
 public class MessageQueueCommands : MonoBehaviour
 {
     public Queue<string> messagesQueue = new Queue<string>(); // queue of message strings
+    public Queue<AudioClip> audioQueue= new Queue<AudioClip>(); // list of corresponding audio files
+    public AudioSource audioSource;
 
      // runs messages currently in queue through dialogue
     [YarnCommand("run_response")]
@@ -22,6 +24,7 @@ public class MessageQueueCommands : MonoBehaviour
         // reset gptResponse to empty to signal that all messages have been said
         if (messagesQueue.Count == 0) {
             GlobalInMemoryVariableStorage.Instance.SetValue("$gptResponse", "");
+            audioQueue.Clear(); 
             return; 
         }
         
@@ -53,7 +56,41 @@ public class MessageQueueCommands : MonoBehaviour
     // waits for messages to populate queue to continue dialogue runner
     [YarnCommand("wait_for_message")]
     public IEnumerator WaitForMessage() {
-        yield return new WaitUntil(() => messagesQueue.Count > 0);
+        yield return new WaitUntil(() => messagesQueue.Count > 0 && audioQueue.Count > 0);
+        Debug.Log($"Ready to process: {messagesQueue.Count} text messages, {audioQueue.Count} audio clips");
+    }
+
+    // waits for audio chunk 
+    [YarnCommand("wait_for_audio")]
+    public IEnumerator WaitForAudio() {
+        yield return new WaitUntil(() => audioQueue.Count > 0);
+    }
+
+    [YarnCommand("play_voiceover")]
+    public IEnumerator PlayVoiceover() {
+        Debug.Log($"Audio queue count: {audioQueue.Count}, Messages queue count: {messagesQueue.Count}");
+        
+        // Check if queues are synchronized
+        if (audioQueue.Count != messagesQueue.Count) {
+            Debug.LogWarning($"Queue mismatch! Audio: {audioQueue.Count}, Text: {messagesQueue.Count}");
+        }
+        
+        if (audioQueue.Count == 0) {
+            Debug.LogWarning("No audio clips in queue!");
+            yield break;
+        }
+
+        AudioClip clip = audioQueue.Dequeue();
+        Debug.Log($"Playing audio clip: {clip.name}, Duration: {clip.length:F2}s");
+        
+        if (clip != null) {
+            audioSource.clip = clip;
+            audioSource.Play();
+            
+            // Don't wait here - let the text display immediately while audio plays
+            // The Yarn system will handle the timing
+            Debug.Log($"Started playing: {clip.name}");
+        }
     }
 }
 

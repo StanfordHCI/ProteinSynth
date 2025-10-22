@@ -9,7 +9,6 @@ using Yarn.Unity;
 using Yarn.Compiler; 
 using static System.String;
 
-
 using OpenAI;
 
 // IMPORTANT: This interface should match the response passed down from
@@ -25,6 +24,13 @@ public class ResponseData
     public string participant_id; 
 }
 
+public class AudioData 
+{
+    public string type; 
+    public string text; 
+    public string audio; 
+}
+
 // TODO: not sure if this should be a MonoBehaviour
 public class WebSocketManager : MonoBehaviour {
     private static WebSocketManager instance = null;
@@ -38,7 +44,8 @@ public class WebSocketManager : MonoBehaviour {
     private SocketConnection socketConnection;
 
     // Queue of messages to be run through dialogue runner
-    private Queue<string> yarnQueue; 
+    private Queue<string> yarnQueue;  // text
+    private Queue<AudioClip> audioQueue;  // corresponding audio 
     private string lastState; 
     private string[] lastStateCharacters; 
     public bool acceptResponse;
@@ -63,6 +70,7 @@ public class WebSocketManager : MonoBehaviour {
         socketConnection = GetComponent<SocketConnection>();
         socketConnection.OnMessageReceived += HandleResponse;
         yarnQueue = GetComponent<MessageQueueCommands>().messagesQueue;
+        audioQueue= GetComponent<MessageQueueCommands>().audioQueue;
         acceptResponse = true; 
         condition = GetComponent<SocketConnection>().condition; 
         lastLineScroll = GetComponent<LastLineScroll>(); 
@@ -76,6 +84,13 @@ public class WebSocketManager : MonoBehaviour {
         if (acceptResponse == false) {
             acceptResponse = true; 
             return; 
+        }
+
+        // If this is an audio packet, process it so it can played 
+        if (response.Contains("tts_chunk")) {
+            AudioData audioData = JsonUtility.FromJson<AudioData>(response);
+            processAudio(audioData.audio);
+            return;
         }
 
         // Parse the JSON string to an object
@@ -173,23 +188,23 @@ public class WebSocketManager : MonoBehaviour {
         lastLineScroll.SetMessageList(yarnQueue); 
         
         // Run photo album tutorial after the first photo has been shown
-        if (seenImage == 1 && yarnQueue.Peek() == "VISUAL") { 
-            if (displayedAlbumTutorial == false) {
-                Queue<string> temp = new Queue<string>(); 
-                while (yarnQueue.Count > 1) {
-                    temp.Enqueue(yarnQueue.Dequeue()); 
-                }
-                string lastQuestion = yarnQueue.Dequeue(); 
-                while (temp.Count > 0) {
-                    yarnQueue.Enqueue(temp.Dequeue()); 
-                }
+        // if (seenImage == 1 && yarnQueue.Peek() == "VISUAL") { 
+        //     if (displayedAlbumTutorial == false) {
+        //         Queue<string> temp = new Queue<string>(); 
+        //         while (yarnQueue.Count > 1) {
+        //             temp.Enqueue(yarnQueue.Dequeue()); 
+        //         }
+        //         string lastQuestion = yarnQueue.Dequeue(); 
+        //         while (temp.Count > 0) {
+        //             yarnQueue.Enqueue(temp.Dequeue()); 
+        //         }
 
-                yarnQueue.Enqueue(lastQuestion); 
-                yarnQueue.Enqueue("ALBUM_TUTORIAL"); 
-                yarnQueue.Enqueue(lastQuestion); 
-                displayedAlbumTutorial = true; 
-            }
-        }
+        //         yarnQueue.Enqueue(lastQuestion); 
+        //         yarnQueue.Enqueue("ALBUM_TUTORIAL"); 
+        //         yarnQueue.Enqueue(lastQuestion); 
+        //         displayedAlbumTutorial = true; 
+        //     }
+        // }
         
         // Run log tutorial as 1st line of 2nd message in state 0_intro
         // if (next_state_id == "0_intro" && introMessageCount == 2) {
@@ -273,14 +288,14 @@ public class WebSocketManager : MonoBehaviour {
             case "TO_PROTEIN_SYNTHESIS_LAB":
                 nodeName = "ProteinSynthesisLab";
                 break;
-            case "TO_PROTEIN_SYNTHESIS_LAB_ANTIBODIES":
-                nodeName = "ProteinSynthesisLabAntibodies";
+            case "TO_PROTEIN_SYNTHESIS_LAB_INSULIN":
+                nodeName = "ProteinSynthesisLabInsulin";
                 break;
-            case "TO_PROTEIN_SYNTHESIS_LAB_HORMONES":
-                nodeName = "ProteinSynthesisLabHormones";
+            case "TO_PROTEIN_SYNTHESIS_LAB_LACTASE":
+                nodeName = "ProteinSynthesisLabLactase";
                 break;
-            case "TO_PROTEIN_SYNTHESIS_LAB_ENZYMES":
-                nodeName = "ProteinSynthesisLabEnzymes";
+            case "TO_PROTEIN_SYNTHESIS_LAB_HEMOGLOBIN":
+                nodeName = "ProteinSynthesisLabHemoglobin";
                 break;
         }
 
@@ -304,6 +319,50 @@ public class WebSocketManager : MonoBehaviour {
         }
     }
 
+    private static int audioChunkCount = 0; // Track chunk count for debugging
+
+    private void processAudio(string base64String) {
+        try
+        {
+            audioChunkCount++;
+            Debug.Log($"Processing audio chunk #{audioChunkCount}");
+            
+            // Decode the Base64 string to raw byte data
+            byte[] audioData = Convert.FromBase64String(base64String);
+            
+            // Validate decoded data
+            if (audioData == null || audioData.Length == 0)
+            {
+                Debug.LogError("Failed to decode base64 audio data or data is empty");
+                return;
+            }
+
+            Debug.Log($"Decoded audio data: {audioData.Length} bytes");
+            
+            MainThreadDispatcher.Enqueue(() =>
+            {
+                try
+                {
+                    AudioClip clip = WavUtility.ToAudioClip(audioData, $"tts_line_{audioChunkCount}");
+                    audioQueue.Enqueue(clip);
+                    Debug.Log($"Successfully queued audio clip: {clip.name} (Duration: {clip.length:F2}s, Total audio clips in queue: {audioQueue.Count})");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Error creating AudioClip: " + e);
+                }
+            });
+        }
+        catch (FormatException ex)
+        {
+            Debug.LogError($"Invalid base64 format: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Error processing audio: {ex.Message}");
+        }
+    }
+
     // Sends player input to server
     [YarnCommand("send_player_message")]
     public void SendPlayerMessage(string yarnResponseVar) { 
@@ -314,10 +373,28 @@ public class WebSocketManager : MonoBehaviour {
         socketConnection.SendMessageToServer(playerResponse); 
     }
 
+    // Generate audio for a hard-coded line
+    [YarnCommand("generate_audio")]
+    public void GenerateAudio(string line) { 
+        // Only proceed if server is connected
+        if (socketConnection != null && socketConnection.condition == "Connected")
+        {
+            // Manually construct JSON string
+            string jsonMessage = "{\"message\":\"" + "AUDIO:" + line + "\"}";
+            Debug.Log("Sending JSON: " + jsonMessage); 
+            socketConnection.SendMessageToServer(jsonMessage); 
+            GetComponent<MessageQueueCommands>().WaitForAudio(); 
+        }
+        else
+        {
+            Debug.Log("Server not connected — skipping audio generation.");
+        }
+    }
+
     // Sends first message containing username + initial state to server
     [YarnCommand("send_first_message")]
-    public void SendFirstMessage(string usernameVar, string initialStateVar, string participantIdVar, string conditionVar, string gradeVar) { 
-        string user, state, pid, condition, grade;
+    public void SendFirstMessage(string usernameVar, string initialStateVar, string participantIdVar, string conditionVar, string gradeVar, string tutorVar) { 
+        string user, state, pid, condition, grade, peer_tutor;
         GlobalInMemoryVariableStorage.Instance.TryGetValue(usernameVar, out user);
         
         Debug.Log("Username variable: " + usernameVar);
@@ -333,11 +410,14 @@ public class WebSocketManager : MonoBehaviour {
             pid = "";
             getGeneratedPid = true; 
         }
+
         GlobalInMemoryVariableStorage.Instance.TryGetValue(conditionVar, out condition);
         GlobalInMemoryVariableStorage.Instance.TryGetValue(gradeVar, out grade);
-        Debug.Log("Initial message - User: " + user + ", Initial state: " + state + ", Participant ID: " + pid + "Condition: " + condition + ", Grade: " + grade); 
+        GlobalInMemoryVariableStorage.Instance.TryGetValue(tutorVar, out peer_tutor);
 
-        socketConnection.SendFirstMessageToServer(user, state, pid, condition, grade); 
+        Debug.Log("Initial message - User: " + user + ", Initial state: " + state + ", Participant ID: " + pid + "Condition: " + condition + ", Grade: " + grade + ", Peer tutor: " + peer_tutor); 
+
+        socketConnection.SendFirstMessageToServer(user, state, pid, condition, grade, peer_tutor); 
     }
 
     public void SendImage(byte[] bytes) {

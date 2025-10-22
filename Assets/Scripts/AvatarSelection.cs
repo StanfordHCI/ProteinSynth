@@ -118,7 +118,7 @@ public class AvatarSelection : MonoBehaviour
         isAnimating = true;
 
         Vector2 startPos = containerRect.anchoredPosition;
-        Vector2 endPos = new Vector2((-index * 1100) + 2540, startPos.y);
+        Vector2 endPos = new Vector2((-index * 1400) + 3010, startPos.y);
 
         float elapsed = 0f;
         while (elapsed < scrollDuration)

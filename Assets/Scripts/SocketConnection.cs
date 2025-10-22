@@ -30,6 +30,7 @@ namespace OpenAI
         public string pid = ""; // participant id
         public string condition = ""; // condition
         public string grade = "";
+        public string peer_tutor = ""; 
         public WebSocketManager websocketManager; 
         private bool reconnectSuccess = false; 
 
@@ -147,12 +148,12 @@ namespace OpenAI
             }
         }
 
-        public void SendFirstMessageToServer(string username, string initial_state, string participant_id, string cond, string grade)
+        public void SendFirstMessageToServer(string username, string initial_state, string participant_id, string cond, string grade, string peer_tutor)
         {
             if (connected)
             {
                 condition = cond; 
-                var formattedMessage = $"{{\"username\":\"{username.Replace("\"", "\\\"")}\",\"initial_state\":\"{initial_state.Replace("\"", "\\\"")}\",\"participant_id\":\"{participant_id.Replace("\"", "\\\"")}\",\"type\":\"{cond.Replace("\"", "\\\"")}\",\"grade\":\"{grade.Replace("\"", "\\\"")}\"}}"; 
+                var formattedMessage = $"{{\"username\":\"{username.Replace("\"", "\\\"")}\",\"initial_state\":\"{initial_state.Replace("\"", "\\\"")}\",\"participant_id\":\"{participant_id.Replace("\"", "\\\"")}\",\"type\":\"{cond.Replace("\"", "\\\"")}\",\"grade\":\"{grade.Replace("\"", "\\\"")}\", \"peer_tutor\":\"{peer_tutor.Replace("\"", "\\\"")}\"}}"; 
                 Debug.Log("Sending message: " + formattedMessage); 
                 websocket.Send(formattedMessage);  
             }
@@ -207,7 +208,8 @@ namespace OpenAI
                 }
                 GlobalInMemoryVariableStorage.Instance.TryGetValue("$condition", out condition);
                 GlobalInMemoryVariableStorage.Instance.TryGetValue("$grade", out grade);
-                SendFirstMessageToServer("", "", pid, condition, grade);
+                GlobalInMemoryVariableStorage.Instance.TryGetValue("$peer_tutor", out peer_tutor);
+                SendFirstMessageToServer("", "", pid, condition, grade, peer_tutor);
                 Debug.Log("Reconnected after disconnected and sent first message for participant" + pid + "with condition" + condition);
                 reconnectSuccess = true; 
             }

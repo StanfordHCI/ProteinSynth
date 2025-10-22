@@ -37,8 +37,42 @@ public class TemplateDNASpawner : MonoBehaviour
     private void Start()
     {
         if (autoSpawn)
-            SpawnTemplateSequence();
+            SpawnTemplateSequenceInstant();
     }
+
+    public void SpawnTemplateSequenceInstant()
+    {
+        if (spawnParent == null)
+        {
+            Debug.LogWarning($"{name}: spawnParent not assigned!");
+            return;
+        }
+
+        ClearAllChildren();
+
+        string sequence = defaultSequence.ToUpper();
+        int spawnCount = Mathf.Min(sequence.Length, spawnParent.childCount);
+
+        for (int i = 0; i < spawnCount; i++)
+        {
+            char baseChar = sequence[i];
+            Transform spawnPoint = spawnParent.GetChild(i);
+            GameObject prefab = GetPrefab(baseChar);
+
+            if (prefab == null)
+            {
+                Debug.LogWarning($"{name}: No prefab found for base '{baseChar}' at position {i}");
+                continue;
+            }
+
+            Vector3 offset = new Vector3(xOffset, yOffset, zOffset);
+            Vector3 spawnPos = spawnPoint.position + spawnPoint.TransformDirection(offset);
+            Quaternion spawnRot = spawnPoint.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
+
+            GameObject spawned = Instantiate(prefab, spawnPos, spawnRot, spawnPoint);
+        }
+    }
+
 
     public bool SpawnTemplateSequence()
     {
