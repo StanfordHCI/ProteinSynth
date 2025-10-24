@@ -23,8 +23,10 @@ public class CodonTracker : MonoBehaviour
     
     public bool transcriptionFinished = false;
     public bool animationDone = false;
+    public bool ribosomeMoved = false;
     private bool shouldStartTranslation = false;
     public bool translationDone = false;
+    private bool ribosomeFound = false;
 
 
     [Header("Animation Settings")]
@@ -72,14 +74,34 @@ public class CodonTracker : MonoBehaviour
         {
             UpdateCodonStringIfChanged();
         }
+
+        if (transcriptionFinished && ribosomeFound && !GlobalDialogueManager.runner.IsDialogueRunning && !ribosomeMoved) 
+        {
+            ribosomeMoved = true;
+            GlobalDialogueManager.runner.Stop();
+            MoveToRibosome();
+        }
+        else if (transcriptionFinished && !ribosomeFound && !GlobalDialogueManager.runner.IsDialogueRunning && !ribosomeMoved)
+        {
+            GlobalDialogueManager.StartDialogue("ScanRibosome");
+        }
+
         if (transcriptionFinished && animationDone)
         {
             mRNAonRibosome();
+            DNATargetObject.SetActive(false);
         }
         DNAonNucleus();
     }
 
-   [YarnCommand("set_sequence")]
+    public void SetRibosomeFound()
+    {
+        ribosomeFound = true;
+        GlobalDialogueManager.runner.VariableStorage.SetValue("$finished_scanning_ribosome", true);
+    }
+
+
+    [YarnCommand("set_sequence")]
     public void SetSequence(string templateSequence)
     {
         TemplateDNASpawner templateStrand = TemplateStrand.GetComponent<TemplateDNASpawner>();
@@ -314,7 +336,7 @@ public class CodonTracker : MonoBehaviour
         {
             transcriptionFinished = true;
             Debug.Log("Finished transcribing correctly.");
-            MoveToRibosome();
+            GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionSuccessful");
         }
         else
         {
@@ -325,6 +347,12 @@ public class CodonTracker : MonoBehaviour
 
     public void MoveToRibosome()
     {
+        if (!ribosomeFound) 
+        {
+            Debug.Log("Ribosome not found yet.");
+            return;
+        }
+
         if (mRNAObject != null) {
             FlipAndResizeMRNA();
         }

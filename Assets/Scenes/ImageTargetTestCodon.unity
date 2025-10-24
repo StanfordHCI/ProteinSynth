@@ -2949,7 +2949,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &440019045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7558,7 +7558,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 405934927}
         m_TargetAssemblyTypeName: CodonTracker, Assembly-CSharp
-        m_MethodName: EnterDNATutorial
+        m_MethodName: SetRibosomeFound
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
