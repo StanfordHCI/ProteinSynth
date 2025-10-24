@@ -21,7 +21,7 @@ public class tRNASpawner : MonoBehaviour
     public int maxVisibleTRNAs = 2;
 
     [Header("Timing Settings")]
-    public float spawnDelay = 2.0f;
+    public float spawnDelay = 2.0f; // *unused now but still visible in inspector*
     public float hideDelay = 1.0f;
 
     [Header("Animation Settings")]
@@ -80,28 +80,26 @@ public class tRNASpawner : MonoBehaviour
             // Wait for Enter animation to finish
             yield return new WaitForSeconds(enterAnimDuration + 0.1f);
 
-            // After animation, move its amino acid to the holder
+            // Move amino acid to ribosome holder
             Transform aminoAcid = spawned.transform.Find("Model/AminoAcid");
             if (aminoAcid != null && aminoAcidHolder != null)
-            {
                 aminoAcid.SetParent(aminoAcidHolder, true);
-            }
 
-            // Add new tRNA to the queue
+            // Add new tRNA to active queue
             activeTRNAs.Enqueue(spawned);
 
-            // If we exceed max visible, off-board oldest immediately
+            // If too many visible, offboard oldest IN PARALLEL
             if (activeTRNAs.Count > maxVisibleTRNAs)
             {
                 GameObject oldest = activeTRNAs.Dequeue();
-                yield return StartCoroutine(OffboardTRNA(oldest));
+                StartCoroutine(OffboardTRNA(oldest)); // <-- non-blocking
             }
 
-            // Delay before spawning next tRNA
-            yield return new WaitForSeconds(spawnDelay);
+            // Spawn the next tRNA halfway through this one's exit
+            yield return new WaitForSeconds(exitAnimDuration * 0.5f);
         }
 
-        // After all spawns, off-board any leftovers one by one
+        // After all spawns, remove any leftovers one-by-one
         while (activeTRNAs.Count > 0)
         {
             GameObject tRNA = activeTRNAs.Dequeue();
@@ -121,10 +119,10 @@ public class tRNASpawner : MonoBehaviour
         if (animator != null)
             animator.Play("Exit");
 
-        // Wait for Exit animation to finish
+        // Wait for exit to finish
         yield return new WaitForSeconds(exitAnimDuration);
 
-        // Hide after animation
+        // Hide
         if (tRNA != null)
             tRNA.SetActive(false);
     }

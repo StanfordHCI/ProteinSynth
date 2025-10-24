@@ -393,7 +393,7 @@ MonoBehaviour:
   xRotation: 0
   yRotation: 0
   zRotation: 0
-  maxVisibleTRNAs: 3
+  maxVisibleTRNAs: 2
   spawnDelay: 2
   hideDelay: 1
   enterAnimDuration: 2

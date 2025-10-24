@@ -72,7 +72,7 @@ public class CodonTracker : MonoBehaviour
         {
             UpdateCodonStringIfChanged();
         }
-        if (transcriptionFinished && shouldStartTranslation)
+        if (transcriptionFinished && animationDone)
         {
             mRNAonRibosome();
         }
