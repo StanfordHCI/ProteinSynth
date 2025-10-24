@@ -255,7 +255,4 @@ title: ProteinSynthesisAminoAcidInputSuccessful
 <<hide_canvas Canvas true>>
 <<ToggleAminoAcidInput CodonManager false>>
 <<start_trna CodonManager>>
-// <<StartTranslation CodonManager>>
 ===
-// <<start_trna CodonManager>>
-// ===
