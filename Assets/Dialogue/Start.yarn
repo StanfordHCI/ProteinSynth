@@ -254,9 +254,8 @@ title: ProteinSynthesisAminoAcidInputSuccessful
 {$peer_tutor}: Nice work! Now let's watch how the tRNA come in to form the amino acid sequence you created.
 <<hide_canvas Canvas true>>
 <<ToggleAminoAcidInput CodonManager false>>
-<<<<<<< HEAD
-<<StartTranslation CodonManager>>
-=======
 <<start_trna CodonManager>>
->>>>>>> 943359b7800a821f21383653074461ee1cf39e5b
+// <<StartTranslation CodonManager>>
 ===
+// <<start_trna CodonManager>>
+// ===
