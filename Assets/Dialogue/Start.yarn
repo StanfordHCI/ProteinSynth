@@ -54,10 +54,17 @@ tags:
 <<connect_to_server WebsocketManager remote>>
 <<hide_scroll WebsocketManager true>>
 
+Enter your participant ID number!
+<<RequestInput InputPanel "Type in your participant ID!">>
+-> Submit
+<<SaveAndCloseInput InputPanel "$participant_id">>
+
+
 What's your name?
 <<RequestInput InputPanel "Type in your name!">> // accept player input
 -> Submit
 <<SaveAndCloseInput InputPanel "$player_name">>
+
 
 // select peer tutor
 Select your peer tutor! 
