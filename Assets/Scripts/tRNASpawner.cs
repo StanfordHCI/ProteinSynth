@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Yarn.Unity;
 
 public class tRNASpawner : MonoBehaviour
 {
@@ -106,8 +107,8 @@ public class tRNASpawner : MonoBehaviour
             yield return StartCoroutine(OffboardTRNA(tRNA));
             yield return new WaitForSeconds(hideDelay);
         }
-
         activeCoroutine = null;
+        GlobalDialogueManager.StartDialogue("ProteinSynthesisReflection");
     }
 
     private IEnumerator OffboardTRNA(GameObject tRNA)

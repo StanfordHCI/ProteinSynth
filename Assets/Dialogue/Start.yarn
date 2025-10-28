@@ -32,22 +32,27 @@ tags:
 -> Start
 <<hide_cover Cover>>
 
+
 -> Start from intro
 -> Jump to lab
-    <<jump ProteinSynthesisLab>>
+    <<jump ProteinSynthesisLabLactase>>
 
+// <<hide_scroll WebsocketManager true>>
+// Select the server host.
+// -> Remote
+//     <<set $remote to true>>
+// -> Local
+//     <<set $remote to false>>
+
+// <<if $remote == true>>
+//     <<connect_to_server WebsocketManager remote>>
+// <<else>>
+//     <<connect_to_server WebsocketManager>>
+// <<endif>>
+
+<<set $remote to true>>
+<<connect_to_server WebsocketManager remote>>
 <<hide_scroll WebsocketManager true>>
-Select the server host.
--> Remote
-    <<set $remote to true>>
--> Local
-    <<set $remote to false>>
-
-<<if $remote == true>>
-    <<connect_to_server WebsocketManager remote>>
-<<else>>
-    <<connect_to_server WebsocketManager>>
-<<endif>>
 
 What's your name?
 <<RequestInput InputPanel "Type in your name!">> // accept player input
@@ -182,7 +187,7 @@ title: ProteinSynthesisLabLactase
 
 title: ProteinSynthesisLab
 ---
-<<LoadScene ImageTargetTestCodon>> // comment this out if needed
+// <<LoadScene ImageTargetTestCodon>> // comment this out if needed
 <<hide_background Canvas true>>
 <<toggle_character_position Canvas true>>
 {$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.

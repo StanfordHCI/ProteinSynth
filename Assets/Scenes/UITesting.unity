@@ -728,6 +728,7 @@ GameObject:
   - component: {fileID: 477174424}
   - component: {fileID: 477174423}
   - component: {fileID: 477174422}
+  - component: {fileID: 477174427}
   m_Layer: 5
   m_Name: Input
   m_TagString: Untagged
@@ -753,7 +754,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 880, y: -10}
+  m_AnchoredPosition: {x: 880, y: -260}
   m_SizeDelta: {x: 1560, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &477174422
@@ -857,7 +858,19 @@ MonoBehaviour:
       m_Calls: []
   m_OnSelect:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 477174424}
+        m_TargetAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
+        m_MethodName: ActivateInputField
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnDeselect:
     m_PersistentCalls:
       m_Calls: []
@@ -880,7 +893,7 @@ MonoBehaviour:
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
-  m_RichText: 1
+  m_RichText: 0
   m_GlobalFontAsset: {fileID: 0}
   m_OnFocusSelectAll: 1
   m_ResetOnDeActivation: 1
@@ -926,6 +939,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 477174420}
   m_CullTransparentMesh: 1
+--- !u!114 &477174427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477174420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af022676c98794903aa0e05abc2fd4cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &639919474
 GameObject:
   m_ObjectHideFlags: 0
@@ -1758,7 +1783,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 962.24445, y: -163}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 275.24, y: 0}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1076249728
 MonoBehaviour:
@@ -2450,7 +2475,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 880, y: -163}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 275.24, y: 0}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!223 &1504110366
 Canvas:
@@ -3479,7 +3504,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 233.815, y: -18.857498}
+  m_AnchoredPosition: {x: 233.815, y: -37.715}
   m_SizeDelta: {x: 311.36, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1991968202
@@ -3840,7 +3865,7 @@ MonoBehaviour:
   m_enableKerning: 1
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
-  m_isRichText: 1
+  m_isRichText: 0
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0

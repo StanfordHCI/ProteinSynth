@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Yarn.Unity;
 using System.Collections;
+using UnityEngine.EventSystems;
 using static System.String;
 
 public class InputCommands : MonoBehaviour
@@ -57,7 +58,7 @@ public class InputCommands : MonoBehaviour
     promptText.GetComponent<TextMeshProUGUI>().text = prompt;
     input.text = "";
     hide(false);
-    
+
     // optionsListView.transform.Find("RoundedOptionView(Clone)").GetComponent<CanvasGroup>().interactable = false;
     // optionsListView.transform.Find("RoundedOptionView(Clone)").GetComponent<CanvasGroup>().blocksRaycasts = false; 
     
@@ -70,8 +71,9 @@ public class InputCommands : MonoBehaviour
   private IEnumerator WaitForInput() {
     // Need to delay focus slightly to work
     yield return new WaitForSeconds(0.01f);
-    input.ActivateInputField();
-    TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default);
+    // input.Select();
+    // input.ActivateInputField();
+    // TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default, autocorrection: true);
 
     // wait until input is something nonempty to enable the submit button
     while (IsNullOrWhiteSpace(input.text)) {
