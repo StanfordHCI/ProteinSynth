@@ -37,22 +37,22 @@ tags:
 -> Jump to lab
     <<jump ProteinSynthesisLabLactase>>
 
-// <<hide_scroll WebsocketManager true>>
-// Select the server host.
-// -> Remote
-//     <<set $remote to true>>
-// -> Local
-//     <<set $remote to false>>
-
-// <<if $remote == true>>
-//     <<connect_to_server WebsocketManager remote>>
-// <<else>>
-//     <<connect_to_server WebsocketManager>>
-// <<endif>>
-
-<<set $remote to true>>
-<<connect_to_server WebsocketManager remote>>
 <<hide_scroll WebsocketManager true>>
+Select the server host.
+-> Remote
+    <<set $remote to true>>
+-> Local
+    <<set $remote to false>>
+
+<<if $remote == true>>
+    <<connect_to_server WebsocketManager remote>>
+<<else>>
+    <<connect_to_server WebsocketManager>>
+<<endif>>
+
+// <<set $remote to true>>
+// <<connect_to_server WebsocketManager remote>>
+// <<hide_scroll WebsocketManager true>>
 
 Enter your participant ID number!
 <<RequestInput InputPanel "Type in your participant ID!">>
