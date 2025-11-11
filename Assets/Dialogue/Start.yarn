@@ -28,7 +28,6 @@ tags:
 <<declare $finished_scanning_nucleus = false as bool>>
 <<declare $finished_scanning_ribosome = false as bool>>
 
-
 -> Start
 <<hide_cover Cover>>
 
@@ -69,12 +68,12 @@ What's your name?
 // select peer tutor
 Select your peer tutor! 
 <<LoadScene AvatarSelection>>
-<<hide_static_elements Canvas true>>
+<<hide_static_elements DialogueCanvas true>>
 -> Confirm
 <<UnloadScene>>
-<<hide_static_elements Canvas false>>
+<<hide_static_elements DialogueCanvas false>>
 <<hide_scroll WebsocketManager false>>
-<<update_character Canvas "$peer_tutor">>
+<<update_character DialogueCanvas "$peer_tutor">>
 // checks that player actually input something
 // <<if $player_name is "">>
 //    <<jump PlayerResponding>>
@@ -102,9 +101,9 @@ title: SendingToServer
 // <<else>>
 //     <<show_current_bubbles TwoCharacterDisplay>>
 //     <<set_characters_idle TwoCharacterDisplay>>
-    <<show_thinking_indicator Canvas>>
+    <<show_thinking_indicator DialogueCanvas>>
     <<wait_for_message WebsocketManager>> // wait for responses to show up in queue
-    <<hide_thinking_indicator Canvas>>
+    <<hide_thinking_indicator DialogueCanvas>>
 //     <<hide_current_bubbles TwoCharacterDisplay>>
 //     <<set_characters_not_idle TwoCharacterDisplay>>
 // <<endif>>
@@ -173,6 +172,7 @@ title: GPTResponding
 title: ProteinSynthesisLabInsulin
 ---
 <<LoadScene ImageTargetTestCodon>>
+<<enable_camera CodonManager false>>
 <<set $protein_synthesis_topic to "insulin">>
 <<set_sequence CodonManager "TACCCGGAGACCGAC">>
 <<jump ProteinSynthesisLab>>
@@ -180,6 +180,7 @@ title: ProteinSynthesisLabInsulin
 title: ProteinSynthesisLabHemoglobin
 ---
 <<LoadScene ImageTargetTestCodon>>
+<<enable_camera CodonManager false>>
 <<set $protein_synthesis_topic to "hemoglobin">>
 <<set_sequence CodonManager "TACCACGTGGACTGA">>
 <<jump ProteinSynthesisLab>>
@@ -187,6 +188,7 @@ title: ProteinSynthesisLabHemoglobin
 title: ProteinSynthesisLabLactase
 ---
 <<LoadScene ImageTargetTestCodon>>
+<<enable_camera CodonManager false>>
 <<set $protein_synthesis_topic to "lactase">>
 <<set_sequence CodonManager "TACCTCGACAGAACC">>
 <<jump ProteinSynthesisLab>>
@@ -195,65 +197,66 @@ title: ProteinSynthesisLabLactase
 title: ProteinSynthesisLab
 ---
 // <<LoadScene ImageTargetTestCodon>> // comment this out if needed
-<<hide_background Canvas true>>
-<<toggle_character_position Canvas true>>
+<<enable_camera CodonManager true>>
+<<hide_background DialogueCanvas true>>
+<<toggle_character_position DialogueCanvas true>>
 {$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
 {$peer_tutor}: It seems like you might be interested in {$protein_synthesis_topic}. Let's figure out how {$protein_synthesis_topic} is synthesized.
 {$peer_tutor}: First, scan the nucleus of the cell with your camera.
-<<hide_canvas Canvas true>>
+<<hide_canvas DialogueCanvas true>>
 <<jump ProteinSynthesisDNATutorial>>
 ===
 
 title: ProteinSynthesisDNATutorial
 ---
 <<if $finished_scanning_nucleus == true>>
-    <<hide_canvas "Canvas" false>>
+    <<hide_canvas DialogueCanvas false>>
     {$peer_tutor}: Nice! Do you see the DNA that popped up? Imagine this is the gene that codes for {$protein_synthesis_topic}.
     {$peer_tutor}: During transcription, a small portion of the DNA unwinds. One of the strands is used as a template to create mRNA.
     {$peer_tutor}: Your job is to figure out what the bases of this new mRNA strand should be!
     {$peer_tutor}: Arrange the codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
     {$peer_tutor}: Once you're done, press the "Finish transcription" button to generate your mRNA strand.
-    <<hide_canvas "Canvas" true>>
+    <<hide_canvas DialogueCanvas true>>
 <<endif>>
 ===
 
 title: ProteinSynthesisTranscriptionUnsuccessful
 ---
-<<hide_canvas Canvas false>>
+<<hide_canvas DialogueCanvas false>>
 {$peer_tutor}: It doesn't look like you've arranged all the codon cards yet. Make sure that your camera is tracking all the cards correctly. Let's try again!
-<<hide_canvas Canvas true>>
+<<hide_canvas DialogueCanvas true>>
 ===
 
 title: ProteinSynthesisTranscriptionIncorrect
 ---
-<<hide_canvas Canvas false>>
+<<hide_canvas DialogueCanvas false>>
 {$peer_tutor}: Hmmm... I don't think you've transcribed the DNA correctly. Let's try again! 
-<<hide_canvas Canvas true>>
+<<hide_canvas DialogueCanvas true>>
 ===
 
 title: ProteinSynthesisTranscriptionSuccessful
 ---
-<<hide_canvas Canvas false>>
+<<hide_canvas DialogueCanvas false>>
 {$peer_tutor}: Nice work! After the mRNA strand is made, it exits the nucleus and moves to a ribosome, where translation happens.
 {$peer_tutor}: Now, scan the ribosome with your camera.
-<<hide_canvas Canvas true>>
+<<hide_canvas DialogueCanvas true>>
 ===
 
 title: ScanRibosome
 ---
-<<hide_canvas Canvas false>>
+<<hide_canvas DialogueCanvas false>>
 {$peer_tutor}: Make sure to scan the ribosome with your camera.
-<<hide_canvas Canvas true>>
+<<hide_canvas DialogueCanvas true>>
 ===
 
 
 title: ProteinSynthesisReflection
 ---
 {$peer_tutor}: Congrats! You just made a protein!
-<<UnloadScene>>
-<<hide_background Canvas false>>
-<<hide_canvas Canvas false>>
-<<toggle_character_position Canvas false>>
+// <<UnloadScene>>
+<<hide_background DialogueCanvas false>>
+<<hide_canvas DialogueCanvas false>>
+<<toggle_character_position DialogueCanvas false>>
 
 <<set $playerResponse to "">>
 <<send_player_message WebsocketManager "$playerResponse">>
@@ -262,19 +265,19 @@ title: ProteinSynthesisReflection
 
 title: ProteinSynthesisAminoAcidInput
 ---
-<<hide_canvas Canvas false>>
+<<hide_canvas DialogueCanvas false>>
 {$peer_tutor}: Great! Now let's figure out what amino acids we get from this mRNA strand.
 {$peer_tutor}: Grab your codon chart and use it to figure out which amino acids correspond to each codon.
 {$peer_tutor}: Once you're done, press the "Check amino acids" button to see if your amino acid sequence matches the codon sequence.
-<<hide_canvas Canvas true>>
+<<hide_canvas DialogueCanvas true>>
 <<ToggleAminoAcidInput CodonManager true>>
 ===
 
 title: ProteinSynthesisAminoAcidInputSuccessful
 ---
-<<hide_canvas Canvas false>>
+<<hide_canvas DialogueCanvas false>>
 {$peer_tutor}: Nice work! Now let's watch how the tRNA come in to form the amino acid sequence you created.
-<<hide_canvas Canvas true>>
+<<hide_canvas DialogueCanvas true>>
 <<ToggleAminoAcidInput CodonManager false>>
 <<start_trna CodonManager>>
 ===

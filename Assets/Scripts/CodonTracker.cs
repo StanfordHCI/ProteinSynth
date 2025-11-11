@@ -5,10 +5,13 @@
 */
 
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using TMPro;
 using Yarn.Compiler;
 using Yarn.Unity;
+using Vuforia; 
+using UnityEngine.XR.ARFoundation;
 
 public class CodonTracker : MonoBehaviour
 {
@@ -44,6 +47,7 @@ public class CodonTracker : MonoBehaviour
     public TemplateDNASpawner mRNA;
     public tRNASpawner tRNASpawner;
     public GameObject aminoAcidInput;
+    public GameObject arCamera; 
 
     [Header("3D Model Transforms")]
     [SerializeField] private float xOffset;
@@ -62,10 +66,21 @@ public class CodonTracker : MonoBehaviour
     public TextMeshProUGUI aminoAcidTextUI;
     public TextMeshProUGUI aminoAcidInputCodonTextUI;
 
+    private ObserverBehaviour observer;
+
+
     void Awake()
     {
         instance = this;
         aminoAcidInput.SetActive(false);
+        observer = DNATargetObject.GetComponent<ObserverBehaviour>();
+        if (observer) {
+            observer.OnTargetStatusChanged += OnTargetStatusChanged;
+        }
+
+        if (DNAObject != null) {
+            DNAObject.SetActive(false);
+        }
     }
 
     void Update()
@@ -219,26 +234,22 @@ public class CodonTracker : MonoBehaviour
                 UpdateStrand();
         }
     }
-
+    
+    private void OnTargetStatusChanged(ObserverBehaviour behaviour, TargetStatus status)
+    {
+        bool isTracked = status.Status == Status.TRACKED || status.Status == Status.EXTENDED_TRACKED;
+        DNAObject.SetActive(isTracked);
+    }
+   
     private void DNAonNucleus() 
     {
-        if (DNATargetObject != null && DNATargetObject.activeInHierarchy)
-        {
-            Vector3 hoverPosition = DNATargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
+        if (!DNAObject.activeSelf)
+            return;
+            
+        Vector3 hoverPosition = DNATargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
 
-            DNAObject.transform.position = Vector3.Lerp(DNAObject.transform.position, hoverPosition, Time.deltaTime * 10f);
-            DNAObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
-
-            if (!DNAObject.activeSelf)
-            {
-                DNAObject.SetActive(true);
-            }
-        }
-        else
-        {
-            if (DNAObject.activeSelf)
-                DNAObject.SetActive(false);
-        }
+        DNAObject.transform.position = Vector3.Lerp(DNAObject.transform.position, hoverPosition, Time.deltaTime * 10f);
+        DNAObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
     }
 
     private void mRNAonRibosome() 
@@ -445,6 +456,7 @@ public class CodonTracker : MonoBehaviour
     public void EnterDNATutorial() 
     {
         GlobalDialogueManager.runner.VariableStorage.SetValue("$finished_scanning_nucleus", true);
+
     }
 
     public void EndLab() {
@@ -464,5 +476,73 @@ public class CodonTracker : MonoBehaviour
     [YarnCommand("StartTranslation")]
     public void StartTranslation() {
         shouldStartTranslation = true;
+    }
+
+    [YarnCommand("enable_camera")]
+    public void EnableCamera(bool enable)
+    {
+        if (enable) {
+            Debug.Log("Enabling AR camera and restarting Vuforia tracking...");
+            // Start the reset coroutine first, then activate camera when ready
+            StartCoroutine(EnableCameraWithReset());
+        } else {
+            Debug.Log("Disabling AR camera");
+            arCamera.SetActive(false);
+        }
+    }
+
+    private IEnumerator EnableCameraWithReset()
+    {
+        // First ensure Vuforia is initialized
+        while (VuforiaApplication.Instance.IsInitialized == null || VuforiaApplication.Instance.IsInitialized == false)
+        {
+            Debug.Log("Waiting for Vuforia to initialize before enabling camera...");
+            yield return null;
+        }
+
+        // Wait a frame to ensure everything is stable
+        yield return new WaitForEndOfFrame();
+
+        // Now activate the camera
+        arCamera.SetActive(true);
+        Debug.Log("AR camera activated");
+
+        // Wait a moment for camera to initialize
+        yield return new WaitForSeconds(0.1f);
+
+        // Then reset Vuforia tracking
+        yield return StartCoroutine(ResetVuforiaWhenReady());
+    } 
+
+
+    private IEnumerator ResetVuforiaWhenReady()
+    {
+        // Wait until Vuforia has actually started
+        // Fix: Wait while Vuforia is NOT initialized (null or false)
+        while (VuforiaApplication.Instance.IsInitialized == null || VuforiaApplication.Instance.IsInitialized == false)
+        {
+            Debug.Log("Waiting for Vuforia to initialize...");
+            yield return null;
+        }
+
+        Debug.Log("Vuforia is initialized, proceeding with reset...");
+
+        // Wait a frame to ensure everything is ready
+        yield return new WaitForEndOfFrame();
+
+        var devicePose = VuforiaBehaviour.Instance.DevicePoseBehaviour;
+        if (devicePose != null && devicePose.enabled)
+        {
+            Debug.Log("Restarting Vuforia tracking safely before AR activity");
+            devicePose.Reset();
+            
+            // Wait a moment after reset to ensure tracking restarts properly
+            yield return new WaitForSeconds(0.5f);
+            Debug.Log("Vuforia tracking reset complete");
+        }
+        else
+        {
+            Debug.LogWarning("DevicePoseBehaviour not available or disabled.");
+        }
     }
 }
