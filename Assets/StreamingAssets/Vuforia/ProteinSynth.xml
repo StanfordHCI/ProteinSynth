@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="GGC" size="0.075000 0.056250" />
     <ImageTarget name="nucleus" size="0.075000 0.057950" />
     <ImageTarget name="GAG" size="0.075000 0.056250" />
     <ImageTarget name="ACU" size="0.075000 0.056250" />
