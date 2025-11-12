@@ -172,32 +172,25 @@ title: GPTResponding
 title: ProteinSynthesisLabInsulin
 ---
 <<LoadScene ImageTargetTestCodon>>
-// <<enable_camera CodonManager false>>
 <<set $protein_synthesis_topic to "insulin">>
 <<set_sequence CodonManager "TACCCGGAGACCGAC">>
-<<jump ProteinSynthesisLab>>
 ===
 title: ProteinSynthesisLabHemoglobin
 ---
 <<LoadScene ImageTargetTestCodon>>
-// <<enable_camera CodonManager false>>
 <<set $protein_synthesis_topic to "hemoglobin">>
 <<set_sequence CodonManager "TACCACGTGGACTGA">>
-<<jump ProteinSynthesisLab>>
 ===
 title: ProteinSynthesisLabLactase
 ---
 <<LoadScene ImageTargetTestCodon>>
-// <<enable_camera CodonManager false>>
 <<set $protein_synthesis_topic to "lactase">>
 <<set_sequence CodonManager "TACCTCGACAGAACC">>
-<<jump ProteinSynthesisLab>>
 ===
 
 title: ProteinSynthesisLab
 ---
 // <<LoadScene ImageTargetTestCodon>> // comment this out if needed
-<<enable_camera CodonManager true>>
 <<hide_background DialogueCanvas true>>
 <<toggle_character_position DialogueCanvas true>>
 {$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.

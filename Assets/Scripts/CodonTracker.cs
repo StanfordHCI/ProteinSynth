@@ -478,71 +478,71 @@ public class CodonTracker : MonoBehaviour
         shouldStartTranslation = true;
     }
 
-    [YarnCommand("enable_camera")]
-    public void EnableCamera(bool enable)
-    {
-        if (enable) {
-            Debug.Log("Enabling AR camera and restarting Vuforia tracking...");
-            // Start the reset coroutine first, then activate camera when ready
-            StartCoroutine(EnableCameraWithReset());
-        } else {
-            Debug.Log("Disabling AR camera");
-            arCamera.SetActive(false);
-        }
-    }
+    // [YarnCommand("enable_camera")]
+    // public void EnableCamera(bool enable)
+    // {
+    //     if (enable) {
+    //         Debug.Log("Enabling AR camera and restarting Vuforia tracking...");
+    //         // Start the reset coroutine first, then activate camera when ready
+    //         StartCoroutine(EnableCameraWithReset());
+    //     } else {
+    //         Debug.Log("Disabling AR camera");
+    //         arCamera.SetActive(false);
+    //     }
+    // }
 
-    private IEnumerator EnableCameraWithReset()
-    {
-        // First ensure Vuforia is initialized
-        while (VuforiaApplication.Instance.IsInitialized == null || VuforiaApplication.Instance.IsInitialized == false)
-        {
-            Debug.Log("Waiting for Vuforia to initialize before enabling camera...");
-            yield return null;
-        }
+    // private IEnumerator EnableCameraWithReset()
+    // {
+    //     // First ensure Vuforia is initialized
+    //     while (VuforiaApplication.Instance.IsInitialized == null || VuforiaApplication.Instance.IsInitialized == false)
+    //     {
+    //         Debug.Log("Waiting for Vuforia to initialize before enabling camera...");
+    //         yield return null;
+    //     }
 
-        // Wait a frame to ensure everything is stable
-        yield return new WaitForEndOfFrame();
+    //     // Wait a frame to ensure everything is stable
+    //     yield return new WaitForEndOfFrame();
 
-        // Now activate the camera
-        arCamera.SetActive(true);
-        Debug.Log("AR camera activated");
+    //     // Now activate the camera
+    //     arCamera.SetActive(true);
+    //     Debug.Log("AR camera activated");
 
-        // Wait a moment for camera to initialize
-        yield return new WaitForSeconds(0.1f);
+    //     // Wait a moment for camera to initialize
+    //     yield return new WaitForSeconds(0.1f);
 
-        // Then reset Vuforia tracking
-        yield return StartCoroutine(ResetVuforiaWhenReady());
-    } 
+    //     // Then reset Vuforia tracking
+    //     yield return StartCoroutine(ResetVuforiaWhenReady());
+    // } 
 
 
-    private IEnumerator ResetVuforiaWhenReady()
-    {
-        // Wait until Vuforia has actually started
-        // Fix: Wait while Vuforia is NOT initialized (null or false)
-        while (VuforiaApplication.Instance.IsInitialized == null || VuforiaApplication.Instance.IsInitialized == false)
-        {
-            Debug.Log("Waiting for Vuforia to initialize...");
-            yield return null;
-        }
+    // private IEnumerator ResetVuforiaWhenReady()
+    // {
+    //     // Wait until Vuforia has actually started
+    //     // Fix: Wait while Vuforia is NOT initialized (null or false)
+    //     while (VuforiaApplication.Instance.IsInitialized == null || VuforiaApplication.Instance.IsInitialized == false)
+    //     {
+    //         Debug.Log("Waiting for Vuforia to initialize...");
+    //         yield return null;
+    //     }
 
-        Debug.Log("Vuforia is initialized, proceeding with reset...");
+    //     Debug.Log("Vuforia is initialized, proceeding with reset...");
 
-        // Wait a frame to ensure everything is ready
-        yield return new WaitForEndOfFrame();
+    //     // Wait a frame to ensure everything is ready
+    //     yield return new WaitForEndOfFrame();
 
-        var devicePose = VuforiaBehaviour.Instance.DevicePoseBehaviour;
-        if (devicePose != null && devicePose.enabled)
-        {
-            Debug.Log("Restarting Vuforia tracking safely before AR activity");
-            devicePose.Reset();
+    //     var devicePose = VuforiaBehaviour.Instance.DevicePoseBehaviour;
+    //     if (devicePose != null && devicePose.enabled)
+    //     {
+    //         Debug.Log("Restarting Vuforia tracking safely before AR activity");
+    //         devicePose.Reset();
             
-            // Wait a moment after reset to ensure tracking restarts properly
-            yield return new WaitForSeconds(0.5f);
-            Debug.Log("Vuforia tracking reset complete");
-        }
-        else
-        {
-            Debug.LogWarning("DevicePoseBehaviour not available or disabled.");
-        }
-    }
+    //         // Wait a moment after reset to ensure tracking restarts properly
+    //         yield return new WaitForSeconds(0.5f);
+    //         Debug.Log("Vuforia tracking reset complete");
+    //     }
+    //     else
+    //     {
+    //         Debug.LogWarning("DevicePoseBehaviour not available or disabled.");
+    //     }
+    // }
 }
