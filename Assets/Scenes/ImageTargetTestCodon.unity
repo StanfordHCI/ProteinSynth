@@ -486,7 +486,7 @@ GameObject:
   - component: {fileID: 81825603}
   - component: {fileID: 81825602}
   - component: {fileID: 81825601}
-  - component: {fileID: 81825600}
+  - component: {fileID: 81825605}
   m_Layer: 0
   m_Name: ImageTarget_GGC
   m_TagString: Untagged
@@ -494,25 +494,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &81825600
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 81825599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mObserverBehaviour: {fileID: 81825602}
-  mHiddenRoot: {fileID: 0}
-  mTargetName: GGC
-  mDatasetName: Vuforia/ProteinSynth.xml
-  mCastedBehaviour: {fileID: 81825602}
-  mMeshFilter: {fileID: 0}
-  mMeshRenderer: {fileID: 0}
 --- !u!114 &81825601
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -583,7 +564,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 81825600}
+  mPreview: {fileID: 81825605}
 --- !u!114 &81825603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -612,6 +593,25 @@ Transform:
   - {fileID: 83389101}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &81825605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 81825599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1778676317, guid: 8a9a760f95896c34689febc965510927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mObserverBehaviour: {fileID: 81825602}
+  mHiddenRoot: {fileID: 0}
+  mTargetName: GGC
+  mDatasetName: Vuforia/ProteinSynth.xml
+  mCastedBehaviour: {fileID: 81825602}
+  mMeshFilter: {fileID: 0}
+  mMeshRenderer: {fileID: 0}
 --- !u!1 &83389100
 GameObject:
   m_ObjectHideFlags: 0
@@ -16426,6 +16426,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 805768486}
     m_Modifications:
+    - target: {fileID: 475223529625214593, guid: 8d5bb101d20714846b47bd06e948963b,
+        type: 3}
+      propertyPath: yOffset
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4256416378905150553, guid: 8d5bb101d20714846b47bd06e948963b,
         type: 3}
       propertyPath: m_LocalPosition.x

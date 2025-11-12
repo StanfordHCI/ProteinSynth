@@ -387,9 +387,9 @@ MonoBehaviour:
   tRNAPrefab: {fileID: 5024986216856351854, guid: 75592fcc0872e5a45863dc703d8bce90,
     type: 3}
   aminoAcidHolder: {fileID: 7739658199200675622}
-  xOffset: 0.089
+  xOffset: 0.13
   yOffset: 0
-  zOffset: -0.003
+  zOffset: -0.0055
   xRotation: 0
   yRotation: 0
   zRotation: 0
