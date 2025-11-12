@@ -31,6 +31,8 @@ public class CodonTracker : MonoBehaviour
     public bool translationDone = false;
     private bool ribosomeFound = false;
 
+    private bool introDone = false;
+    private bool nucleusDialogue = false;
 
     [Header("Animation Settings")]
     [SerializeField] private Vector3 targetScaleMultiplier = new Vector3(1.5f, 1.5f, 1.5f);
@@ -65,6 +67,7 @@ public class CodonTracker : MonoBehaviour
     public TextMeshProUGUI codonTextUI;
     public TextMeshProUGUI aminoAcidTextUI;
     public TextMeshProUGUI aminoAcidInputCodonTextUI;
+    public TodoList todoList;
 
     private ObserverBehaviour observer;
 
@@ -106,7 +109,11 @@ public class CodonTracker : MonoBehaviour
             mRNAonRibosome();
             DNATargetObject.SetActive(false);
         }
-        DNAonNucleus();
+
+        if (introDone == true)
+        {
+            DNAonNucleus();
+        }
     }
 
     public void SetRibosomeFound()
@@ -115,6 +122,23 @@ public class CodonTracker : MonoBehaviour
         GlobalDialogueManager.runner.VariableStorage.SetValue("$finished_scanning_ribosome", true);
     }
 
+    [YarnCommand("set_intro_done")]
+    public void SetIntroDone()
+    {
+        introDone = true;
+    }
+
+    [YarnCommand("hide_todo")]
+    public void HideToDo()
+    {
+        todoList.gameObject.SetActive(false);
+    }
+
+    [YarnCommand("show_todo")]
+    public void ShowToDo()
+    {
+        todoList.gameObject.SetActive(true);
+    }
 
     [YarnCommand("set_sequence")]
     public void SetSequence(string templateSequence)
@@ -245,11 +269,18 @@ public class CodonTracker : MonoBehaviour
     {
         if (!DNAObject.activeSelf)
             return;
-            
+
         Vector3 hoverPosition = DNATargetObject.transform.position + new Vector3(xOffset, yOffset, zOffset);
 
         DNAObject.transform.position = Vector3.Lerp(DNAObject.transform.position, hoverPosition, Time.deltaTime * 10f);
         DNAObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
+
+        if (!nucleusDialogue)
+        {
+            nucleusDialogue = true;
+            todoList.CheckoffToDo("scan_nucleus");
+            GlobalDialogueManager.StartDialogue("ProteinSynthesisDNATutorial");
+        }
     }
 
     private void mRNAonRibosome() 
@@ -348,6 +379,8 @@ public class CodonTracker : MonoBehaviour
             transcriptionFinished = true;
             Debug.Log("Finished transcribing correctly.");
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionSuccessful");
+            todoList.CheckoffToDo("arrange_cards");
+            todoList.CheckoffToDo("finish_transcription");
         }
         else
         {
@@ -363,6 +396,8 @@ public class CodonTracker : MonoBehaviour
             Debug.Log("Ribosome not found yet.");
             return;
         }
+
+        todoList.CheckoffToDo("scan_ribosome");
 
         if (mRNAObject != null) {
             FlipAndResizeMRNA();
