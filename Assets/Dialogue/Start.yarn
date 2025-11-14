@@ -247,7 +247,7 @@ title: ScanRibosome
 title: ProteinSynthesisReflection
 ---
 {$peer_tutor}: Congrats! You just made a protein!
-// <<UnloadScene>>
+<<UnloadScene>>
 <<hide_background DialogueCanvas false>>
 <<hide_canvas DialogueCanvas false>>
 <<toggle_character_position DialogueCanvas false>>
@@ -272,10 +272,10 @@ title: ProteinSynthesisAminoAcidInput
 title: ProteinSynthesisAminoAcidInputSuccessful
 ---
 <<hide_canvas DialogueCanvas false>>
-<<show_todo CodonManager>>
 <<checkoff_todo Todos "select_amino">>
 {$peer_tutor}: Nice work! Now let's watch how the tRNA come in to form the amino acid sequence you created.
 <<hide_canvas DialogueCanvas true>>
 <<ToggleAminoAcidInput CodonManager false>>
+<<show_todo CodonManager>>
 <<start_trna CodonManager>>
 ===

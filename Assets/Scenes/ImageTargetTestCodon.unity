@@ -3008,6 +3008,7 @@ MonoBehaviour:
   tRNASpawner: {fileID: 1633486546}
   aminoAcidInput: {fileID: 1104845247}
   arCamera: {fileID: 1667839872}
+  transcriptionButton: {fileID: 703752104}
   xOffset: 0
   yOffset: 0
   zOffset: 0.05
@@ -5523,6 +5524,7 @@ GameObject:
   - component: {fileID: 887080525}
   - component: {fileID: 887080524}
   - component: {fileID: 887080528}
+  - component: {fileID: 887080530}
   m_Layer: 5
   m_Name: Todos
   m_TagString: Untagged
@@ -5652,6 +5654,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   toDoUI: {fileID: 1334297013635930043, guid: 51b1079965af41f41a720a3630bcb07c, type: 3}
   layoutGroup: {fileID: 887080524}
+--- !u!222 &887080530
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887080522}
+  m_CullTransparentMesh: 1
 --- !u!1 &895498171
 GameObject:
   m_ObjectHideFlags: 0
@@ -12392,6 +12402,7 @@ GameObject:
   - component: {fileID: 1667839875}
   - component: {fileID: 1667839874}
   - component: {fileID: 1667839879}
+  - component: {fileID: 1667839880}
   m_Layer: 0
   m_Name: ARCamera
   m_TagString: MainCamera
@@ -12557,6 +12568,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TrackingWarning: {fileID: 0}
+--- !u!114 &1667839880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1667839872}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 713bcbb0705094fc88cb78dbb2f19366, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1698318161
 GameObject:
   m_ObjectHideFlags: 0

@@ -50,6 +50,7 @@ public class CodonTracker : MonoBehaviour
     public tRNASpawner tRNASpawner;
     public GameObject aminoAcidInput;
     public GameObject arCamera; 
+    public GameObject transcriptionButton; 
 
     [Header("3D Model Transforms")]
     [SerializeField] private float xOffset;
@@ -381,6 +382,7 @@ public class CodonTracker : MonoBehaviour
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionSuccessful");
             todoList.CheckoffToDo("arrange_cards");
             todoList.CheckoffToDo("finish_transcription");
+            transcriptionButton.SetActive(false); 
         }
         else
         {
