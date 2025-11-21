@@ -53,7 +53,7 @@ public class AminoAcidDropdownInput : MonoBehaviour
         SetupDropdowns();
         SetupValidationButton();
         UpdateCodonCheckButton();
-        UpdateDisplay();
+        // UpdateDisplay();
     }
     
     void SetupDropdowns()
@@ -67,7 +67,7 @@ public class AminoAcidDropdownInput : MonoBehaviour
         // Add all amino acids (only 3-letter codes)
         foreach (var aminoAcid in aminoAcidData.OrderBy(x => x.Key))
         {
-            options.Add(new TMP_Dropdown.OptionData(aminoAcid.Key));
+            options.Add(new TMP_Dropdown.OptionData(aminoAcid.Key + " (" + aminoAcid.Value + ")"));
         }
         
         // Setup each dropdown
@@ -123,10 +123,11 @@ public class AminoAcidDropdownInput : MonoBehaviour
         {
             // Get the 3-letter code directly from the option text
             string optionText = aminoAcidDropdowns[dropdownIndex].options[selectedValue].text;
-            selectedAminoAcids[dropdownIndex] = optionText;
+            string abbreviation = optionText.Split()[0]; 
+            selectedAminoAcids[dropdownIndex] = abbreviation;
         }
         
-        UpdateDisplay();
+        // UpdateDisplay();
         UpdateCodonCheckButton();
         
         // Auto-validate if enabled
@@ -231,7 +232,7 @@ public class AminoAcidDropdownInput : MonoBehaviour
             }
             selectedAminoAcids[i] = "";
         }
-        UpdateDisplay();
+        // UpdateDisplay();
         UpdateVisualFeedback(false, "Please select amino acids");
     }
     
@@ -255,7 +256,7 @@ public class AminoAcidDropdownInput : MonoBehaviour
                 }
             }
         }
-        UpdateDisplay();
+        // UpdateDisplay();
         ValidateSelection();
     }
     
