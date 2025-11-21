@@ -22,7 +22,6 @@ public class CharacterCanvas : MonoBehaviour
         "Thinking...",
         "Pondering...",
         "Contemplating...",
-        "Processing...",
         "Reflecting...",
     };
 
