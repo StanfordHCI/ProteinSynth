@@ -33,6 +33,7 @@ public class TemplateDNASpawner : MonoBehaviour
 
     private Coroutine activeCoroutine;                // spawning coroutine
     private readonly List<Coroutine> fadeCoroutines = new(); // track all fade-ins
+    private string previousSequence = "";             // track previous sequence to detect changes
 
     private void Start()
     {
@@ -71,6 +72,9 @@ public class TemplateDNASpawner : MonoBehaviour
 
             GameObject spawned = Instantiate(prefab, spawnPos, spawnRot, spawnPoint);
         }
+
+        // Reset previous sequence for instant spawn
+        previousSequence = sequence;
     }
 
 
@@ -82,6 +86,8 @@ public class TemplateDNASpawner : MonoBehaviour
     public bool SpawnTemplateSequence(string sequence)
     {
         if (spawnParent == null) return false;
+
+        sequence = sequence.ToUpper();
 
         // cancel previous spawns
         if (activeCoroutine != null)
@@ -97,29 +103,63 @@ public class TemplateDNASpawner : MonoBehaviour
         }
         fadeCoroutines.Clear();
 
-        // wipe before spawning fresh
-        ClearAllChildren();
+        // Find the first index where sequences differ
+        int firstDifferenceIndex = FindFirstDifference(previousSequence, sequence);
 
-        // start new coroutine
-        activeCoroutine = StartCoroutine(SpawnSequenceCoroutine(sequence));
+        // If sequences are identical, do nothing
+        if (firstDifferenceIndex == -1 && previousSequence == sequence)
+        {
+            return true;
+        }
+
+        // Verify existing objects match up to the difference point
+        bool existingMatches = true;
+        if (firstDifferenceIndex > 0 && !string.IsNullOrEmpty(previousSequence))
+        {
+            existingMatches = CheckExistingSequenceMatchesUpTo(previousSequence, firstDifferenceIndex);
+        }
+
+        // If no previous sequence, completely different, or existing objects don't match, clear everything
+        if (string.IsNullOrEmpty(previousSequence) || firstDifferenceIndex == 0 || !existingMatches)
+        {
+            ClearAllChildren();
+            activeCoroutine = StartCoroutine(SpawnSequenceCoroutine(sequence, 0));
+        }
+        else
+        {
+            // Clear from first difference onward
+            ClearChildrenFromIndex(firstDifferenceIndex);
+            
+            // Spawn new sequence from first difference onward
+            string newPart = sequence.Substring(firstDifferenceIndex);
+            activeCoroutine = StartCoroutine(SpawnSequenceCoroutine(newPart, firstDifferenceIndex));
+        }
+
+        // Update previous sequence
+        previousSequence = sequence;
         return true;
     }
 
-    private IEnumerator SpawnSequenceCoroutine(string sequence)
+    private IEnumerator SpawnSequenceCoroutine(string sequence, int startIndex = 0)
     {
-        int spawnCount = Mathf.Min(sequence.Length, spawnParent.childCount);
+        int spawnCount = Mathf.Min(sequence.Length, spawnParent.childCount - startIndex);
 
         for (int i = 0; i < spawnCount; i++)
         {
             char baseChar = sequence[i];
-            Transform spawnPoint = spawnParent.GetChild(i);
+            int actualIndex = startIndex + i;
+            
+            if (actualIndex >= spawnParent.childCount)
+                break;
+
+            Transform spawnPoint = spawnParent.GetChild(actualIndex);
             GameObject prefab = GetPrefab(baseChar);
 
             if (prefab != null)
             {
                 Vector3 offset = new Vector3(xOffset, yOffset, zOffset);
                 Vector3 spawnPos = spawnPoint.position + spawnPoint.TransformDirection(offset);
-                if (i == 0) {
+                if (actualIndex == 0) {
                     Debug.Log("spawnPoint.position" + spawnPoint.position);
                     Debug.Log("offset" + spawnPoint.TransformDirection(offset));
                     Debug.Log("spawnPos" + spawnPos);
@@ -127,6 +167,14 @@ public class TemplateDNASpawner : MonoBehaviour
                 Quaternion spawnRot = spawnPoint.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
 
                 GameObject spawned = Instantiate(prefab, spawnPos, spawnRot, spawnPoint);
+
+                // Play pop sound when nucleotide is spawned with varied pitch
+                if (AudioManager.Instance != null)
+                {
+                    // Vary pitch between 0.8 and 1.2 for variation
+                    float pitchVariation = Random.Range(0.8f, 1.2f);
+                    AudioManager.Instance.PlaySFXWithPitch("pop", pitchVariation);
+                }
 
                 if (useFadeIn)
                 {
@@ -139,6 +187,165 @@ public class TemplateDNASpawner : MonoBehaviour
         }
 
         activeCoroutine = null; // finished
+    }
+
+    private int FindFirstDifference(string oldSequence, string newSequence)
+    {
+        if (string.IsNullOrEmpty(oldSequence))
+            return 0;
+
+        if (string.IsNullOrEmpty(newSequence))
+            return 0;
+
+        int minLength = Mathf.Min(oldSequence.Length, newSequence.Length);
+
+        // Find first character that differs
+        for (int i = 0; i < minLength; i++)
+        {
+            if (oldSequence[i] != newSequence[i])
+            {
+                return i;
+            }
+        }
+
+        // If we get here, the shorter sequence is a prefix of the longer one
+        // If new is longer, first difference is at the end of old
+        // If old is longer, first difference is at the end of new (but we'll clear from minLength)
+        if (newSequence.Length > oldSequence.Length)
+        {
+            return oldSequence.Length; // Extension - start from end of old
+        }
+        else if (oldSequence.Length > newSequence.Length)
+        {
+            return newSequence.Length; // Shortened - clear from this point
+        }
+
+        // Sequences are identical
+        return -1;
+    }
+
+    private void ClearChildrenFromIndex(int startIndex)
+    {
+        if (spawnParent == null || startIndex < 0)
+            return;
+
+        int childCount = spawnParent.childCount;
+        for (int i = startIndex; i < childCount; i++)
+        {
+            Transform spawnPoint = spawnParent.GetChild(i);
+            for (int j = spawnPoint.childCount - 1; j >= 0; j--)
+            {
+                DestroyImmediate(spawnPoint.GetChild(j).gameObject);
+            }
+        }
+    }
+
+    private bool CheckExistingSequenceMatchesUpTo(string sequence, int upToIndex)
+    {
+        if (string.IsNullOrEmpty(sequence) || spawnParent == null || upToIndex <= 0)
+            return false;
+
+        int checkCount = Mathf.Min(upToIndex, sequence.Length, spawnParent.childCount);
+
+        for (int i = 0; i < checkCount; i++)
+        {
+            Transform spawnPoint = spawnParent.GetChild(i);
+            
+            // If spawn point has no children, sequence doesn't match
+            if (spawnPoint.childCount == 0)
+                return false;
+
+            // Get the expected prefab for this position
+            char expectedBase = sequence[i];
+            GameObject expectedPrefab = GetPrefab(expectedBase);
+
+            if (expectedPrefab == null)
+                return false;
+
+            // Check if any child matches the expected prefab
+            bool foundMatch = false;
+            string expectedPrefabName = expectedPrefab.name;
+            
+            for (int j = 0; j < spawnPoint.childCount; j++)
+            {
+                GameObject child = spawnPoint.GetChild(j).gameObject;
+                string childName = child.name;
+                
+                // Remove "(Clone)" suffix if present for comparison
+                if (childName.EndsWith("(Clone)"))
+                {
+                    childName = childName.Substring(0, childName.Length - 7);
+                }
+                
+                // Compare by checking if the child's name matches the prefab name
+                // or contains the expected base character
+                if (childName == expectedPrefabName || 
+                    childName.Contains(expectedBase.ToString()))
+                {
+                    foundMatch = true;
+                    break;
+                }
+            }
+
+            if (!foundMatch)
+                return false;
+        }
+
+        return true;
+    }
+
+    private bool CheckExistingSequenceMatches(string sequence)
+    {
+        if (string.IsNullOrEmpty(sequence) || spawnParent == null)
+            return false;
+
+        int checkCount = Mathf.Min(sequence.Length, spawnParent.childCount);
+
+        for (int i = 0; i < checkCount; i++)
+        {
+            Transform spawnPoint = spawnParent.GetChild(i);
+            
+            // If spawn point has no children, sequence doesn't match
+            if (spawnPoint.childCount == 0)
+                return false;
+
+            // Get the expected prefab for this position
+            char expectedBase = sequence[i];
+            GameObject expectedPrefab = GetPrefab(expectedBase);
+
+            if (expectedPrefab == null)
+                return false;
+
+            // Check if any child matches the expected prefab
+            bool foundMatch = false;
+            string expectedPrefabName = expectedPrefab.name;
+            
+            for (int j = 0; j < spawnPoint.childCount; j++)
+            {
+                GameObject child = spawnPoint.GetChild(j).gameObject;
+                string childName = child.name;
+                
+                // Remove "(Clone)" suffix if present for comparison
+                if (childName.EndsWith("(Clone)"))
+                {
+                    childName = childName.Substring(0, childName.Length - 7);
+                }
+                
+                // Compare by checking if the child's name matches the prefab name
+                // or contains the expected base character
+                if (childName == expectedPrefabName || 
+                    childName.Contains(expectedBase.ToString()))
+                {
+                    foundMatch = true;
+                    break;
+                }
+            }
+
+            if (!foundMatch)
+                return false;
+        }
+
+        return true;
     }
 
     private GameObject GetPrefab(char baseChar)

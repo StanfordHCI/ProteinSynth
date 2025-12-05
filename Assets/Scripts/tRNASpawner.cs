@@ -78,8 +78,20 @@ public class tRNASpawner : MonoBehaviour
             if (animator != null)
                 animator.Play("Enter");
 
+            // Play swoosh sound when tRNA enters
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX("swoosh");
+            }
+
             // Wait for Enter animation to finish
             yield return new WaitForSeconds(enterAnimDuration + 0.1f);
+
+            // Play pop sound when Enter animation ends
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX("pop");
+            }
 
             // Move amino acid to ribosome holder
             Transform aminoAcid = spawned.transform.Find("Model/AminoAcid");
@@ -119,6 +131,12 @@ public class tRNASpawner : MonoBehaviour
         Animator animator = tRNA.GetComponent<Animator>();
         if (animator != null)
             animator.Play("Exit");
+
+        // Play swoosh sound when tRNA exits
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlaySFX("swoosh");
+        }
 
         // Wait for exit to finish
         yield return new WaitForSeconds(exitAnimDuration);

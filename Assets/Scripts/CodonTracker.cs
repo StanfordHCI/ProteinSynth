@@ -339,7 +339,7 @@ public class CodonTracker : MonoBehaviour
     }
 
     public void UpdateStrand() {
-        mRNA.ClearAllChildren();
+        // Let SpawnTemplateSequence handle clearing logic based on sequence comparison
         bool success = mRNA.SpawnTemplateSequence(lastCodonString.Replace("-", string.Empty));
     }
 
