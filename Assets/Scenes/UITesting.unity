@@ -1336,6 +1336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5c2a939ec5ed884ebe4352033dfc15e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableDebugLogging: 1
   sfxSource: {fileID: 1302464992}
   musicSource: {fileID: 1615310826}
   voiceSource: {fileID: 1809668998}
@@ -1357,6 +1358,9 @@ MonoBehaviour:
     volume: 0.099
   musicList: []
   voiceList: []
+  autoLoadVoiceFromResources: 1
+  voiceResourcesPath: Audio/DialogueAudio
+  includeCharacterSubfolders: 1
 --- !u!4 &731568064
 Transform:
   m_ObjectHideFlags: 0

@@ -297,6 +297,18 @@ public class WebSocketManager : MonoBehaviour {
             case "TO_PROTEIN_SYNTHESIS_LAB_HEMOGLOBIN":
                 nodeName = "ProteinSynthesisLabHemoglobin";
                 break;
+            case "TO_PROTEIN_SYNTHESIS_LAB_MYOSIN":
+                nodeName = "ProteinSynthesisLabMyosin";
+                break;
+            case "TO_PROTEIN_SYNTHESIS_LAB_KERATIN":
+                nodeName = "ProteinSynthesisLabKeratin";
+                break;
+            case "TO_PROTEIN_SYNTHESIS_LAB_IMMUNOGLOBULINS":
+                nodeName = "ProteinSynthesisLabImmunoglobulins";
+                break;
+            case "TO_PROTEIN_SYNTHESIS_LAB_CYTOKINES":
+                nodeName = "ProteinSynthesisLabTyrosinase";
+                break;
         }
 
         if (nodeName != "") {

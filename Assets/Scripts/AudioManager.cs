@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Yarn.Unity;
+using System.IO;
 
 public class AudioManager : MonoBehaviour
 {
@@ -15,6 +16,14 @@ public class AudioManager : MonoBehaviour
     public List<AudioEntry> sfxList = new List<AudioEntry>();
     public List<AudioEntry> musicList = new List<AudioEntry>();
     public List<AudioEntry> voiceList = new List<AudioEntry>();
+
+    [Header("Voice Auto-Load Settings")]
+    [Tooltip("Enable automatic loading of voice clips from Resources folders")]
+    public bool autoLoadVoiceFromResources = true;
+    [Tooltip("Resources folder path for voice clips (relative to Assets/Resources/)")]
+    public string voiceResourcesPath = "Audio/DialogueAudio";
+    [Tooltip("If true, searches character subfolders (Alex, Jessica, Benji, Yari)")]
+    public bool includeCharacterSubfolders = true;
 
     private Dictionary<string, AudioEntry> sfxDict = new Dictionary<string, AudioEntry>();
     private Dictionary<string, AudioEntry> musicDict = new Dictionary<string, AudioEntry>();
@@ -43,23 +52,14 @@ public class AudioManager : MonoBehaviour
 
         Instance = this;
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
-
         BuildDictionaries();
     }
 
     void OnDestroy()
     {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-
         // If this instance is being destroyed, clear the singleton reference
         if (Instance == this)
             Instance = null;
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        BuildDictionaries();
     }
 
     private void BuildDictionaries()
@@ -80,10 +80,70 @@ public class AudioManager : MonoBehaviour
                 musicDict.TryAdd(entry.name.ToLower(), entry);
         }
 
+        // Load from manual list first
         foreach (var entry in voiceList)
         {
             if (entry != null && entry.clip != null && !string.IsNullOrEmpty(entry.name))
                 voiceDict.TryAdd(entry.name.ToLower(), entry);
+        }
+
+        // Auto-load from Resources if enabled
+        if (autoLoadVoiceFromResources)
+        {
+            LoadVoiceClipsFromResources();
+        }
+    }
+
+    private void LoadVoiceClipsFromResources()
+    {
+        if (string.IsNullOrEmpty(voiceResourcesPath))
+            return;
+
+        // Load clips from the main voice folder (no prefix)
+        LoadClipsFromPath(voiceResourcesPath, voiceDict);
+
+        // Load clips from character subfolders if enabled
+        if (includeCharacterSubfolders)
+        {
+            // Load from character-specific folders: Alex, Jessica, Benji, Yari
+            string[] characterFolders = { "Alex", "Jessica", "Benji", "Yari" };
+            
+            foreach (string charFolder in characterFolders)
+            {
+                string subPath = $"{voiceResourcesPath}/{charFolder}";
+                AudioClip[] subClips = Resources.LoadAll<AudioClip>(subPath);
+
+                if (subClips != null && subClips.Length > 0)
+                {
+                    // Found clips in this character's folder, load them with character prefix
+                    LoadClipsFromPath(subPath, voiceDict, $"{charFolder}_");
+                }
+            }
+        }
+    }
+
+    private void LoadClipsFromPath(string resourcesPath, Dictionary<string, AudioEntry> targetDict, string namePrefix = "")
+    {
+        AudioClip[] clips = Resources.LoadAll<AudioClip>(resourcesPath);
+
+        foreach (AudioClip clip in clips)
+        {
+            if (clip == null) continue;
+
+            string clipName = namePrefix + clip.name;
+            string key = clipName.ToLower();
+
+            // Only add if not already in dictionary (manual entries take precedence)
+            if (!targetDict.ContainsKey(key))
+            {
+                AudioEntry entry = new AudioEntry
+                {
+                    name = clipName,
+                    clip = clip,
+                    volume = 1f
+                };
+                targetDict.Add(key, entry);
+            }
         }
     }
 
@@ -269,7 +329,9 @@ public class AudioManager : MonoBehaviour
         float finalVolume = (volume >= 0f) ? Mathf.Clamp01(volume) : entry.volume;
 
         if (!interrupt && voiceSource.isPlaying)
+        {
             return;
+        }
 
         voiceSource.Stop();
         voiceSource.clip = entry.clip;
