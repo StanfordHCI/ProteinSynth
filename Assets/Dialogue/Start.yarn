@@ -255,8 +255,6 @@ title: ProteinSynthesisLab
         <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Cytokines>>
-    <<elseif $protein_synthesis_topic == "ion channels">>
-        <<play_voice AudioManager Alex_ProteinSynthesisLab_02_IonChannels>>
     <<endif>>
 <<elseif $peer_tutor == "Yari">>
     <<if $protein_synthesis_topic == "insulin">>
@@ -275,8 +273,6 @@ title: ProteinSynthesisLab
         <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Cytokines>>
-    <<elseif $protein_synthesis_topic == "ion channels">>
-        <<play_voice AudioManager Yari_ProteinSynthesisLab_02_IonChannels>>
     <<endif>>
 <<elseif $peer_tutor == "Jessica">>
     <<if $protein_synthesis_topic == "insulin">>
@@ -295,8 +291,6 @@ title: ProteinSynthesisLab
         <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Cytokines>>
-    <<elseif $protein_synthesis_topic == "ion channels">>
-        <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_IonChannels>>
     <<endif>>
 <<elseif $peer_tutor == "Benji">>
     <<if $protein_synthesis_topic == "insulin">>
@@ -315,8 +309,6 @@ title: ProteinSynthesisLab
         <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Cytokines>>
-    <<elseif $protein_synthesis_topic == "ion channels">>
-        <<play_voice AudioManager Benji_ProteinSynthesisLab_02_IonChannels>>
     <<endif>>
 <<endif>>
 {$peer_tutor}: It seems like you might be interested in {$protein_synthesis_topic}. Let's figure out how {$protein_synthesis_topic} is synthesized.
@@ -355,8 +347,6 @@ title: ProteinSynthesisDNATutorial
         <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Cytokines>>
-    <<elseif $protein_synthesis_topic == "ion channels">>
-        <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_IonChannels>>
     <<endif>>
 <<elseif $peer_tutor == "Yari">>
     <<if $protein_synthesis_topic == "insulin">>
@@ -375,8 +365,6 @@ title: ProteinSynthesisDNATutorial
         <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Cytokines>>
-    <<elseif $protein_synthesis_topic == "ion channels">>
-        <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_IonChannels>>
     <<endif>>
 <<elseif $peer_tutor == "Jessica">>
     <<if $protein_synthesis_topic == "insulin">>
@@ -395,8 +383,6 @@ title: ProteinSynthesisDNATutorial
         <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Cytokines>>
-    <<elseif $protein_synthesis_topic == "ion channels">>
-        <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_IonChannels>>
     <<endif>>
 <<elseif $peer_tutor == "Benji">>
     <<if $protein_synthesis_topic == "insulin">>
@@ -415,8 +401,6 @@ title: ProteinSynthesisDNATutorial
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Cytokines>>
-    <<elseif $protein_synthesis_topic == "ion channels">>
-        <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_IonChannels>>
     <<endif>>
 <<endif>>
 {$peer_tutor}: Nice! Do you see the DNA that popped up? Imagine this is the gene that codes for {$protein_synthesis_topic}.
