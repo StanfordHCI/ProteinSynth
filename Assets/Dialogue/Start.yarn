@@ -168,59 +168,60 @@ title: GPTResponding
     <<jump PlayerResponding>>
 <<endif>>
 ===
-
-title: ProteinSynthesisLabInsulin
+title: ProteinSynthesisLabLactase
 ---
 <<LoadScene ImageTargetTestCodon>>
-<<set $protein_synthesis_topic to "insulin">>
+<<set $protein_synthesis_topic to "lactase">>
 <<set_sequence CodonManager "TACCCGGTGACCGAC">>
 ===
+
 title: ProteinSynthesisLabHemoglobin
 ---
 <<LoadScene ImageTargetTestCodon>>
 <<set $protein_synthesis_topic to "hemoglobin">>
 <<set_sequence CodonManager "TACCACGTGGACTGA">>
 ===
-title: ProteinSynthesisLabLactase
+
+title: ProteinSynthesisLabInsulin
 ---
 <<LoadScene ImageTargetTestCodon>>
-<<set $protein_synthesis_topic to "lactase">>
-<<set_sequence CodonManager "TACCTCGACAGAACC">>
+<<set $protein_synthesis_topic to "insulin">>
+<<set_sequence CodonManager "TACCTCGACAGAUGG">>
 ===
 
 title: ProteinSynthesisLabMyosin
 ---
 <<LoadScene ImageTargetTestCodon>>
 <<set $protein_synthesis_topic to "myosin">>
-<<set_sequence CodonManager "TACCCGGTGACCGAC">>
+<<set_sequence CodonManager "TACCACGTGCCGACC">>
 ===
 
 title: ProteinSynthesisLabKeratin
 ---
 <<LoadScene ImageTargetTestCodon>>
 <<set $protein_synthesis_topic to "keratin">>
-<<set_sequence CodonManager "TACCCGGTGACCGAC">>
+<<set_sequence CodonManager "TACCGGCCGGACACC">>
 ===
 
 title: ProteinSynthesisLabImmunoglobulins
 ---
 <<LoadScene ImageTargetTestCodon>>
 <<set $protein_synthesis_topic to "immunoglobulins">>
-<<set_sequence CodonManager "TACCCGGTGACCGAC">>
+<<set_sequence CodonManager "TACCTCCACGACTGA">>
 ===
 
 title: ProteinSynthesisLabTyrosinase
 ---
 <<LoadScene ImageTargetTestCodon>>
 <<set $protein_synthesis_topic to "tyrosinase">>
-<<set_sequence CodonManager "TACCCGGTGACCGAC">>
+<<set_sequence CodonManager "TACCCGGTGCTCAGA">>
 ===
 
 title: ProteinSynthesisLabCytokines
 ---
 <<LoadScene ImageTargetTestCodon>>
 <<set $protein_synthesis_topic to "cytokines">>
-<<set_sequence CodonManager "TACCCGGTGACCGAC">>
+<<set_sequence CodonManager "TACTGACACGACCCG">>
 ===
 
 title: ProteinSynthesisLab
