@@ -58,6 +58,9 @@ public class AvatarSelection : MonoBehaviour
                 avatars.Add(child.gameObject);
         }
         
+        // Randomize the character order (shuffle names, descriptions, and avatars together)
+        ShuffleCharacters();
+        
         // Calculate initial offset based on container's starting position
         // This centers the first avatar (index 0)
         initialOffset = containerRect.anchoredPosition.x;
@@ -144,5 +147,46 @@ public class AvatarSelection : MonoBehaviour
 
         containerRect.anchoredPosition = endPos;
         isAnimating = false;
+    }
+
+    // Shuffle the character order lists and reorder children options in UI accordingly
+    private void ShuffleCharacters()
+    {
+        if (names.Length != descriptions.Length || names.Length != avatars.Count)
+        {
+            Debug.LogError("Names, descriptions, and avatars must have the same length!");
+            return;
+        }
+
+        for (int i = names.Length - 1; i > 0; i--)
+        {
+            int randomIndex = Random.Range(0, i + 1);
+            
+            // Swap names
+            string tempName = names[i];
+            names[i] = names[randomIndex];
+            names[randomIndex] = tempName;
+            
+            // Swap descriptions (keep them paired with names)
+            string tempDesc = descriptions[i];
+            descriptions[i] = descriptions[randomIndex];
+            descriptions[randomIndex] = tempDesc;
+            
+            GameObject tempAvatar = avatars[i];
+            avatars[i] = avatars[randomIndex];
+            avatars[randomIndex] = tempAvatar;
+        }
+
+        // Reorder the child GameObjects in the scene hierarchy to match the shuffled order
+        for (int i = 0; i < avatars.Count; i++)
+        {
+            avatars[i].transform.SetSiblingIndex(i);
+        }
+
+        avatars.Clear();
+        foreach (Transform child in containerRect)
+        {
+            avatars.Add(child.gameObject);
+        }
     }
 }
