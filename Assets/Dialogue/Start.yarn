@@ -32,16 +32,11 @@ tags:
 <<hide_cover Cover>>
 
 
--> Start from intro
--> Jump to lab
-    <<jump ProteinSynthesisLabLactase>>
-
 <<hide_scroll WebsocketManager true>>
-Select the server host.
--> Remote
-    <<set $remote to true>>
--> Local
-    <<set $remote to false>>
+
+<<set $remote to true>>
+//-> Local
+//    <<set $remote to false>>
 
 <<if $remote == true>>
     <<connect_to_server WebsocketManager remote>>
@@ -49,21 +44,15 @@ Select the server host.
     <<connect_to_server WebsocketManager>>
 <<endif>>
 
-// <<set $remote to true>>
-// <<connect_to_server WebsocketManager remote>>
-// <<hide_scroll WebsocketManager true>>
-
 Enter your participant ID number!
 <<RequestInput InputPanel "Type in your participant ID!">>
 -> Submit
 <<SaveAndCloseInput InputPanel "$participant_id">>
 
-
 What's your name?
 <<RequestInput InputPanel "Type in your name!">> // accept player input
 -> Submit
 <<SaveAndCloseInput InputPanel "$player_name">>
-
 
 // select peer tutor
 Select your peer tutor! 
@@ -228,6 +217,7 @@ title: ProteinSynthesisLab
 ---
 // <<LoadScene ImageTargetTestCodon>> // comment this out if needed
 <<hide_background DialogueCanvas true>>
+<<update_character DialogueCanvas "$peer_tutor">>
 <<toggle_character_position DialogueCanvas true>>
 <<if $peer_tutor == "Alex">>
     <<play_voice AudioManager Alex_ProteinSynthesisLab_01>>

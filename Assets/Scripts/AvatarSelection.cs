@@ -40,7 +40,7 @@ public class AvatarSelection : MonoBehaviour
         
         "A lively 10th grader who proudly wears his Singaporean heritage on his sleeve. His energy pulls everyone in, and he’s on a mission to make learning feel like an epic team project.",
 
-        "A humble 11th grader who proudly identifies as African American. He's a great listener and a natural leader.", 
+        "A humble 11th grader who proudly identifies as Black. He's a great listener and a natural leader.", 
 
         "A stylish 12th grader who identifies as African American. She loves breaking down science concepts and sharing her knowledge with others.", 
 
@@ -147,6 +147,27 @@ public class AvatarSelection : MonoBehaviour
 
         containerRect.anchoredPosition = endPos;
         isAnimating = false;
+    }
+
+    /// <summary>
+    /// Sets the peer tutor by name. Useful for dropdown integration.
+    /// Updates both the carousel display and the Yarn variable.
+    /// </summary>
+    /// <param name="tutorName">The name of the peer tutor to select</param>
+    public void SetPeerTutorByName(string tutorName)
+    {
+        // Find the index of the tutor name
+        for (int i = 0; i < names.Length; i++)
+        {
+            if (names[i] == tutorName)
+            {
+                index = i;
+                changeAvatarChoice();
+                return;
+            }
+        }
+
+        Debug.LogWarning($"AvatarSelection: Tutor name '{tutorName}' not found in names array.");
     }
 
     // Shuffle the character order lists and reorder children options in UI accordingly
