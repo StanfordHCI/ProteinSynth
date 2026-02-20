@@ -33,6 +33,7 @@ public class CodonTracker : MonoBehaviour
 
     private bool introDone = false;
     private bool nucleusDialogue = false;
+    private bool isStartingDNATutorial = false;
 
     [Header("Animation Settings")]
     [SerializeField] private Vector3 targetScaleMultiplier = new Vector3(1.5f, 1.5f, 1.5f);
@@ -127,6 +128,12 @@ public class CodonTracker : MonoBehaviour
     public void SetIntroDone()
     {
         introDone = true;
+    }
+
+    [YarnCommand("set_nucleus_dialogue_done")]
+    public void SetNucleusDialogueDone()
+    {
+        nucleusDialogue = true;
     }
 
     [YarnCommand("hide_todo")]
@@ -276,11 +283,18 @@ public class CodonTracker : MonoBehaviour
         DNAObject.transform.position = Vector3.Lerp(DNAObject.transform.position, hoverPosition, Time.deltaTime * 10f);
         DNAObject.transform.rotation = DNATargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
 
-        if (!nucleusDialogue)
+        if (!nucleusDialogue && introDone && !isStartingDNATutorial)
         {
-            nucleusDialogue = true;
             todoList.CheckoffToDo("scan_nucleus");
-            GlobalDialogueManager.StartDialogue("ProteinSynthesisDNATutorial");
+            
+            if (GlobalDialogueManager.runner.IsDialogueRunning)
+            {
+                StartCoroutine(WaitAndStartDNATutorial());
+            }
+            else
+            {
+                GlobalDialogueManager.StartDialogue("ProteinSynthesisDNATutorial");
+            }
         }
     }
 
@@ -488,6 +502,35 @@ public class CodonTracker : MonoBehaviour
 
         // Start amino acid input when animation is complete
         StartAminoAcidInput();
+    }
+
+    private IEnumerator WaitAndStartDNATutorial()
+    {
+        isStartingDNATutorial = true;
+        float elapsed = 0f;
+        float waitTime = 4.7f;
+        
+        // Wait up to 4.7 seconds, but check if dialogue stops early
+        while (elapsed < waitTime)
+        {
+            // If dialogue stops running, immediately proceed
+            if (!GlobalDialogueManager.runner.IsDialogueRunning)
+            {
+                break;
+            }
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        // Stop any remaining dialogue and start the new one
+        if (GlobalDialogueManager.runner.IsDialogueRunning)
+        {
+            GlobalDialogueManager.runner.Stop();
+        }
+        
+        GlobalDialogueManager.StartDialogue("ProteinSynthesisDNATutorial");
+        isStartingDNATutorial = false;
     }
 
     public void EnterDNATutorial() 

@@ -227,6 +227,10 @@ title: ProteinSynthesisLab
     <<play_voice AudioManager Jessica_ProteinSynthesisLab_01>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisLab_01>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisLab_01>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisLab_01>>
 <<endif>>
 {$peer_tutor}: In this lab, you'll get some hands-on experience with the processes of transcription and translation.
 <<if $peer_tutor == "Alex">>
@@ -241,7 +245,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Immunoglobulins>>
+        <<play_voice AudioManager Alex_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -259,7 +263,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Immunoglobulins>>
+        <<play_voice AudioManager Yari_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -277,7 +281,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Immunoglobulins>>
+        <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -295,11 +299,47 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Immunoglobulins>>
+        <<play_voice AudioManager Benji_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Cytokines>>
+    <<endif>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Cytokines>>
+    <<endif>>
+<<elseif $peer_tutor == "Maya">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Cytokines>>
     <<endif>>
 <<endif>>
 {$peer_tutor}: It seems like you might be interested in {$protein_synthesis_topic}. Let's figure out how {$protein_synthesis_topic} is synthesized.
@@ -311,15 +351,20 @@ title: ProteinSynthesisLab
     <<play_voice AudioManager Jessica_ProteinSynthesisLab_03>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisLab_03>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisLab_03>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisLab_03>>
 <<endif>>
-{$peer_tutor}: First, scan the nucleus of the cell with your camera.
 <<add_todo Todos "scan_nucleus">>
-<<hide_canvas DialogueCanvas true>>
 <<set_intro_done CodonManager>>
+{$peer_tutor}: First, scan the nucleus of the cell with your camera.
+<<hide_canvas DialogueCanvas true>>
 ===
 
 title: ProteinSynthesisDNATutorial
 ---
+<<set_nucleus_dialogue_done CodonManager>>
 <<hide_canvas DialogueCanvas false>>
 <<if $peer_tutor == "Alex">>
     <<if $protein_synthesis_topic == "insulin">>
@@ -333,7 +378,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
+        <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -351,7 +396,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
+        <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -369,7 +414,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
+        <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -386,12 +431,48 @@ title: ProteinSynthesisDNATutorial
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Myosin>>
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Keratin>>
-    <<elifter $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Cytokines>>
+    <<endif>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Cytokines>>
+    <<endif>>
+<<elseif $peer_tutor == "Maya">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Cytokines>>
     <<endif>>
 <<endif>>
 {$peer_tutor}: Nice! Do you see the DNA that popped up? Imagine this is the gene that codes for {$protein_synthesis_topic}.
@@ -403,6 +484,10 @@ title: ProteinSynthesisDNATutorial
     <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_02>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_02>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_02>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_02>>
 <<endif>>
 {$peer_tutor}: During transcription, a small portion of the DNA unwinds. One of the strands is used as a template to create mRNA.
 <<if $peer_tutor == "Alex">>
@@ -413,6 +498,10 @@ title: ProteinSynthesisDNATutorial
     <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_03>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_03>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_03>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_03>>
 <<endif>>
 {$peer_tutor}: Your job is to figure out what the bases of this new mRNA strand should be!
 <<if $peer_tutor == "Alex">>
@@ -423,6 +512,10 @@ title: ProteinSynthesisDNATutorial
     <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_04>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_04>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_04>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_04>>
 <<endif>>
 {$peer_tutor}: Arrange the codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
 <<add_todo Todos "arrange_cards">>
@@ -434,6 +527,10 @@ title: ProteinSynthesisDNATutorial
     <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_05>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_05>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_05>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_05>>
 <<endif>>
 {$peer_tutor}: Once you're done, press the "Finish transcription" button to generate your mRNA strand.
 <<add_todo Todos "finish_transcription">>
@@ -451,6 +548,10 @@ title: ProteinSynthesisTranscriptionUnsuccessful
     <<play_voice AudioManager Jessica_ProteinSynthesisTranscriptionUnsuccessful_01>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisTranscriptionUnsuccessful_01>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisTranscriptionUnsuccessful_01>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisTranscriptionUnsuccessful_01>>
 <<endif>>
 {$peer_tutor}: It doesn't look like you've arranged all the codon cards yet. Make sure that your camera is tracking all the cards correctly. Let's try again!
 <<hide_canvas DialogueCanvas true>>
@@ -467,6 +568,10 @@ title: ProteinSynthesisTranscriptionIncorrect
     <<play_voice AudioManager Jessica_ProteinSynthesisTranscriptionIncorrect_01>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisTranscriptionIncorrect_01>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisTranscriptionIncorrect_01>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisTranscriptionIncorrect_01>>
 <<endif>>
 {$peer_tutor}: Hmmm... I don't think you've transcribed the DNA correctly. Let's try again! 
 <<hide_canvas DialogueCanvas true>>
@@ -483,6 +588,10 @@ title: ProteinSynthesisTranscriptionSuccessful
     <<play_voice AudioManager Jessica_ProteinSynthesisTranscriptionSuccessful_01>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisTranscriptionSuccessful_01>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisTranscriptionSuccessful_01>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisTranscriptionSuccessful_01>>
 <<endif>>
 {$peer_tutor}: Nice work! After the mRNA strand is made, it exits the nucleus and moves to a ribosome, where translation happens.
 <<if $peer_tutor == "Alex">>
@@ -493,6 +602,10 @@ title: ProteinSynthesisTranscriptionSuccessful
     <<play_voice AudioManager Jessica_ProteinSynthesisTranscriptionSuccessful_02>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisTranscriptionSuccessful_02>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisTranscriptionSuccessful_02>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisTranscriptionSuccessful_02>>
 <<endif>>
 {$peer_tutor}: Now, scan the ribosome with your camera.
 <<add_todo Todos "scan_ribosome">>
@@ -510,6 +623,10 @@ title: ScanRibosome
     <<play_voice AudioManager Jessica_ScanRibosome_01>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ScanRibosome_01>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ScanRibosome_01>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ScanRibosome_01>>
 <<endif>>
 {$peer_tutor}: Make sure to scan the ribosome with your camera.
 <<hide_canvas DialogueCanvas true>>
@@ -525,6 +642,10 @@ title: ProteinSynthesisReflection
     <<play_voice AudioManager Jessica_ProteinSynthesisReflection_01>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisReflection_01>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_01>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisReflection_01>>
 <<endif>>
 {$peer_tutor}: Congrats! You just made a protein!
 <<UnloadScene>>
@@ -550,6 +671,10 @@ title: ProteinSynthesisAminoAcidInput
     <<play_voice AudioManager Jessica_ProteinSynthesisAminoAcidInput_01>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisAminoAcidInput_01>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisAminoAcidInput_01>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisAminoAcidInput_01>>
 <<endif>>
 {$peer_tutor}: Great! Now let's figure out what amino acids we get from this mRNA strand.
 <<if $peer_tutor == "Alex">>
@@ -560,6 +685,10 @@ title: ProteinSynthesisAminoAcidInput
     <<play_voice AudioManager Jessica_ProteinSynthesisAminoAcidInput_02>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisAminoAcidInput_02>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisAminoAcidInput_02>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisAminoAcidInput_02>>
 <<endif>>
 {$peer_tutor}: Grab your codon chart and use it to figure out which amino acids correspond to each codon.
 <<if $peer_tutor == "Alex">>
@@ -570,6 +699,10 @@ title: ProteinSynthesisAminoAcidInput
     <<play_voice AudioManager Jessica_ProteinSynthesisAminoAcidInput_03>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisAminoAcidInput_03>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisAminoAcidInput_03>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisAminoAcidInput_03>>
 <<endif>>
 {$peer_tutor}: Once you're done, press the "Check amino acids" button to see if your amino acid sequence matches the codon sequence.
 <<hide_canvas DialogueCanvas true>>
@@ -588,6 +721,10 @@ title: ProteinSynthesisAminoAcidInputSuccessful
     <<play_voice AudioManager Jessica_ProteinSynthesisAminoAcidInputSuccessful_01>>
 <<elseif $peer_tutor == "Benji">>
     <<play_voice AudioManager Benji_ProteinSynthesisAminoAcidInputSuccessful_01>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisAminoAcidInputSuccessful_01>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisAminoAcidInputSuccessful_01>>
 <<endif>>
 {$peer_tutor}: Nice work! Now let's watch how the tRNA come in to form the amino acid sequence you created.
 <<hide_canvas DialogueCanvas true>>
