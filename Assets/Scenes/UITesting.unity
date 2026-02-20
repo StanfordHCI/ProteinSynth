@@ -1336,7 +1336,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5c2a939ec5ed884ebe4352033dfc15e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableDebugLogging: 1
   sfxSource: {fileID: 1302464992}
   musicSource: {fileID: 1615310826}
   voiceSource: {fileID: 1809668998}
@@ -4053,8 +4052,8 @@ Camera:
   m_GameObject: {fileID: 2003216846}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.43137258, g: 0.49411768, b: 0.9176471, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

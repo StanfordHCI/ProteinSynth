@@ -120,7 +120,8 @@ public class tRNASpawner : MonoBehaviour
             yield return new WaitForSeconds(hideDelay);
         }
         activeCoroutine = null;
-        GlobalDialogueManager.StartDialogue("ProteinSynthesisReflection");
+        GlobalDialogueManager.StartDialogue("ProteinSynthesisCongrats");
+        CodonTracker.instance.ToggleEndSceneDelayed(true);
     }
 
     private IEnumerator OffboardTRNA(GameObject tRNA)

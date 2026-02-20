@@ -23,6 +23,13 @@ public class CodonTracker : MonoBehaviour
 
     // Keeps track of the last known codon string to detect changes 
     private string lastCodonString = "";
+
+    // Store initial mRNA transform for restoration
+    private Vector3 initialmRNAPosition;
+    private Quaternion initialmRNARotation;
+    private Vector3 initialmRNAScale;
+    private Transform initialmRNAParent;
+    private bool hasStoredInitialmRNA = false;
     
     public bool transcriptionFinished = false;
     public bool animationDone = false;
@@ -42,6 +49,7 @@ public class CodonTracker : MonoBehaviour
     public GameObject TemplateStrand; 
     public GameObject CodingStrand;
     public GameObject mRNAObject;
+    public GameObject mRNAPrefab; // Prefab for the original mRNA (needed to restore after flip)
     public GameObject mRNAReversePrefab;
     public GameObject mRNAReverseObject;
     public GameObject DNATargetObject;   
@@ -49,6 +57,7 @@ public class CodonTracker : MonoBehaviour
     public TemplateDNASpawner mRNA;
     public tRNASpawner tRNASpawner;
     public GameObject aminoAcidInput;
+    public GameObject endScene;
     public GameObject arCamera; 
     public GameObject transcriptionButton; 
 
@@ -77,6 +86,7 @@ public class CodonTracker : MonoBehaviour
     {
         instance = this;
         aminoAcidInput.SetActive(false);
+        endScene.SetActive(false);
         observer = DNATargetObject.GetComponent<ObserverBehaviour>();
         if (observer) {
             observer.OnTargetStatusChanged += OnTargetStatusChanged;
@@ -84,6 +94,16 @@ public class CodonTracker : MonoBehaviour
 
         if (DNAObject != null) {
             DNAObject.SetActive(false);
+        }
+
+        // Store initial mRNA transform for later restoration
+        if (mRNAObject != null && !hasStoredInitialmRNA)
+        {
+            initialmRNAPosition = mRNAObject.transform.position;
+            initialmRNARotation = mRNAObject.transform.rotation;
+            initialmRNAScale = mRNAObject.transform.localScale;
+            initialmRNAParent = mRNAObject.transform.parent;
+            hasStoredInitialmRNA = true;
         }
     }
 
@@ -424,9 +444,8 @@ public class CodonTracker : MonoBehaviour
         Quaternion rot = mRNAObject.transform.rotation;
         Vector3 scale = mRNAObject.transform.lossyScale;
 
-        // Destroy immediately and null reference
-        DestroyImmediate(mRNAObject);
-        mRNAObject = null;
+        // Hide the original mRNA instead of destroying it
+        mRNAObject.SetActive(false);
 
         // Spawn reverse strand
         mRNAReverseObject = Instantiate(mRNAReversePrefab, pos, rot);
@@ -496,8 +515,255 @@ public class CodonTracker : MonoBehaviour
 
     }
 
-    public void EndLab() {
-        GlobalDialogueManager.StartDialogue("ProteinSynthesisReflection");
+    // public void EndLab() {
+    //     GlobalDialogueManager.StartDialogue("ProteinSynthesisReflection");
+    // }
+
+    /// <summary>
+    /// Comprehensive reset function that cleans up all spawned 3D models, resets state, sets new sequence, and resets todo list.
+    /// </summary>
+    public void ResetLabForNewProtein(string newSequence)
+    {
+        Debug.Log("CodonTracker: Resetting lab for new protein with sequence: " + newSequence);
+
+        // Clean up all spawned 3D models
+        CleanupSpawnedObjects();
+
+        // Reset all state flags
+        ResetStateFlags();
+
+        // Reset UI elements
+        ResetUI();
+
+        // Reset todo list
+        ResetTodoList();
+
+        // Reactivate initial objects
+        ReactivateInitialObjects();
+
+        // Set the new sequence
+        SetSequence(newSequence);
+
+        Debug.Log("CodonTracker: Lab reset complete. Ready for new protein.");
+    }
+
+    /// <summary>
+    /// Cleans up all spawned 3D models that were created after initial state.
+    /// </summary>
+    private void CleanupSpawnedObjects()
+    {
+        // Clear active codons dictionary and destroy any remaining objects immediately
+        foreach (var kvp in activeCodons)
+        {
+            if (kvp.Value != null)
+            {
+                DestroyImmediate(kvp.Value);
+            }
+        }
+        activeCodons.Clear();
+
+        // Destroy only the reverse mRNA (spawned object)
+        // Don't destroy the original mRNAObject - we'll just hide/show it
+        if (mRNAReverseObject != null)
+        {
+            DestroyImmediate(mRNAReverseObject);
+            mRNAReverseObject = null;
+        }
+
+        // Clean up tRNA spawner - find and destroy all tRNA objects immediately
+        if (tRNASpawner != null && tRNASpawner.spawnParent != null)
+        {
+            // Destroy all children of spawnParent that are tRNAs
+            for (int i = tRNASpawner.spawnParent.childCount - 1; i >= 0; i--)
+            {
+                Transform child = tRNASpawner.spawnParent.GetChild(i);
+                if (child != null)
+                {
+                    DestroyImmediate(child.gameObject);
+                }
+            }
+        }
+
+        // Clean up amino acid holder if it exists
+        if (tRNASpawner != null && tRNASpawner.aminoAcidHolder != null)
+        {
+            for (int i = tRNASpawner.aminoAcidHolder.childCount - 1; i >= 0; i--)
+            {
+                Transform child = tRNASpawner.aminoAcidHolder.GetChild(i);
+                if (child != null)
+                {
+                    DestroyImmediate(child.gameObject);
+                }
+            }
+        }
+
+        // Clean up mRNA spawner children (DNA bases on mRNA)
+        if (mRNA != null && mRNA.spawnParent != null)
+        {
+            mRNA.ClearAllChildren();
+        }
+
+        // Clean up template and coding strand spawners (clear any spawned bases)
+        if (TemplateStrand != null)
+        {
+            TemplateDNASpawner templateSpawner = TemplateStrand.GetComponent<TemplateDNASpawner>();
+            if (templateSpawner != null && templateSpawner.spawnParent != null)
+            {
+                templateSpawner.ClearAllChildren();
+            }
+        }
+        if (CodingStrand != null)
+        {
+            TemplateDNASpawner codingSpawner = CodingStrand.GetComponent<TemplateDNASpawner>();
+            if (codingSpawner != null && codingSpawner.spawnParent != null)
+            {
+                codingSpawner.ClearAllChildren();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Resets all state flags to initial values.
+    /// </summary>
+    private void ResetStateFlags()
+    {
+        transcriptionFinished = false;
+        animationDone = false;
+        ribosomeMoved = false;
+        shouldStartTranslation = false;
+        translationDone = false;
+        ribosomeFound = false;
+        introDone = false;
+        nucleusDialogue = false;
+        lastCodonString = "";
+    }
+
+    /// <summary>
+    /// Resets UI elements to initial state.
+    /// </summary>
+    private void ResetUI()
+    {
+        // Hide amino acid input and end scene
+        if (aminoAcidInput != null)
+        {
+            aminoAcidInput.SetActive(false);
+            
+            // Reset the AminoAcidDropdownInput component to clear all selections
+            AminoAcidDropdownInput dropdownInput = aminoAcidInput.GetComponent<AminoAcidDropdownInput>();
+            if (dropdownInput != null)
+            {
+                dropdownInput.ClearSelection();
+            }
+        }
+        if (endScene != null)
+        {
+            endScene.SetActive(false);
+        }
+
+        // Reset transcription button
+        if (transcriptionButton != null)
+        {
+            transcriptionButton.SetActive(true);
+        }
+
+        // Clear text displays
+        if (codonTextUI != null)
+        {
+            codonTextUI.text = "";
+        }
+        if (aminoAcidTextUI != null)
+        {
+            aminoAcidTextUI.text = "";
+        }
+        if (aminoAcidInputCodonTextUI != null)
+        {
+            aminoAcidInputCodonTextUI.text = "";
+        }
+    }
+
+    /// <summary>
+    /// Resets the todo list by clearing all active todos.
+    /// </summary>
+    private void ResetTodoList()
+    {
+        if (todoList != null && todoList.layoutGroup != null)
+        {
+            // Destroy all todo items
+            for (int i = todoList.layoutGroup.transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = todoList.layoutGroup.transform.GetChild(i);
+                if (child != null)
+                {
+                    DestroyImmediate(child.gameObject);
+                }
+            }
+
+            // Clear the active todos dictionary using reflection or a public method
+            // Since activeTodos is private, we'll need to add a public method to TodoList
+            todoList.ResetAllTodos();
+        }
+    }
+
+    /// <summary>
+    /// Reactivates initial objects that should be visible at the start.
+    /// </summary>
+    private void ReactivateInitialObjects()
+    {
+        // Reactivate DNA target object
+        if (DNATargetObject != null)
+        {
+            DNATargetObject.SetActive(true);
+        }
+
+        // Deactivate DNA object initially (will be activated when nucleus is scanned)
+        if (DNAObject != null)
+        {
+            DNAObject.SetActive(false);
+        }
+
+        // Reactivate ribosome target object
+        if (RibosomeTargetObject != null)
+        {
+            RibosomeTargetObject.SetActive(true);
+        }
+
+        // Restore original mRNA - show it and reset its position
+        if (mRNAObject != null)
+        {
+            // Show the mRNA (it was hidden when flipped)
+            mRNAObject.SetActive(true);
+            
+            // Reset to initial position if we stored it
+            if (hasStoredInitialmRNA)
+            {
+                mRNAObject.transform.position = initialmRNAPosition;
+                mRNAObject.transform.rotation = initialmRNARotation;
+                mRNAObject.transform.localScale = initialmRNAScale;
+                if (initialmRNAParent != null)
+                {
+                    mRNAObject.transform.SetParent(initialmRNAParent, true);
+                }
+            }
+            
+            // Restore the mRNA spawner reference
+            Transform spawnerChild = mRNAObject.transform.Find("mRNA spawner");
+            if (spawnerChild != null)
+            {
+                mRNA = spawnerChild.GetComponent<TemplateDNASpawner>();
+                tRNASpawner = spawnerChild.GetComponent<tRNASpawner>();
+                Debug.Log("Restored original mRNA and spawner references.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Cleans up all spawned 3D models and resets the tracker state for a new lab run.
+    /// </summary>
+    public void CleanupAndReset()
+    {
+        CleanupSpawnedObjects();
+        ResetStateFlags();
+        Debug.Log("CodonTracker: Cleanup complete.");
     }
 
     public void StartAminoAcidInput() {
@@ -508,6 +774,29 @@ public class CodonTracker : MonoBehaviour
     [YarnCommand("ToggleAminoAcidInput")]
     public void ToggleAminoAcidInput(bool show) {
         aminoAcidInput.SetActive(show);
+    }
+
+    [YarnCommand("ToggleEndScene")]
+    public void ToggleEndScene(bool show) {
+        Debug.Log("ToggleEndScene: " + show);
+        endScene.SetActive(show);
+    }
+
+    /// <summary>
+    /// Toggles the end scene after a 2 second delay. Can be called from other scripts.
+    /// </summary>
+    public void ToggleEndSceneDelayed(bool show) {
+        StartCoroutine(ToggleEndSceneAfterDelay(show, 2f));
+    }
+
+    [YarnCommand("ToggleEndSceneDelayed")]
+    public void ToggleEndSceneDelayedCommand(bool show) {
+        ToggleEndSceneDelayed(show);
+    }
+
+    private IEnumerator ToggleEndSceneAfterDelay(bool show, float delay) {
+        yield return new WaitForSeconds(delay);
+        ToggleEndScene(show);
     }
 
     [YarnCommand("StartTranslation")]

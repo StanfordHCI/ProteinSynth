@@ -234,6 +234,16 @@ public class AminoAcidDropdownInput : MonoBehaviour
         }
         // UpdateDisplay();
         UpdateVisualFeedback(false, "Please select amino acids");
+        
+        // Reset button states
+        SetupValidationButton();
+        UpdateCodonCheckButton();
+        
+        // Reset validation indicator
+        if (validationIndicator != null)
+        {
+            validationIndicator.color = neutralColor;
+        }
     }
     
     public void SetSelection(string[] aminoAcids)

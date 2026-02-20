@@ -101,6 +101,14 @@ public class TodoList : MonoBehaviour
     }
 
     /// <summary>
+    /// Resets all todos by clearing the active todos dictionary.
+    /// </summary>
+    public void ResetAllTodos()
+    {
+        activeTodos.Clear();
+    }
+
+    /// <summary>
     /// Updates the transparency of a to-do item based on whether it's checked.
     /// </summary>
     private void UpdateTransparency(GameObject item, bool isChecked)

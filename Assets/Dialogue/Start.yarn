@@ -227,6 +227,7 @@ title: ProteinSynthesisLabCytokines
 title: ProteinSynthesisLab
 ---
 // <<LoadScene ImageTargetTestCodon>> // comment this out if needed
+<<update_character DialogueCanvas "$peer_tutor">>
 <<hide_background DialogueCanvas true>>
 <<toggle_character_position DialogueCanvas true>>
 <<if $peer_tutor == "Alex">>
@@ -251,7 +252,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Immunoglobulins>>
+        <<play_voice AudioManager Alex_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -269,7 +270,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Immunoglobulins>>
+        <<play_voice AudioManager Yari_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -287,7 +288,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Immunoglobulins>>
+        <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -305,7 +306,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Immunoglobulins>>
+        <<play_voice AudioManager Benji_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -343,7 +344,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
+        <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -361,7 +362,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
+        <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -379,7 +380,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
+        <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -397,7 +398,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elifter $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
+        <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -525,8 +526,9 @@ title: ScanRibosome
 <<hide_canvas DialogueCanvas true>>
 ===
 
-title: ProteinSynthesisReflection
+title: ProteinSynthesisCongrats
 ---
+<<hide_canvas DialogueCanvas false>>
 <<if $peer_tutor == "Alex">>
     <<play_voice AudioManager Alex_ProteinSynthesisReflection_01>>
 <<elseif $peer_tutor == "Yari">>
@@ -537,10 +539,14 @@ title: ProteinSynthesisReflection
     <<play_voice AudioManager Benji_ProteinSynthesisReflection_01>>
 <<endif>>
 {$peer_tutor}: Congrats! You just made a protein!
-<<UnloadScene>>
+===
+
+title: ProteinSynthesisReflection
+---
 <<hide_background DialogueCanvas false>>
 <<hide_canvas DialogueCanvas false>>
 <<toggle_character_position DialogueCanvas false>>
+<<UnloadScene>>
 
 <<set $playerResponse to "">>
 <<send_player_message WebsocketManager "$playerResponse">>
