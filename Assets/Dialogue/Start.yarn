@@ -21,12 +21,12 @@ tags:
 <<declare $participant_id = "craftstest1" as string>>
 <<declare $condition = "treatment" as string>>
 <<declare $remote = false as bool>>
-<<declare $grade = "9th" as string>>
 
 <<declare $protein_synthesis_topic = "" as string>>
 <<declare $peer_tutor = "Yari" as string>>
 <<declare $finished_scanning_nucleus = false as bool>>
 <<declare $finished_scanning_ribosome = false as bool>>
+<<declare $grade = "" as string>>
 
 -> Start
 <<hide_cover Cover>>
@@ -53,6 +53,16 @@ What's your name?
 <<RequestInput InputPanel "Type in your name!">> // accept player input
 -> Submit
 <<SaveAndCloseInput InputPanel "$player_name">>
+
+What grade are you in?
+-> 9th 
+    <<set $grade to "9th">>
+-> 10th
+    <<set $grade to "10th">>
+-> 11th
+    <<set $grade to "11th">>
+-> 12th
+    <<set $grade to "12th">>
 
 // select peer tutor
 Select your peer tutor! 
