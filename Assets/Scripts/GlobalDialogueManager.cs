@@ -1,6 +1,7 @@
 using Yarn.Unity;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering;
 
 /// Provides global static methods for a singleton DialogueRunner.
 /// Can load scenes additively to keep the dialogue UI persistent.
