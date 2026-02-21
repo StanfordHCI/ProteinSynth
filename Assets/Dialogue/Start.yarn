@@ -352,7 +352,7 @@ title: ProteinSynthesisLab
         <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Cytokines>>
     <<endif>>
 <<endif>>
-{$peer_tutor}: It seems like you might be interested in {$protein_synthesis_topic}. Let's figure out how {$protein_synthesis_topic} is synthesized.
+{$peer_tutor}: Let's figure out how {$protein_synthesis_topic} is synthesized, starting from DNA located in the nucleus.
 <<if $peer_tutor == "Alex">>
     <<play_voice AudioManager Alex_ProteinSynthesisLab_03>>
 <<elseif $peer_tutor == "Yari">>
@@ -658,6 +658,7 @@ title: ProteinSynthesisReflection
     <<play_voice AudioManager Maya_ProteinSynthesisReflection_01>>
 <<endif>>
 {$peer_tutor}: Congrats! You just made a protein!
+<<wait 3>>
 <<UnloadScene>>
 <<hide_background DialogueCanvas false>>
 <<hide_canvas DialogueCanvas false>>
