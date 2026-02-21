@@ -674,7 +674,26 @@ title: ProteinSynthesisReflection
 <<elseif $peer_tutor == "Maya">>
     <<play_voice AudioManager Maya_ProteinSynthesisReflection_01>>
 <<endif>>
-{$peer_tutor}: Congrats! You just made a protein!
+{$peer_tutor}: Congrats! You've made an amino acid chain. 
+{$peer_tutor}: When translation is done, the chain folds because different parts within the chain interact— attracting, repelling, and bonding with each other— causing it to twist and bend into a stable three-dimensional shape.
+<<if $protein_synthesis_topic == "lactase">>
+    <<spawn_protein CodonManager "lactase">>
+<<elseif $protein_synthesis_topic == "hemoglobin">>
+    <<spawn_protein CodonManager "hemoglobin">>
+<<elseif $protein_synthesis_topic == "insulin">>
+    <<spawn_protein CodonManager "insulin">>
+<<elseif $protein_synthesis_topic == "myosin">>
+    <<spawn_protein CodonManager "myosin">>
+<<elseif $protein_synthesis_topic == "keratin">>
+    <<spawn_protein CodonManager "keratin">>
+<<elseif $protein_synthesis_topic == "immunoglobulins">>
+    <<spawn_protein CodonManager "immunoglobulins">>
+<<elseif $protein_synthesis_topic == "tyrosinase">>
+    <<spawn_protein CodonManager "tyrosinase">>
+<<elseif $protein_synthesis_topic == "cytokines">>
+    <<spawn_protein CodonManager "cytokines">>
+<<endif>>
+{$peer_tutor}: Finally, {$protein_synthesis_topic} is made. That wraps up the lab. Press next to reflect on what we've learned.
 <<wait 3>>
 <<hide_background DialogueCanvas false>>
 <<hide_canvas DialogueCanvas false>>

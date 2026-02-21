@@ -3056,6 +3056,30 @@ MonoBehaviour:
   DNATargetObject: {fileID: 1071713365}
   RibosomeTargetObject: {fileID: 1130165643}
   mRNA: {fileID: 1633486545}
+  proteinPrefabs:
+  - proteinName: lactase
+    prefab: {fileID: 7202696382790179596, guid: 0532a5d631f6db140a9a5315257b9b83,
+      type: 3}
+  - proteinName: hemoglobin
+    prefab: {fileID: 5372005925156908441, guid: 1db6cd30b4789da4d93b2216f0e6b02e,
+      type: 3}
+  - proteinName: insulin
+    prefab: {fileID: 29323730628168384, guid: 8a9267fb3ec9de24a8e3ce27d9b92bd0, type: 3}
+  - proteinName: myosin
+    prefab: {fileID: 4879387133611500847, guid: 96e2e971d5e0da9459032700abc7adc8,
+      type: 3}
+  - proteinName: keratin
+    prefab: {fileID: 5840613194975117382, guid: 89dfcad7d68814f49987eff0eca24516,
+      type: 3}
+  - proteinName: immunoglobulins
+    prefab: {fileID: 6354760888240204993, guid: a5a1e0c66a05213489212674fe3f8166,
+      type: 3}
+  - proteinName: tyrosinase
+    prefab: {fileID: 2798277716389074038, guid: 31bb591b483aad04397b08f4cf45c670,
+      type: 3}
+  - proteinName: cytokines
+    prefab: {fileID: 6637285289585788415, guid: 9aaab335076e5054688843f088c69e0c,
+      type: 3}
   tRNASpawner: {fileID: 1633486546}
   aminoAcidInput: {fileID: 1104845247}
   arCamera: {fileID: 1667839872}
@@ -3063,6 +3087,7 @@ MonoBehaviour:
   xOffset: 0
   yOffset: 0
   zOffset: 0.05
+  proteinOffsetExtra: {x: 0, y: 0.28, z: 0}
   xRotation: 0
   yRotation: -90
   zRotation: 90

@@ -474,8 +474,8 @@ MonoBehaviour:
   hideDelay: 1
   enterAnimDuration: 2
   exitAnimDuration: 2
-  aminoShiftMin: {x: 0.0016, y: -0.002, z: -0.003}
-  aminoShiftMax: {x: 0.002, y: 0.002, z: -0.005}
+  aminoShiftMin: {x: 0.002, y: -0.002, z: -0.003}
+  aminoShiftMax: {x: 0.0025, y: 0.002, z: -0.005}
 --- !u!4 &5459221582741483883 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5375429031310914499, guid: 9bab250295df9804baa18dee9b2406f7,

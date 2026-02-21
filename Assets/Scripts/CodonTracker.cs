@@ -15,6 +15,13 @@ using UnityEngine.XR.ARFoundation;
 
 public class CodonTracker : MonoBehaviour
 {
+    [System.Serializable]
+    public class ProteinPrefabEntry
+    {
+        public string proteinName;
+        public GameObject prefab;
+    }
+
     // Singleton instance so other scripts can access this tracker globally
     public static CodonTracker instance;
 
@@ -49,6 +56,10 @@ public class CodonTracker : MonoBehaviour
     public GameObject DNATargetObject;   
     public GameObject RibosomeTargetObject;   
     public TemplateDNASpawner mRNA;
+
+    [Header("Protein prefabs (for spawn_protein)")]
+    [SerializeField] private List<ProteinPrefabEntry> proteinPrefabs = new List<ProteinPrefabEntry>();
+    private GameObject spawnedProtein;
     public tRNASpawner tRNASpawner;
     public GameObject aminoAcidInput;
     public GameObject arCamera; 
@@ -58,6 +69,8 @@ public class CodonTracker : MonoBehaviour
     [SerializeField] private float xOffset;
     [SerializeField] private float yOffset;
     [SerializeField] private float zOffset;
+    [Tooltip("Extra offset for spawned protein (added to mRNA offset so protein sits a bit further from ribosome).")]
+    [SerializeField] private Vector3 proteinOffsetExtra = new Vector3(0f, 0.05f, 0.1f);
     [SerializeField] private float xRotation;
     [SerializeField] private float yRotation;
     [SerializeField] private float zRotation;
@@ -330,7 +343,8 @@ public class CodonTracker : MonoBehaviour
             strand.transform.position = Vector3.Lerp(strand.transform.position, hoverPosition, Time.deltaTime * 10f);
             strand.transform.rotation = RibosomeTargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
 
-            if (!strand.activeSelf)
+            // Keep mRNA hidden when a protein is spawned
+            if (!strand.activeSelf && (spawnedProtein == null || !spawnedProtein.activeInHierarchy))
                 strand.SetActive(true);
         }
         else
@@ -339,6 +353,15 @@ public class CodonTracker : MonoBehaviour
             {
                 strand.SetActive(false);
             }
+        }
+
+        // Spawned protein follows ribosome target (offset a bit more than mRNA)
+        if (spawnedProtein != null && spawnedProtein.activeInHierarchy && RibosomeTargetObject != null && RibosomeTargetObject.activeInHierarchy)
+        {
+            Vector3 baseOffset = new Vector3(xOffset, yOffset, zOffset);
+            Vector3 hoverPosition = RibosomeTargetObject.transform.position + baseOffset + proteinOffsetExtra;
+            spawnedProtein.transform.position = Vector3.Lerp(spawnedProtein.transform.position, hoverPosition, Time.deltaTime * 10f);
+            spawnedProtein.transform.rotation = RibosomeTargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation);
         }
     }
 
@@ -580,6 +603,58 @@ public class CodonTracker : MonoBehaviour
     [YarnCommand("StartTranslation")]
     public void StartTranslation() {
         shouldStartTranslation = true;
+    }
+
+    [YarnCommand("spawn_protein")]
+    public void SpawnProtein(string proteinName)
+    {
+        if (string.IsNullOrEmpty(proteinName))
+        {
+            Debug.LogWarning("spawn_protein: protein name is empty.");
+            return;
+        }
+
+        GameObject prefab = null;
+        foreach (var entry in proteinPrefabs)
+        {
+            if (entry != null && entry.prefab != null &&
+                string.Equals(entry.proteinName, proteinName.Trim(), System.StringComparison.OrdinalIgnoreCase))
+            {
+                prefab = entry.prefab;
+                break;
+            }
+        }
+
+        if (prefab == null)
+        {
+            Debug.LogWarning("spawn_protein: no prefab found for protein name '" + proteinName + "'. Add it to CodonTracker's Protein prefabs list.");
+            return;
+        }
+
+        // Hide the mRNA object that was instantiated (reverse strand or original)
+        GameObject strand = mRNAReverseObject != null ? mRNAReverseObject : mRNAObject;
+        if (strand != null)
+            strand.SetActive(false);
+
+        // Destroy previous spawned protein if any
+        if (spawnedProtein != null)
+        {
+            Destroy(spawnedProtein);
+            spawnedProtein = null;
+        }
+
+        // Spawn at ribosome target position (offset a bit more than mRNA)
+        Vector3 baseOffset = new Vector3(xOffset, yOffset, zOffset);
+        Vector3 pos = RibosomeTargetObject != null
+            ? RibosomeTargetObject.transform.position + baseOffset + proteinOffsetExtra
+            : Vector3.zero;
+        Quaternion rot = RibosomeTargetObject != null
+            ? RibosomeTargetObject.transform.rotation * Quaternion.Euler(xRotation, yRotation, zRotation)
+            : Quaternion.identity;
+
+        spawnedProtein = Instantiate(prefab, pos, rot);
+        spawnedProtein.SetActive(true);
+        Debug.Log("spawn_protein: spawned '" + proteinName + "'.");
     }
 
     // [YarnCommand("enable_camera")]
