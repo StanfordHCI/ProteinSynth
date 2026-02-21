@@ -13,6 +13,12 @@ public class GlobalDialogueManager : MonoBehaviour
     private void Awake()
     {
         runner = gameObject.GetComponent<DialogueRunner>();
+
+        // Disable rendering debugger so it doesn't accidentally show up
+        if (DebugManager.instance != null) {
+            DebugManager.instance.enableRuntimeUI = false;
+        }
+
         Debug.Log(runner);
     }
 
