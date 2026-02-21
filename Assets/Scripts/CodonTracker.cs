@@ -34,6 +34,7 @@ public class CodonTracker : MonoBehaviour
     private bool introDone = false;
     private bool nucleusDialogue = false;
     private bool isStartingDNATutorial = false;
+    private bool ribosomeUnhidden = false;
 
     [Header("Animation Settings")]
     [SerializeField] private Vector3 targetScaleMultiplier = new Vector3(1.5f, 1.5f, 1.5f);
@@ -110,6 +111,21 @@ public class CodonTracker : MonoBehaviour
         {
             mRNAonRibosome();
             DNATargetObject.SetActive(false);
+
+            // Unhide the ribosome on the spawned mRNA strand (once)
+            if (!ribosomeUnhidden)
+            {
+                GameObject strand = mRNAReverseObject != null ? mRNAReverseObject : mRNAObject;
+                if (strand != null)
+                {
+                    Transform ribosome = strand.transform.Find("ribosome");
+                    if (ribosome != null)
+                    {
+                        ribosome.gameObject.SetActive(true);
+                        ribosomeUnhidden = true;
+                    }
+                }
+            }
         }
 
         if (introDone == true)
@@ -235,7 +251,12 @@ public class CodonTracker : MonoBehaviour
     private void UpdateCodonStringIfChanged()
     {
         List<GameObject> sorted = new List<GameObject>(activeCodons.Values);
-        sorted.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+        sorted.Sort((a, b) =>
+        {
+            float ax = DNATargetObject.transform.InverseTransformPoint(a.transform.position).x;
+            float bx = DNATargetObject.transform.InverseTransformPoint(b.transform.position).x;
+            return ax.CompareTo(bx);
+        });
 
         string fullCodon = "";
         foreach (GameObject obj in sorted)
@@ -262,7 +283,7 @@ public class CodonTracker : MonoBehaviour
             if (aminoAcidTextUI != null)
                 aminoAcidTextUI.text = "Amino Acids: " + aminoAcidChain;
 
-            if (mRNA != null)
+            if (mRNA != null && mRNA.gameObject.activeInHierarchy)
                 UpdateStrand();
         }
     }
@@ -387,12 +408,14 @@ public class CodonTracker : MonoBehaviour
         if (studentStrand.Length != expectedStrand.Length) 
         {
             Debug.Log("Not finished transcribing all cards.");
+            GlobalDialogueManager.StopDialogue();
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionUnsuccessful");
         }
         else if (studentStrand == expectedStrand)
         {
             transcriptionFinished = true;
             Debug.Log("Finished transcribing correctly.");
+            GlobalDialogueManager.StopDialogue();
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionSuccessful");
             todoList.CheckoffToDo("arrange_cards");
             todoList.CheckoffToDo("finish_transcription");
@@ -401,6 +424,7 @@ public class CodonTracker : MonoBehaviour
         else
         {
             Debug.Log("Not correct. Try again.");
+            GlobalDialogueManager.StopDialogue();
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionIncorrect");
         }
     }

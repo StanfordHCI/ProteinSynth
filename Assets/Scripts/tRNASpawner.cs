@@ -29,8 +29,33 @@ public class tRNASpawner : MonoBehaviour
     public float enterAnimDuration = 2.0f; // how long the Enter animation lasts
     public float exitAnimDuration = 2.0f;  // how long the Exit animation lasts
 
+    [Header("Amino Acid Chain")]
+    [Tooltip("Minimum shift applied to existing amino acids (random per component between min and max).")]
+    public Vector3 aminoShiftMin = Vector3.zero;
+    [Tooltip("Maximum shift applied to existing amino acids.")]
+    public Vector3 aminoShiftMax = new Vector3(0.001f, 0f, -0.003f);
+
     private Coroutine activeCoroutine;
     private readonly Queue<GameObject> activeTRNAs = new Queue<GameObject>();
+    private readonly List<GameObject> spawnedAminoAcids = new List<GameObject>();
+
+    /// <summary>
+    /// Called by tRNAAnimationRelay when a tRNA's Enter animation finishes (animation event).
+    /// Plays the pop sound and advances the ribosome.
+    /// </summary>
+    public void HandleEnterFinished(GameObject tRNA)
+    {
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlaySFX("pop");
+
+        Transform mRNARoot = transform.parent;
+        if (mRNARoot != null)
+        {
+            Transform ribosome = mRNARoot.Find("ribosome");
+            if (ribosome != null)
+                ribosome.localPosition += new Vector3(0f, 0f, -0.011f);
+        }
+    }
 
     public void StartSpawning(string sequence)
     {
@@ -84,19 +109,28 @@ public class tRNASpawner : MonoBehaviour
                 AudioManager.Instance.PlaySFX("swoosh");
             }
 
-            // Wait for Enter animation to finish
-            yield return new WaitForSeconds(enterAnimDuration + 0.1f);
-
-            // Play pop sound when Enter animation ends
-            if (AudioManager.Instance != null)
-            {
-                AudioManager.Instance.PlaySFX("pop");
-            }
+            // Wait for Enter animation to finish (pop + ribosome move are triggered by tRNAAnimationRelay -> HandleEnterFinished)
+            yield return new WaitForSeconds(enterAnimDuration);
 
             // Move amino acid to ribosome holder
             Transform aminoAcid = spawned.transform.Find("Model/AminoAcid");
             if (aminoAcid != null && aminoAcidHolder != null)
+            {
+                // Random shift between min and max for this step
+                Vector3 shift = new Vector3(
+                    Random.Range(aminoShiftMin.x, aminoShiftMax.x),
+                    Random.Range(aminoShiftMin.y, aminoShiftMax.y),
+                    Random.Range(aminoShiftMin.z, aminoShiftMax.z)
+                );
+                for (int j = 0; j < spawnedAminoAcids.Count; j++)
+                {
+                    GameObject existing = spawnedAminoAcids[j];
+                    if (existing != null)
+                        existing.transform.localPosition += shift;
+                }
                 aminoAcid.SetParent(aminoAcidHolder, true);
+                spawnedAminoAcids.Add(aminoAcid.gameObject);
+            }
 
             // Add new tRNA to active queue
             activeTRNAs.Enqueue(spawned);
