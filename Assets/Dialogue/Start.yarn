@@ -187,7 +187,7 @@ title: ProteinSynthesisLabInsulin
 ---
 <<LoadScene ImageTargetTestCodon>>
 <<set $protein_synthesis_topic to "insulin">>
-<<set_sequence CodonManager "TACCTCGACAGAUGG">>
+<<set_sequence CodonManager "TACCTCGACAGAACC">>
 ===
 
 title: ProteinSynthesisLabMyosin
