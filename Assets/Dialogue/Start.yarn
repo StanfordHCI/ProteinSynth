@@ -28,6 +28,7 @@ tags:
 <<declare $finished_scanning_ribosome = false as bool>>
 <<declare $grade = "" as string>>
 <<declare $initalized_websocket = false as bool>>
+<<declare $arrange_cards_todo_added = false as bool>>
 
 -> Start
 <<hide_cover Cover>>
@@ -544,7 +545,10 @@ title: ProteinSynthesisDNATutorial
     <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_04>>
 <<endif>>
 {$peer_tutor}: Arrange the codon cards on the table to form a nucleotide base sequence for the mRNA strand that matches the DNA template strand. Make sure to use the complementary bases!
-<<add_todo Todos "arrange_cards">>
+<<if $arrange_cards_todo_added == false>>
+    <<add_todo Todos "arrange_cards">>
+    <<set $arrange_cards_todo_added to true>>
+<<endif>>
 <<if $peer_tutor == "Alex">>
     <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_05>>
 <<elseif $peer_tutor == "Yari">>
@@ -600,6 +604,13 @@ title: ProteinSynthesisTranscriptionIncorrect
     <<play_voice AudioManager Maya_ProteinSynthesisTranscriptionIncorrect_01>>
 <<endif>>
 {$peer_tutor}: Hmmm... I don't think you've transcribed the DNA correctly. Let's try again! 
+<<hide_canvas DialogueCanvas true>>
+===
+
+title: ProteinSynthesisTranscriptionIncorrectHints
+---
+<<hide_canvas DialogueCanvas false>>
+{$peer_tutor}: I've highlighted the correct card placements teal and the incorrect card placements red. Let's try again!
 <<hide_canvas DialogueCanvas true>>
 ===
 
@@ -675,7 +686,7 @@ title: ProteinSynthesisReflection
     <<play_voice AudioManager Maya_ProteinSynthesisReflection_01>>
 <<endif>>
 {$peer_tutor}: Congrats! You've made an amino acid chain. 
-{$peer_tutor}: When translation is done, the chain folds because different parts within the chain interact— attracting, repelling, and bonding with each other— causing it to twist and bend into a stable three-dimensional shape.
+{$peer_tutor}: When translation is done, the chain folds because different parts within the chain interact, causing it to twist and bend into a stable three-dimensional shape.
 <<if $protein_synthesis_topic == "lactase">>
     <<spawn_protein CodonManager "lactase">>
 <<elseif $protein_synthesis_topic == "hemoglobin">>
@@ -693,8 +704,10 @@ title: ProteinSynthesisReflection
 <<elseif $protein_synthesis_topic == "cytokines">>
     <<spawn_protein CodonManager "cytokines">>
 <<endif>>
-{$peer_tutor}: Finally, {$protein_synthesis_topic} is made. That wraps up the lab. Press next to reflect on what we've learned.
-<<wait 3>>
+{$peer_tutor}: Finally, {$protein_synthesis_topic} is made. Spend a moment looking at it.
+<<wait 10>>
+{$peer_tutor}: That wraps up the transcription and translation lab. Press next to reflect on what we've learned.
+<<wait 2>>
 <<hide_background DialogueCanvas false>>
 <<hide_canvas DialogueCanvas false>>
 <<toggle_character_position DialogueCanvas false>>

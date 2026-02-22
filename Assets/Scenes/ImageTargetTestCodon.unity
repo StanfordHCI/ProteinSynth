@@ -3232,6 +3232,12 @@ MonoBehaviour:
   aminoAcidTextUI: {fileID: 280338881}
   aminoAcidInputCodonTextUI: {fileID: 2011528652}
   todoList: {fileID: 887080528}
+  defaultBorderMaterial: {fileID: 2100000, guid: 569ac39691a704d32af8271efbce1077,
+    type: 2}
+  wrongOrderBorderMaterial: {fileID: 2100000, guid: 6e44afe2ddc70bf46abdc2dce7303145,
+    type: 2}
+  rightOrderBorderMaterial: {fileID: 2100000, guid: 42b8eacdf6279a94699cb1d6e915ea38,
+    type: 2}
 --- !u!4 &405934928
 Transform:
   m_ObjectHideFlags: 0
