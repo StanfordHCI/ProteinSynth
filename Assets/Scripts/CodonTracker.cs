@@ -85,7 +85,16 @@ public class CodonTracker : MonoBehaviour
     public TextMeshProUGUI aminoAcidInputCodonTextUI;
     public TodoList todoList;
 
+    [Header("Border materials (wrong-order hint on 3rd+ attempt)")]
+    [Tooltip("Default border on Image Target > Sprite > Border (e.g. yellow).")]
+    [SerializeField] private Material defaultBorderMaterial;
+    [Tooltip("Material applied to Border on cards that are in the wrong order (3rd+ attempt).")]
+    [SerializeField] private Material wrongOrderBorderMaterial;
+    [Tooltip("Material applied to Border on cards that are in the correct position (3rd+ attempt).")]
+    [SerializeField] private Material rightOrderBorderMaterial;
+
     private ObserverBehaviour observer;
+    private int finishTranscriptionAttemptCount = 0;
 
 
     void Awake()
@@ -107,6 +116,7 @@ public class CodonTracker : MonoBehaviour
         if (!transcriptionFinished) 
         {
             UpdateCodonStringIfChanged();
+            UpdateArrangeCardsTodoCount();
         }
 
         if (transcriptionFinished && ribosomeFound && !GlobalDialogueManager.runner.IsDialogueRunning && !ribosomeMoved) 
@@ -261,6 +271,59 @@ public class CodonTracker : MonoBehaviour
         }
     }
 
+    /// <summary>Returns codon cards sorted left-to-right (same order as displayed strand).</summary>
+    private List<GameObject> GetSortedCodonCards()
+    {
+        List<GameObject> sorted = new List<GameObject>(activeCodons.Values);
+        if (DNATargetObject == null) return sorted;
+        sorted.Sort((a, b) =>
+        {
+            float ax = DNATargetObject.transform.InverseTransformPoint(a.transform.position).x;
+            float bx = DNATargetObject.transform.InverseTransformPoint(b.transform.position).x;
+            return ax.CompareTo(bx);
+        });
+        return sorted;
+    }
+
+    private static string GetCodonFromCardName(GameObject card)
+    {
+        if (card == null) return "";
+        string name = card.name;
+        int i = name.LastIndexOf('_');
+        return i >= 0 && i + 1 < name.Length ? name.Substring(i + 1) : name;
+    }
+
+    private static void SetCardBorderMaterial(GameObject card, Material mat)
+    {
+        if (card == null || mat == null) return;
+        Transform sprite = card.transform.Find("Sprite");
+        if (sprite == null) return;
+        Transform border = sprite.Find("Border");
+        if (border == null) return;
+        MeshRenderer mr = border.GetComponent<MeshRenderer>();
+        if (mr != null)
+            mr.material = mat;
+    }
+
+    private void ResetAllCodonBordersToDefault()
+    {
+        if (defaultBorderMaterial == null) return;
+        foreach (GameObject card in activeCodons.Values)
+            SetCardBorderMaterial(card, defaultBorderMaterial);
+    }
+
+    private const int ExpectedCodonCount = 5;
+
+    private void UpdateArrangeCardsTodoCount()
+    {
+        if (todoList == null)
+            return;
+        int count = activeCodons.Count;
+        todoList.UpdateTodoText("arrange_cards", "Arrange codon cards (" + count + "/" + ExpectedCodonCount + ")");
+        // Don't change transparency for the live 5/5 check so the list doesn't flicker with camera distance
+        todoList.SetTodoChecked("arrange_cards", count == ExpectedCodonCount, applyTransparency: false);
+    }
+
     private void UpdateCodonStringIfChanged()
     {
         List<GameObject> sorted = new List<GameObject>(activeCodons.Values);
@@ -284,6 +347,7 @@ public class CodonTracker : MonoBehaviour
         if (fullCodon != lastCodonString)
         {
             lastCodonString = fullCodon;
+            ResetAllCodonBordersToDefault();
 
             string aminoAcidChain = TranslateToAminoAcids(fullCodon);
 
@@ -430,6 +494,8 @@ public class CodonTracker : MonoBehaviour
 
         if (studentStrand.Length != expectedStrand.Length) 
         {
+            finishTranscriptionAttemptCount++;
+            ResetAllCodonBordersToDefault();
             Debug.Log("Not finished transcribing all cards.");
             GlobalDialogueManager.StopDialogue();
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionUnsuccessful");
@@ -440,15 +506,36 @@ public class CodonTracker : MonoBehaviour
             Debug.Log("Finished transcribing correctly.");
             GlobalDialogueManager.StopDialogue();
             GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionSuccessful");
-            todoList.CheckoffToDo("arrange_cards");
+            todoList.SetTodoChecked("arrange_cards", true);
             todoList.CheckoffToDo("finish_transcription");
             transcriptionButton.SetActive(false); 
         }
         else
         {
+            finishTranscriptionAttemptCount++;
+            ResetAllCodonBordersToDefault();
+            if (finishTranscriptionAttemptCount >= 3 && (wrongOrderBorderMaterial != null || rightOrderBorderMaterial != null))
+            {
+                List<GameObject> sortedCards = GetSortedCodonCards();
+                for (int i = 0; i < expectedStrand.Length; i += 3)
+                {
+                    int codonIndex = i / 3;
+                    if (codonIndex >= sortedCards.Count) break;
+                    string expectedCodon = expectedStrand.Substring(i, 3);
+                    string studentCodon = GetCodonFromCardName(sortedCards[codonIndex]);
+                    bool isCorrect = studentCodon == expectedCodon;
+                    if (!isCorrect && wrongOrderBorderMaterial != null)
+                        SetCardBorderMaterial(sortedCards[codonIndex], wrongOrderBorderMaterial);
+                    else if (isCorrect && rightOrderBorderMaterial != null)
+                        SetCardBorderMaterial(sortedCards[codonIndex], rightOrderBorderMaterial);
+                }
+            }
             Debug.Log("Not correct. Try again.");
             GlobalDialogueManager.StopDialogue();
-            GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionIncorrect");
+            if (finishTranscriptionAttemptCount >= 3)
+                GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionIncorrectHints");
+            else
+                GlobalDialogueManager.StartDialogue("ProteinSynthesisTranscriptionIncorrect");
         }
     }
 
