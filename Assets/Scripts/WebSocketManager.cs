@@ -172,7 +172,7 @@ public class WebSocketManager : MonoBehaviour {
                 line = responseLine;
             }
 
-            string[] sentences = Regex.Split(line, @"(?<=[\.!\?])\s+"); 
+            string[] sentences = Regex.Split(line, @"(?:(?<=[\.!\?][""])|(?<=[\.!\?]))\s+"); 
             foreach (string sentence in sentences) {
                 // Only queue up non-empty strings
                 if (sentence != "") {
