@@ -272,7 +272,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Alex_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Alex_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -290,7 +290,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Yari_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Yari_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -308,7 +308,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Jessica_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -326,7 +326,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Benji_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Benji_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -344,7 +344,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Isaiah_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -362,7 +362,7 @@ title: ProteinSynthesisLab
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Maya_ProteinSynthesisLab_02_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -405,7 +405,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -423,7 +423,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Yari_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -441,7 +441,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Jessica_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -459,7 +459,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Benji_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -477,7 +477,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Isaiah_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -495,7 +495,7 @@ title: ProteinSynthesisDNATutorial
     <<elseif $protein_synthesis_topic == "keratin">>
         <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Keratin>>
     <<elseif $protein_synthesis_topic == "immunoglobulins">>
-        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_ImmunoglobulinsAntibodies>>
+        <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Immunoglobulins>>
     <<elseif $protein_synthesis_topic == "tyrosinase">>
         <<play_voice AudioManager Maya_ProteinSynthesisDNATutorial_01_Tyrosinase>>
     <<elseif $protein_synthesis_topic == "cytokines">>
@@ -610,6 +610,19 @@ title: ProteinSynthesisTranscriptionIncorrect
 title: ProteinSynthesisTranscriptionIncorrectHints
 ---
 <<hide_canvas DialogueCanvas false>>
+<<if $peer_tutor == "Alex">>
+    <<play_voice AudioManager Alex_ProteinSynthesisTranscriptionIncorrectHints_01>>
+<<elseif $peer_tutor == "Yari">>
+    <<play_voice AudioManager Yari_ProteinSynthesisTranscriptionIncorrectHints_01>>
+<<elseif $peer_tutor == "Jessica">>
+    <<play_voice AudioManager Jessica_ProteinSynthesisTranscriptionIncorrectHints_01>>
+<<elseif $peer_tutor == "Benji">>
+    <<play_voice AudioManager Benji_ProteinSynthesisTranscriptionIncorrectHints_01>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisTranscriptionIncorrectHints_01>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisTranscriptionIncorrectHints_01>>
+<<endif>>
 {$peer_tutor}: I've highlighted the correct card placements teal and the incorrect card placements red. Let's try again!
 <<hide_canvas DialogueCanvas true>>
 ===
@@ -686,6 +699,19 @@ title: ProteinSynthesisReflection
     <<play_voice AudioManager Maya_ProteinSynthesisReflection_01>>
 <<endif>>
 {$peer_tutor}: Congrats! You've made an amino acid chain. 
+<<if $peer_tutor == "Alex">>
+    <<play_voice AudioManager Alex_ProteinSynthesisReflection_02>>
+<<elseif $peer_tutor == "Yari">>
+    <<play_voice AudioManager Yari_ProteinSynthesisReflection_02>>
+<<elseif $peer_tutor == "Jessica">>
+    <<play_voice AudioManager Jessica_ProteinSynthesisReflection_02>>
+<<elseif $peer_tutor == "Benji">>
+    <<play_voice AudioManager Benji_ProteinSynthesisReflection_02>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_02>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisReflection_02>>
+<<endif>>
 {$peer_tutor}: When translation is done, the chain folds because different parts within the chain interact, causing it to twist and bend into a stable three-dimensional shape.
 <<if $protein_synthesis_topic == "lactase">>
     <<spawn_protein CodonManager "lactase">>
@@ -704,8 +730,130 @@ title: ProteinSynthesisReflection
 <<elseif $protein_synthesis_topic == "cytokines">>
     <<spawn_protein CodonManager "cytokines">>
 <<endif>>
+<<if $peer_tutor == "Alex">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Alex_ProteinSynthesisReflection_03_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Alex_ProteinSynthesisReflection_03_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Alex_ProteinSynthesisReflection_03_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Alex_ProteinSynthesisReflection_03_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Alex_ProteinSynthesisReflection_03_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Alex_ProteinSynthesisReflection_03_Immunoglobulins>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Alex_ProteinSynthesisReflection_03_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Alex_ProteinSynthesisReflection_03_Cytokines>>
+    <<endif>>
+<<elseif $peer_tutor == "Yari">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Yari_ProteinSynthesisReflection_03_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Yari_ProteinSynthesisReflection_03_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Yari_ProteinSynthesisReflection_03_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Yari_ProteinSynthesisReflection_03_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Yari_ProteinSynthesisReflection_03_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Yari_ProteinSynthesisReflection_03_Immunoglobulins>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Yari_ProteinSynthesisReflection_03_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Yari_ProteinSynthesisReflection_03_Cytokines>>
+    <<endif>>
+<<elseif $peer_tutor == "Jessica">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Jessica_ProteinSynthesisReflection_03_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Jessica_ProteinSynthesisReflection_03_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Jessica_ProteinSynthesisReflection_03_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Jessica_ProteinSynthesisReflection_03_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Jessica_ProteinSynthesisReflection_03_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Jessica_ProteinSynthesisReflection_03_Immunoglobulins>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Jessica_ProteinSynthesisReflection_03_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Jessica_ProteinSynthesisReflection_03_Cytokines>>
+    <<endif>>
+<<elseif $peer_tutor == "Benji">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Benji_ProteinSynthesisReflection_03_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Benji_ProteinSynthesisReflection_03_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Benji_ProteinSynthesisReflection_03_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Benji_ProteinSynthesisReflection_03_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Benji_ProteinSynthesisReflection_03_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Benji_ProteinSynthesisReflection_03_Immunoglobulins>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Benji_ProteinSynthesisReflection_03_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Benji_ProteinSynthesisReflection_03_Cytokines>>
+    <<endif>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_03_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_03_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_03_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_03_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_03_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_03_Immunoglobulins>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_03_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_03_Cytokines>>
+    <<endif>>
+<<elseif $peer_tutor == "Maya">>
+    <<if $protein_synthesis_topic == "insulin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisReflection_03_Insulin>>
+    <<elseif $protein_synthesis_topic == "hemoglobin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisReflection_03_Hemoglobin>>
+    <<elseif $protein_synthesis_topic == "lactase">>
+        <<play_voice AudioManager Maya_ProteinSynthesisReflection_03_Lactase>>
+    <<elseif $protein_synthesis_topic == "myosin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisReflection_03_Myosin>>
+    <<elseif $protein_synthesis_topic == "keratin">>
+        <<play_voice AudioManager Maya_ProteinSynthesisReflection_03_Keratin>>
+    <<elseif $protein_synthesis_topic == "immunoglobulins">>
+        <<play_voice AudioManager Maya_ProteinSynthesisReflection_03_Immunoglobulins>>
+    <<elseif $protein_synthesis_topic == "tyrosinase">>
+        <<play_voice AudioManager Maya_ProteinSynthesisReflection_03_Tyrosinase>>
+    <<elseif $protein_synthesis_topic == "cytokines">>
+        <<play_voice AudioManager Maya_ProteinSynthesisReflection_03_Cytokines>>
+    <<endif>>
+<<endif>>
 {$peer_tutor}: Finally, {$protein_synthesis_topic} is made. Spend a moment looking at it.
 <<wait 10>>
+<<if $peer_tutor == "Alex">>
+    <<play_voice AudioManager Alex_ProteinSynthesisReflection_04>>
+<<elseif $peer_tutor == "Yari">>
+    <<play_voice AudioManager Yari_ProteinSynthesisReflection_04>>
+<<elseif $peer_tutor == "Jessica">>
+    <<play_voice AudioManager Jessica_ProteinSynthesisReflection_04>>
+<<elseif $peer_tutor == "Benji">>
+    <<play_voice AudioManager Benji_ProteinSynthesisReflection_04>>
+<<elseif $peer_tutor == "Isaiah">>
+    <<play_voice AudioManager Isaiah_ProteinSynthesisReflection_04>>
+<<elseif $peer_tutor == "Maya">>
+    <<play_voice AudioManager Maya_ProteinSynthesisReflection_04>>
+<<endif>>
 {$peer_tutor}: That wraps up the transcription and translation lab. Press next to reflect on what we've learned.
 <<wait 2>>
 <<hide_background DialogueCanvas false>>
@@ -793,14 +941,6 @@ title: ProteinSynthesisAminoAcidInputSuccessful
 
 title: EndGame
 ---
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
-Congratulations! You've completed the lesson. Please let a researcher know that you're done.
+Narration: Congratulations! You've completed the lesson. Please let a researcher know that you're done.
+<<jump EndGame>>
 ===
