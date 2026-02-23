@@ -309,6 +309,9 @@ public class WebSocketManager : MonoBehaviour {
                 nodeName = "ProteinSynthesisLabImmunoglobulins";
                 break;
             case "TO_PROTEIN_SYNTHESIS_LAB_CYTOKINES":
+                nodeName = "ProteinSynthesisLabCytokines";
+                break;
+            case "TO_PROTEIN_SYNTHESIS_LAB_TYROSINASE":
                 nodeName = "ProteinSynthesisLabTyrosinase";
                 break;
             case "ENCOURAGE_STUDENT_AND_BID_THEM_FAREWELL":
