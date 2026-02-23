@@ -22,7 +22,7 @@ public class AudioManager : MonoBehaviour
     public bool autoLoadVoiceFromResources = true;
     [Tooltip("Resources folder path for voice clips (relative to Assets/Resources/)")]
     public string voiceResourcesPath = "Audio/DialogueAudio";
-    [Tooltip("If true, searches character subfolders (Alex, Jessica, Benji, Yari)")]
+    [Tooltip("If true, searches character subfolders (Alex, Jessica, Benji, Yari, Isaiah, Maya)")]
     public bool includeCharacterSubfolders = true;
 
     private Dictionary<string, AudioEntry> sfxDict = new Dictionary<string, AudioEntry>();
@@ -105,8 +105,8 @@ public class AudioManager : MonoBehaviour
         // Load clips from character subfolders if enabled
         if (includeCharacterSubfolders)
         {
-            // Load from character-specific folders: Alex, Jessica, Benji, Yari
-            string[] characterFolders = { "Alex", "Jessica", "Benji", "Yari" };
+            // Load from character-specific folders: Alex, Jessica, Benji, Yari, Isaiah, Maya
+            string[] characterFolders = { "Alex", "Jessica", "Benji", "Yari", "Isaiah", "Maya" };
             
             foreach (string charFolder in characterFolders)
             {
