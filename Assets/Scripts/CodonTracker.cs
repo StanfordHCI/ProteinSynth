@@ -7,10 +7,11 @@
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using Yarn.Compiler;
 using Yarn.Unity;
-using Vuforia; 
+using Vuforia;
 using UnityEngine.XR.ARFoundation;
 
 public class CodonTracker : MonoBehaviour
@@ -111,6 +112,16 @@ public class CodonTracker : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        // Finish transcription button stays non-interactable until dialogue tells player to use it
+        if (transcriptionButton != null)
+        {
+            var btn = transcriptionButton.GetComponent<Button>();
+            if (btn != null) btn.interactable = false;
+        }
+    }
+
     void Update()
     {
         if (!transcriptionFinished) 
@@ -185,6 +196,16 @@ public class CodonTracker : MonoBehaviour
     public void ShowToDo()
     {
         todoList.gameObject.SetActive(true);
+    }
+
+    [YarnCommand("enable_finish_transcription_button")]
+    public void EnableFinishTranscriptionButton()
+    {
+        if (transcriptionButton != null)
+        {
+            var btn = transcriptionButton.GetComponent<Button>();
+            if (btn != null) btn.interactable = true;
+        }
     }
 
     [YarnCommand("set_sequence")]

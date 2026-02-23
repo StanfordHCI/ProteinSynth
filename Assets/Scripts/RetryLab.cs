@@ -32,6 +32,10 @@ public class RetryLab : MonoBehaviour
     [Range(0f, 1f)]
     [SerializeField] private float unselectedAlpha = 0.5f;
 
+    [Header("Participant ID")]
+    [Tooltip("Optional TMP input for participant ID. Drag and drop the TMP_InputField here. Value is set as $participant_id in Start.yarn.")]
+    [SerializeField] private TMP_InputField participantIdInput;
+
     [Header("Peer Tutor Dropdown")]
     [Tooltip("Optional dropdown for selecting peer tutor. Drag and drop the dropdown UI component here.")]
     [SerializeField] private TMP_Dropdown peerTutorDropdown;
@@ -100,6 +104,13 @@ public class RetryLab : MonoBehaviour
     /// </summary>
     public void StartLabWithSelectedProtein()
     {
+        // Sync participant ID from input to Yarn before starting (so Start.yarn uses it)
+        if (participantIdInput != null && yarnStorage != null)
+        {
+            string id = (participantIdInput.text ?? "").Trim();
+            yarnStorage.SetValue("$participant_id", string.IsNullOrEmpty(id) ? "no id provided" : id);
+        }
+
         // Stop any currently running dialogue first
         GlobalDialogueManager.StopDialogue();
 

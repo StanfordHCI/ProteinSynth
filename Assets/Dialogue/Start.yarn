@@ -549,6 +549,7 @@ title: ProteinSynthesisDNATutorial
     <<add_todo Todos "arrange_cards">>
     <<set $arrange_cards_todo_added to true>>
 <<endif>>
+<<enable_finish_transcription_button CodonManager>>
 <<if $peer_tutor == "Alex">>
     <<play_voice AudioManager Alex_ProteinSynthesisDNATutorial_05>>
 <<elseif $peer_tutor == "Yari">>
