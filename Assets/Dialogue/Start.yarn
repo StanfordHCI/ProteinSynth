@@ -241,7 +241,7 @@ title: ProteinSynthesisLab
 
     <<set $initalized_websocket to true>>
 <<endif>>
-
+<<hide_cover Cover>>
 // <<LoadScene ImageTargetTestCodon>> // comment this out if needed
 <<hide_background DialogueCanvas true>>
 <<update_character DialogueCanvas "$peer_tutor">>
