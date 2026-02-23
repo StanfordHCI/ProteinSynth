@@ -713,6 +713,31 @@ public class CodonTracker : MonoBehaviour
         shouldStartTranslation = true;
     }
 
+    /// <summary>
+    /// Yarn command: after the given seconds, stops any running dialogue and starts the specified node.
+    /// </summary>
+    [YarnCommand("play_dialogue_after_seconds")]
+    public void PlayDialogueAfterSeconds(float seconds, string nodeName)
+    {
+        if (string.IsNullOrEmpty(nodeName))
+        {
+            Debug.LogWarning("play_dialogue_after_seconds: node name is empty.");
+            return;
+        }
+        StartCoroutine(PlayDialogueAfterSecondsCoroutine(seconds, nodeName));
+    }
+
+    private IEnumerator PlayDialogueAfterSecondsCoroutine(float seconds, string nodeName)
+    {
+        yield return new WaitForSeconds(seconds);
+        if (GlobalDialogueManager.runner != null)
+        {
+            if (GlobalDialogueManager.runner.IsDialogueRunning)
+                GlobalDialogueManager.StopDialogue();
+            GlobalDialogueManager.StartDialogue(nodeName);
+        }
+    }
+
     [YarnCommand("spawn_protein")]
     public void SpawnProtein(string proteinName)
     {

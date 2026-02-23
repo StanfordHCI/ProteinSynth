@@ -840,8 +840,12 @@ title: ProteinSynthesisReflection
         <<play_voice AudioManager Maya_ProteinSynthesisReflection_03_Cytokines>>
     <<endif>>
 <<endif>>
+<<play_dialogue_after_seconds CodonManager 15.0 "ProteinSynthesisReflection04">> 
 {$peer_tutor}: Finally, {$protein_synthesis_topic} is made. Spend a moment looking at it.
-<<wait 10>>
+===
+
+title: ProteinSynthesisReflection04
+---
 <<if $peer_tutor == "Alex">>
     <<play_voice AudioManager Alex_ProteinSynthesisReflection_04>>
 <<elseif $peer_tutor == "Yari">>
