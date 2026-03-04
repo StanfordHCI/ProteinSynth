@@ -32,17 +32,17 @@ public class AvatarSelection : MonoBehaviour
     private GlobalInMemoryVariableStorage storage; // syncing with Yarn
 
     private string[] descriptions = {
-        "A vibrant 10th grader who proudly identifies as Afro-Latina, with Dominican and Puerto Rican roots. She's charismatic and can make any dry biology lesson come alive!",
+        "A vibrant college freshman who proudly identifies as Afro-Latina, with Dominican and Puerto Rican roots. She's charismatic and can make any dry biology lesson come alive!",
 
-        "A thoughtful 10th grader who reps his roots as a first-gen Mexican American. He doesn’t talk a lot during lessons, but when it comes time to help a classmate he’s all in.",
+        "A thoughtful college freshman who reps his roots as a first-gen Mexican American. He doesn’t talk a lot during lessons, but when it comes time to help a classmate he’s all in.",
 
-        "A thoughtful 10th grader who confidently reps her South Korean roots. She remembers feeling lost at first, so now she makes sure no one else feels left behind.",
+        "A thoughtful college freshman who confidently reps her South Korean roots. She remembers feeling lost at first, so now she makes sure no one else feels left behind.",
         
-        "A lively 10th grader who proudly wears his Singaporean heritage on his sleeve. His energy pulls everyone in, and he’s on a mission to make learning feel like an epic team project.",
+        "A lively college freshman who proudly wears his Singaporean heritage on his sleeve. His energy pulls everyone in, and he’s on a mission to make learning feel like an epic team project.",
 
-        "A humble 11th grader who proudly identifies as Black. He's a great listener and a natural leader.", 
+        "A humble college sophomore who proudly identifies as Black. He's a great listener and a natural leader.", 
 
-        "A stylish 12th grader who identifies as African American. She loves breaking down science concepts and sharing her knowledge with others.", 
+        "A stylish college junior who identifies as African American. She loves breaking down science concepts and sharing her knowledge with others.", 
 
     };
 
