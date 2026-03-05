@@ -76,6 +76,11 @@ namespace OpenAI
                     Debug.Log("Message is text: " + e.Data);
                     if (OnMessageReceived != null)
                     {
+                        if (e.Data == "{\"type\": \"ping\"}")
+                        {
+                            Debug.Log("Ignoring ping message");
+                            return;
+                        }
                         Debug.Log("Invoking OnMessageReceived event");
                         OnMessageReceived.Invoke(e.Data);
                         Debug.Log("OnMessageReceived event invoked");
