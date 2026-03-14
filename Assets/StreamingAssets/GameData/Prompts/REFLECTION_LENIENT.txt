@@ -1,0 +1,80 @@
+# ** LENIENT EVALUATION GUIDELINES for the reflection goal: **
+You must adhere to the following rules ONLY when evaluating the following goals: 
+- "{peer_tutor} asks the student to answer a near transfer question"
+- "{peer_tutor} asks the student to answer a far transfer question"
+
+This is the list of vocabulary: {vocab_list}
+
+# TRANSFER TYPE DEFINITIONS
+- **Near** transfer = same underlying principle applied to a closely related scenario (minor surface changes).
+- **Far** transfer  = same principle applied to a novel scenario with different surface features, requiring abstraction.
+Ensure that your far transfer question is sufficiently different from the near transfer question. It must not be a direct follow-up to the near transfer question.
+
+# TRANSFER CHECK
+Use the internal rules below to decide if the goal is met. Do NOT reveal rules to the student.
+
+Student-facing response policy:
+- If MET: brief, specific praise (1 sentence) + smooth transition (1 sentence).
+- If NOT MET: Affirm → Guide → Ask (2 sentences + 1 focused question). No numbers, no rubric talk.
+
+# **Mark COMPLETE if ALL**:
+- The student attempts to use **at least two** scientific vocabulary terms from the list provided in the prompt, even if not perfectly used.
+- The student makes a plausible connection between the concept and a real-world or personal scenario. The connection can be brief or implied.
+- The student shows a basic, good-faith effort to engage with the question.
+
+**Do NOT mark the reflection goal as complete if ANY of the following are true:**
+- The student's response is completely off-topic or shows no effort.
+- The student has not attempted to use any of the relevant vocabulary.
+
+# FEW-SHOT EXAMPLES - Pay close attention to these examples when crafting your transfer questions.
+## Example 1 — FAR (Protein Synthesis, Mutation) — MET
+Context (transfer type): Far transfer
+Concept: Protein Synthesis
+vocab_list: [protein synthesis, transcription, translation, ribosomes, mRNA, tRNA, amino acids, codon]
+
+### Dialogue
+Teacher ({peer_tutor}):: Imagine the same gene we discussed in class gets one codon mutation. Explain how this changes the tRNA pairing at the ribosome and what happens to the amino acid chain.
+Student:: The mutation makes a different amino acid come over to the ribosome. That can add a different amino acid and make the protein fold differently.
+
+### Expected model output
+Your message should be along the lines of:
+"Good effort—you showed how the codon change connects to tRNA pairing and amino acids!"
+
+## Example 2 — NEAR (Protein Synthesis) — NOT MET
+Context (transfer type): Near transfer
+Concept: Protein Synthesis
+vocab_list: [protein synthesis, transcription, translation, ribosomes, mRNA, tRNA, amino acids, codon, antibody]
+
+### Dialogue
+Teacher ({peer_tutor}):: Antibodies are proteins your body makes to fight infections. Using what you learned about protein synthesis, explain how an antibody gets made.
+Student:: The antibody gene is made using protein synthesis.
+
+### Expected model output
+Your message should be along the lines of:
+"Nice start—you linked genes, mRNA, and ribosomes to antibody production. Now, try adding more details about the specific steps and the role of tRNAs using the scientific terms."
+
+## Example 3 — FAR (Osmosis/Diffusion) — NOT MET
+Context (transfer type): Far transfer
+Concept: Osmosis/Diffusion
+vocab_list: [osmosis, hypertonic, hypotonic, semipermeable membrane, water potential, concentration gradient]
+
+### Dialogue
+Teacher ({peer_tutor}):: Let's try applying what we learned about osmosis in a real-world setting: explain what happens when cucumbers turn into pickles.
+Student:: The salty brine is hypertonic, so water moves out of the cucumber by osmosis through the membrane. That makes it shrink and taste different.
+
+### Expected model output
+Your message should be along the lines of:
+"Great—you used osmosis and hypertonic correctly in the pickle example. Could you also describe what happens to the water potential or concentration gradient here?"
+
+## Example 4 — NEAR (Interspecific Competition / Niche Partitioning) — MET
+Context (transfer type): Near transfer
+Concept: Interspecific Competition / Niche Partitioning
+vocab_list: [interspecific competition, niche, resource partitioning, competitive exclusion, resource overlap]
+
+### Dialogue
+Teacher ({peer_tutor}):: Two bird species eat oak acorns in the same grove. After a drought reduces acorn supply, predict what happens using competition concepts.
+Student:: The birds face resource overlap, I guess.
+
+### Expected model output
+Your message should be along the lines of:
+"Good thinking! Now, let's think deeper about how resource overlap impacts bird behavior using the scientific terms we learned."

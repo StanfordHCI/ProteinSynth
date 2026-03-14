@@ -79,7 +79,7 @@ public class WebSocketManager : MonoBehaviour {
         // socketConnection.SendMessageToServer("Hello!");
     }
 
-    private void HandleResponse(string response) {
+    public void HandleResponse(string response) {
         // check if this message should be ignored 
         if (acceptResponse == false) {
             acceptResponse = true; 

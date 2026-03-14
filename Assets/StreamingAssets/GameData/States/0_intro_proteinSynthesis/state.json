@@ -1,0 +1,27 @@
+{
+  "id": "0_intro_proteinSynthesis",
+  "description": "The student has recently been given a lecture on protein synthesis. A fellow student named [[PERSONA]], who resonate with the student's cultural background, introduces proteins in a way that feels familiar and personally relevant. This sets up the explanation of protein synthesis in the next scene. Avoid scientific jargon.",
+  "goals": {
+    "[[PERSONA]] briefly introduces themselves": false,
+    "Ask the student about their family or traditions": false
+  },
+  "unlockable_goals": {
+    "The student names one thing they learned or found interesting about protein synthesis in their lesson": [
+      "[[PERSONA]] briefly introduces themselves",
+      "Ask the student about their family or traditions"
+    ],
+    "Ask the student if they still have any questions about protein synthesis": [
+      "[[PERSONA]] briefly introduces themselves",
+      "Ask the student about their family or traditions"
+    ],
+    "Introduce ONE of the following valid list of proteins based on the student's interest: ['lactase', 'hemoglobin', 'insulin', 'myosin', 'keratin', 'immunoglobulins', 'tyrosinase', 'cytokines']": [
+      "[[PERSONA]] briefly introduces themselves",
+      "Ask the student about their family or traditions"
+    ]
+  },
+  "actions": [],
+  "location": "in a classroom",
+  "characters": [
+    "[[PERSONA]]"
+  ]
+}
