@@ -1,0 +1,24 @@
+{
+  "id": "2_lab_reflection",
+  "description": "The student has completed an augmented reality (AR) lab activity on protein synthesis, during which they (1) transcribed DNA to mRNA by matching codons to their corresponding anticodons, (2) predicted which amino acids would be created during translation by looking up each codon on a codon chart, and (3) saw various AR animations of protein synthesis process. Now, they are going to reflect on their learning by applying their new knowledge to a situation outside of the classroom.",
+  "goals": {
+    "[[PERSONA]] asks the student to explain protein synthesis without using scientific vocabulary": false
+  },
+  "unlockable_goals": {
+    "[[PERSONA]] provides the list of scientific vocabulary learned in the lesson to the student":
+    [
+      "[[PERSONA]] asks the student to explain protein synthesis without using scientific vocabulary"
+    ],
+    "[[PERSONA]] asks the student to answer a near transfer question": 
+    [
+      "[[PERSONA]] provides the list of scientific vocabulary learned in the lesson to the student"
+    ],
+    "[[PERSONA]] asks the student to answer a far transfer question": 
+    [
+      "[[PERSONA]] asks the student to answer a near transfer question"
+    ]
+  },
+  "actions": ["PROVIDE_VOCAB", "ENCOURAGE_STUDENT_AND_BID_THEM_FAREWELL"],
+  "location": "in a classroom",
+  "characters": ["[[PERSONA]]"]
+}
