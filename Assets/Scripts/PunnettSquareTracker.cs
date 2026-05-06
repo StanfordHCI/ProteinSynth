@@ -22,7 +22,14 @@ public class PunnettSquareTracker : MonoBehaviour
     private int currentDim = 2 ; // dimension of current Punnett square
 
     // Store all tracked genotypes
-    private Dictionary<string, GameObject> tracked = new Dictionary<string, GameObject>();
+    [System.Serializable]
+    public class TrackedGenotype
+    {
+        public string genotype;
+        public GameObject obj;
+    }
+
+    private List<TrackedGenotype> tracked = new List<TrackedGenotype>();
     private string[,] activeGenotypes = new string[2, 2];
     private string[,] answerGenotypes= new string[2, 2];
 
@@ -33,15 +40,26 @@ public class PunnettSquareTracker : MonoBehaviour
     [Header("UI Elements")]
     public TextMeshProUGUI traitText;
     public TextMeshProUGUI offspringRatio;
-    public TextMeshProUGUI hintText;
     public Button checkSquare; 
+    public TextMeshProUGUI genesTrackedText;
+    public TextMeshProUGUI correctText; 
 
 
+    void Awake() {
+        instance = this;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        checkSquare.interactable = false; 
+
+        // TODO: Dynamically update these answers, for now hard-coded for example
+        answerGenotypes = new string[,]
+        {
+            { "A_A_", "A_a" },
+            { "GAG", "aa" }
+        };
     }
 
     // Update is called once per frame
@@ -49,31 +67,57 @@ public class PunnettSquareTracker : MonoBehaviour
     {
         // Sort tracked genotypes into the right cells
         SortGenotypes(); 
+        UpdateTrackedGenesText(); // for debugging, to see what genes are tracked
 
         // Verify all cells are filled to enable button to check Punnett square
         VerifyFilledCells();
+
         
     }
 
     void SortGenotypes() {
-        List<GameObject> sorted = new List<GameObject>(tracked.Values);
+        List<TrackedGenotype> sorted = new List<TrackedGenotype>();
+        foreach (var t in tracked)
+        {
+            sorted.Add(t);
+        }
 
-        float rowTolerance = 0.05f;
+        float rowTolerance = 0.1f;
 
-        // Sort top-to-bottom, then left-to-right
+        // Define grid axes based on your physical layout
+        Vector3 origin = parent1.transform.position;
+
+        // parent1 = horizontal axis (left → right)
+        Vector3 rightAxis = parent1.transform.right;
+
+        // parent2 = vertical axis (bottom → top or top → bottom depending on setup)
+        Vector3 upAxis = parent2.transform.up;
+
+        // Convert world position → grid coordinates
+        Vector2 GetGridPos(Vector3 worldPos)
+        {
+            Vector3 delta = worldPos - origin;
+
+            float x = Vector3.Dot(delta, rightAxis);
+            float y = Vector3.Dot(delta, upAxis);
+
+            return new Vector2(x, y);
+        }
+
+        // Sort into grid order (top-to-bottom, left-to-right)
         sorted.Sort((a, b) =>
         {
-            Vector3 aLocal = parent1.transform.InverseTransformPoint(a.transform.position);
-            Vector3 bLocal = parent1.transform.InverseTransformPoint(b.transform.position);
+            Vector2 aGrid = GetGridPos(a.obj.transform.position);
+            Vector2 bGrid = GetGridPos(b.obj.transform.position);
 
-            // Different rows
-            if (Mathf.Abs(aLocal.y - bLocal.y) > rowTolerance)
+            // Row comparison (Y axis)
+            if (Mathf.Abs(aGrid.y - bGrid.y) > rowTolerance)
             {
-                return bLocal.y.CompareTo(aLocal.y);
+                return bGrid.y.CompareTo(aGrid.y); // higher y = top row
             }
 
-            // Same row
-            return aLocal.x.CompareTo(bLocal.x);
+            // Column comparison (X axis)
+            return aGrid.x.CompareTo(bGrid.x);
         });
 
         // Clear matrix first
@@ -94,29 +138,25 @@ public class PunnettSquareTracker : MonoBehaviour
             if (row >= currentDim)
                 break;
 
-            GameObject obj = sorted[i];
+            TrackedGenotype obj = sorted[i];
+            activeGenotypes[row, col] = obj.genotype;
 
-            // Assuming genotype string is the GameObject name
-            activeGenotypes[row, col] = obj.name;
-
-            Debug.Log($"Placed {obj.name} at [{row},{col}]");
+            Debug.Log($"Placed {obj.genotype} at [{row},{col}]");
         }
     }
 
     public void RegisterGenotype(string genotype,GameObject obj) {
-        // Animate genotype being locked into cell
-        if (!tracked.ContainsKey(genotype))
+        // TODO: Animate genotype being locked into cell
+        tracked.Add(new TrackedGenotype
         {
-            tracked[genotype] = obj;
-        }
+            genotype = genotype,
+            obj = obj
+        });
     }
 
-    public void UnregisterGenotype(string genotype) {
-        // Animate genotype being removed from cell
-        if (tracked.ContainsKey(genotype))
-        {
-            tracked.Remove(genotype);
-        }
+    public void UnregisterGenotype(string genotype, GameObject obj) {
+        // TODO: Animate genotype being removed from cell
+        tracked.RemoveAll(t => t.obj == obj);
     }
 
     void VerifyFilledCells() {
@@ -131,6 +171,7 @@ public class PunnettSquareTracker : MonoBehaviour
         }
         if (filled) {
             checkSquare.interactable = true;
+            CheckPunnettSquare(); // TODO: remove this, here for testing bc i can't get the button to click
         } else {
             checkSquare.interactable = false;
         }
@@ -141,14 +182,15 @@ public class PunnettSquareTracker : MonoBehaviour
         for (int i = 0; i < currentDim; i++) {
             for (int j = 0; j < currentDim; j++) {
                 if (activeGenotypes[i, j] != answerGenotypes[i, j]) {
-                    Debug.Log("wrong genotype at cell (" + i + ", " + j + ")");
-                    hintText.text = "Almost there, try again!";
+                    Debug.Log("wrong genotype at cell (" + i + ", " + j + "), currently says" + activeGenotypes[i, j] + " but should be " + answerGenotypes[i, j]);
+                    correctText.text = "Almost there, try again!";
                     return;
                 }
             }
         }
 
         Debug.Log("Punnett square is correct!");
+        correctText.text = "Good job! Punnett square is correct!";
         SpawnOffspring(); 
     }
 
@@ -157,5 +199,14 @@ public class PunnettSquareTracker : MonoBehaviour
         // Animate all phenotypes appearing above the genotypes
         // Animate spinner choosing between genotypes
         // Show selected child
+    }
+
+    void UpdateTrackedGenesText() {
+        string trackedGenes = "Tracked Genotypes:\n";
+        foreach (var obj in tracked) {
+            trackedGenes += obj.genotype+ "\n";
+        }
+        Debug.Log("current tracked genes are" + trackedGenes); 
+        genesTrackedText.text = trackedGenes;
     }
 }
