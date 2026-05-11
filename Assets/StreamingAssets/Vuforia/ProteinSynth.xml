@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="A_a1" size="0.075000 0.075000" />
+    <ImageTarget name="A_A_" size="0.075000 0.075000" />
     <ImageTarget name="aa" size="0.075000 0.075000" />
     <ImageTarget name="A_a" size="0.075000 0.075000" />
-    <ImageTarget name="A_A_" size="0.075000 0.075000" />
     <ImageTarget name="parent1" size="0.050000 0.050000" />
     <ImageTarget name="parent2" size="0.050000 0.050000" />
     <ImageTarget name="GGC" size="0.075000 0.056250" />
