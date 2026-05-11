@@ -22,6 +22,10 @@ public class CodonTarget : MonoBehaviour
 
     private void OnTargetStatusChanged(ObserverBehaviour behaviour, TargetStatus status)
     {
+        // Scenes without CodonManager / CodonTracker (e.g. cell tour only) must not throw here.
+        if (CodonTracker.instance == null)
+            return;
+
         string codonName = behaviour.TargetName;
 
         // If we're tracking or extended tracked, register

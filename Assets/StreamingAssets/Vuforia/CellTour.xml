@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="HAND" size="0.075000 0.075000" />
+    <ImageTarget name="CELL" size="0.075000 0.075000" />
+  </Tracking>
+</QCARConfig>
