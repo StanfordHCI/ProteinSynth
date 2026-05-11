@@ -51,6 +51,8 @@ public class PunnettSquareTracker : MonoBehaviour
     public float offspringSpawnHeight = 3f;    
     public float orbitDuration       = 2.5f;   // in sec
     public float descentDuration     = 1.8f;   // in sec
+    public Camera mainCam;
+    public float dimFadeDuration = 0.3f;
 
 
     void Awake() {
@@ -228,6 +230,9 @@ public class PunnettSquareTracker : MonoBehaviour
         // ── 0. Lock UI so the player can't re-trigger anything ───────────────────
         checkSquare.interactable = false;
 
+        yield return StartCoroutine(FadeCameraBackground(0f, 1.0f, dimFadeDuration));
+
+
         // ── 1. Cache original parent transforms ──────────────────────────────────
         Vector3 p1Origin = parent1.transform.position;
         Vector3 p2Origin = parent2.transform.position;
@@ -393,7 +398,22 @@ public class PunnettSquareTracker : MonoBehaviour
             var ps = glowFX.GetComponent<ParticleSystem>();
             ps.Stop();
         }
+        yield return StartCoroutine(FadeCameraBackground(1.0f, 0f, dimFadeDuration));
 
         Debug.Log("SpawnOffspring: offspring has landed!");
+    }
+
+    IEnumerator FadeCameraBackground(float fromDark, float toDark, float duration)
+    {
+        float elapsed = 0f;
+        Color original = mainCam.backgroundColor;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            float dark = Mathf.Lerp(fromDark, toDark, t);
+            mainCam.backgroundColor = original * (1f - dark);
+            yield return null;
+        }
     }
 }
