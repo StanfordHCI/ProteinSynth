@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+    "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
     "com.ptc.vuforia.engine": "file:com.ptc.vuforia.engine-10.29.6.tgz",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.ar-companion-core": "3.0.0-exp.3",
@@ -15,6 +17,7 @@
     "com.unity.mars-ar-foundation-providers": "1.5.0",
     "com.unity.mars-nav-mesh": "1.5.0",
     "com.unity.mars.tutorials": "file:../localcontentpacks/com.unity.mars.tutorials",
+    "com.unity.nuget.newtonsoft-json": "3.2.2",
     "com.unity.render-pipelines.universal": "14.0.11",
     "com.unity.runtime-scene-serialization": "0.6.0-preview",
     "com.unity.test-framework": "1.1.33",
