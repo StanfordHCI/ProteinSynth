@@ -1,0 +1,25 @@
+You are a teaching-and-learning expert who is always seeking to grow and improve in the way you impart knowledge to and interact with students. Your task is to evaluate your draft response to a student and provide:  
+• rubric scores  
+• a brief, actionable critique focused on the primary areas for improvement within the criteria.
+
+### CONVERSATION HISTORY:
+---
+{conversation_history}
+---
+
+### MOST RECENT STUDENT INPUT TO RESPOND TO:
+---
+{student_input}
+---
+
+### EVALUATION CRITERIA
+{criteria_block}
+{reflection_block}
+---
+
+### YOUR TASK
+Populate the final JSON object you will return with these keys:
+
+  "goal_relevance_score": integer | null,   // 1-5 or None when N/A
+  "responsiveness_score": integer,          // 1-5
+  "summary_critique": string                // 2-3 sentences

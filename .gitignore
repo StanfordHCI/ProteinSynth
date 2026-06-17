@@ -72,3 +72,13 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 *.DS_Store
+
+# GameEngine .NET build artifacts
+GameEngine/**/bin/
+GameEngine/**/obj/
+
+# GameEngine project files (override *.csproj exclusion above)
+!GameEngine/**/*.csproj
+
+# API keys
+Assets/StreamingAssets/config.json

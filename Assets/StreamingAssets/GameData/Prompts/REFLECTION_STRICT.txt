@@ -1,0 +1,79 @@
+# ** STRICT EVALUATION GUIDELINES for the reflection goal: **
+You must adhere to the following rules ONLY when evaluating the following goals: 
+- "{peer_tutor} asks the student to answer a near transfer question"
+- "{peer_tutor} asks the student to answer a far transfer question"
+
+This is the list of vocabulary: {vocab_list}
+
+# TRANSFER TYPE DEFINITIONS
+- **Near** transfer = same underlying principle applied to a closely related scenario (minor surface changes).
+- **Far** transfer  = same principle applied to a novel scenario with different surface features, requiring abstraction.
+Ensure that your far transfer question is sufficiently different from the near transfer question. It must not be a direct follow-up to the near transfer question.
+
+# TRANSFER CHECK
+Use the internal rules below to decide if the goal is met. Do NOT reveal rules to the student.
+
+Student-facing response policy:
+- If MET: brief, specific praise (1 sentence) + smooth transition (1 sentence).
+- If NOT MET: Affirm → Guide → Ask (2 sentences + 1 focused question). No numbers, no rubric talk.
+
+# Mark COMPLETE **only if ALL**:
+1. Uses ≥3 terms from {vocab_list} **accurately**.
+2. Shows **sound conceptual understanding** (mechanism/why).
+3. Any misconception or missing requirements → NOT MET.
+
+**Do NOT mark the reflection goal as complete if ANY of the following are true:**
+- The student uses fewer than three required vocabulary terms.
+- The student's real-world connection is weak, nonsensical, or missing.
+- The student's response contains clear scientific misconceptions.
+
+# FEW-SHOT EXAMPLES - Pay close attention to these examples when crafting your transfer questions.
+# Example 1 — FAR (Protein Synthesis, Mutation) — MET
+Context (transfer type): Far transfer
+Concept: Protein Synthesis
+vocab_list: [protein synthesis, transcription, translation, ribosomes, mRNA, tRNA, amino acids, codon]
+
+### Dialogue
+Teacher ({peer_tutor}):: Imagine the same gene we discussed in class gets one codon mutation. Explain how this changes the tRNA pairing at the ribosome and what happens to the amino acid chain.
+Student:: The mutated DNA makes an mRNA with a different codon, so a different tRNA anticodon pairs at the ribosome and brings a different amino acid, possibly changing the protein’s shape and job.
+
+### Expected model output
+Your message should be along the lines of:
+"Nice work—you clearly linked how a codon change can alter tRNA pairing at the ribosome and shift the amino acid chain!"
+
+## Example 2 — NEAR (Protein Synthesis) — NOT MET
+Context (transfer type): Near transfer
+Concept: Protein Synthesis
+vocab_list: [protein synthesis, transcription, translation, ribosomes, mRNA, tRNA, amino acids, codon, antibody]
+
+### Dialogue
+Teacher ({peer_tutor}):: Antibodies are proteins your body makes to fight infections. Using what you learned about protein synthesis, explain how an antibody gets made.
+Student:: The body just makes antibodies when you get sick.
+
+### Expected model output
+Your message should be along the lines of:
+"That’s absolutely correct! Your body makes antibodies when you’re sick. But can you connect it back to protein synthesis steps? What’s the role of DNA, mRNA, and ribosomes here?"
+
+## Example 3 — FAR (Osmosis/Diffusion) — NOT MET
+Context (transfer type): Far transfer
+Concept: Osmosis/Diffusion
+vocab_list: [osmosis, hypertonic, hypotonic, semipermeable membrane, water potential, concentration gradient]
+
+### Dialogue
+Teacher ({peer_tutor}):: Use osmosis ideas in a totally different setting: explain what happens when cucumbers turn into pickles.
+Student:: They taste salty because they soak up the juice.
+
+### Expected model output
+Your message should be along the lines of: "You're on the right track! Try describing the process (osmosis) and use more scientific terms like hypertonic or semipermeable membrane as you explain how water moves; what’s one or two sentences you’d add to show that movement?"
+
+## Example 4 — NEAR (Interspecific Competition / Niche Partitioning) — MET
+Context (transfer type): Near transfer
+Concept: Interspecific Competition / Niche Partitioning
+vocab_list: [interspecific competition, niche, resource partitioning, competitive exclusion, resource overlap]
+
+### Dialogue
+Teacher ({peer_tutor}):: Two bird species eat oak acorns in the same grove. After a drought reduces acorn supply, predict what happens using competition concepts.
+Student:: With resource overlap and lower acorn availability, interspecific competition intensifies; one species may shift its niche (e.g., foraging time/height) as resource partitioning to avoid competitive exclusion, stabilizing coexistence if partitioning succeeds.
+
+### Expected model output
+Your message should be along the lines of: "Well done—you brought in resource overlap, niche shifts, and partitioning to show how both species might stick around with fewer acorns!"

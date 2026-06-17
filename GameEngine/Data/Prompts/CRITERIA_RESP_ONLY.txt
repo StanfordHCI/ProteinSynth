@@ -1,0 +1,53 @@
+### EVALUATION CRITERIA:
+Below is the goal that {peer_tutor}'s response currently aims to achieve: 
+{chosen_goal_for_turn}
+
+1.  **Responsiveness (1-5):** How well does the draft attend to the student’s most recent message, including both content and emotional tone?
+- When scoring responsiveness, consider whether {peer_tutor}’s message directly acknowledges and responds to both the literal content and the emotional context of the student’s last message. High responsiveness reflects not just topical alignment but interpersonal attunement.
+
+### YOUR TASK:
+Based on the criterion above, provide a JSON object with the following fields ('responsiveness_score', and 'summary_critique'):
+
+- `responsiveness_score`: (integer) Your score from 1-5.
+5 = Directly engages with what the student said and how they said it (e.g., validates emotions, answers questions)
+4 = Engages content well but overlooks or underplays emotional cues
+3 = Shifts focus too quickly or doesn’t respond to what the student expressed
+1–2 = Ignores the student’s message or topic entirely
+
+A high score reflects that {peer_tutor}:
+- Acknowledges or answers the student’s question, concern, or point of confusion
+- Shows awareness of the student’s emotional state (e.g. hesitation, excitement, frustration)
+- Builds naturally on what the student just said
+A response that ignores the student’s feelings, skips past confusion, or changes the subject should receive a lower score (≤2).
+
+- `summary_critique`: (string) A concise, actionable critique and a suggestion for what to improve in the next revision. 
+
+---
+### EXAMPLE 1 – STRONG RESPONSIVENESS
+CONVERSATION HISTORY:
+Student: I like solving jigsaw puzzles with my little brother.
+
+DRAFT RESPONSE:
+That’s awesome! Puzzles are a great way to think about proteins. When your body builds a protein, it’s like putting puzzle pieces (amino acids) together in the right order using your DNA’s instructions.
+
+GOAL:
+Ask the student about their hobbies and interests and use that to transition into the biology concept for the turn.
+
+Output in JSON:
+  "responsiveness_score": 5,
+  "summary_critique": "{peer_tutor} explicitly asks about the student’s interest, then uses it as a metaphor for the concept. The analogy is clear, and the tone is warm and well-attuned to the student’s message."
+
+
+### EXAMPLE 2 – LOW RESPONSIVENESS
+CONVERSATION HISTORY:
+Student: I don’t think I’m ready to try this... it looks kind of confusing.
+
+DRAFT RESPONSE:
+It’s a step-by-step process involving mRNA, ribosomes, and amino acids. You don’t even have to think about it—it just happens!
+
+GOAL:
+Support the student in taking a first step toward understanding protein synthesis using an accessible analogy tied to their interest.
+
+Output in JSON: 
+  "responsiveness_score": 1,
+  "summary_critique": "The explanation jumps straight into content without acknowledging the student’s hesitation. {peer_tutor} neither reassures nor scaffolds. The response is not grounded in the student's expressed concern."
