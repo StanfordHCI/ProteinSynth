@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
+using Newtonsoft.Json;
 using GameEngine.Models;
 
 namespace GameEngine.Systems;
@@ -36,8 +36,7 @@ public class StateLoader
         string peerTutor)
     {
         // Parse the JSON
-        var stateData = JsonSerializer.Deserialize<StateJsonData>(stateJson,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+        var stateData = JsonConvert.DeserializeObject<StateJsonData>(stateJson)
             ?? throw new InvalidOperationException("Failed to parse state JSON");
 
         // Replace [[PERSONA]] tokens
@@ -80,10 +79,9 @@ public class StateLoader
     /// </summary>
     private StateJsonData ReplacePersonaTokenInStateData(StateJsonData data, string peerTutor)
     {
-        var json = JsonSerializer.Serialize(data);
+        var json = JsonConvert.SerializeObject(data);
         var replaced = json.Replace("[[PERSONA]]", peerTutor);
-        return JsonSerializer.Deserialize<StateJsonData>(replaced,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+        return JsonConvert.DeserializeObject<StateJsonData>(replaced)!;
     }
 
     /// <summary>

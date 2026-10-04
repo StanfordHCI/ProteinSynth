@@ -7599,11 +7599,10 @@ GameObject:
   - component: {fileID: 1506667591}
   - component: {fileID: 1506667590}
   - component: {fileID: 1506667589}
-  - component: {fileID: 1506667588}
   - component: {fileID: 1506667587}
   - component: {fileID: 1506667586}
   m_Layer: 0
-  m_Name: WebsocketManager
+  m_Name: DialogueService
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7639,23 +7638,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 7778558436155328542}
---- !u!114 &1506667588
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1506667585}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f208afd9f511a466ca3ef468569cf186, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pid: 
-  condition: 
-  grade: 
-  peer_tutor: 
-  websocketManager: {fileID: 0}
 --- !u!114 &1506667589
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7677,10 +7659,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1506667585}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15e0f88e9000c476d803b4469fc4a5cc, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f8c47943ed5a4788a7d0e729a80dc8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceptResponse: 0
 --- !u!4 &1506667591
 Transform:
   m_ObjectHideFlags: 0
@@ -12207,7 +12188,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 7778558436155328537}
-        m_TargetAssemblyTypeName: Yarn.Unity.LineView, Assembly-CSharp
+        m_TargetAssemblyTypeName: AudioReadyLineView, Assembly-CSharp
         m_MethodName: OnContinueClicked
         m_Mode: 1
         m_Arguments:
@@ -12507,7 +12488,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7778558436155328541}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddcdd604a328c4ab296f048eb7b3a925, type: 3}
+  m_Script: {fileID: 11500000, guid: f1dfdcd492764304b1c244a8f9ff7611, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   canvasGroup: {fileID: 7778558436155328536}
@@ -12529,6 +12510,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   typewriterEffectSpeed: 85
+  messageQueue: {fileID: 1506667587}
   continueButton: {fileID: 7778558436021695549}
   holdTime: 1
   autoAdvance: 0

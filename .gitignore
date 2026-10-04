@@ -82,3 +82,8 @@ GameEngine/**/obj/
 
 # API keys
 Assets/StreamingAssets/config.json
+
+# Private editor credentials and generated build artifacts
+.local/
+supabase/.temp/
+supabase/.branches/

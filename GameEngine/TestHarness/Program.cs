@@ -57,8 +57,7 @@ game.InstantiateGame(
         File.ReadAllText(Path.Combine(dataDir, "Characters", name, "character.json")),
     promptDataProvider: filename =>
         File.ReadAllText(Path.Combine(dataDir, "Prompts", filename)),
-    parameterSetting: "strict",
-    noReviser: true
+    parameterSetting: "strict"
 );
 
 Console.WriteLine($"\nGame initialized! State: {game.CurrentGameState.Id}");
@@ -222,6 +221,7 @@ async Task RunInteractiveModeAsync(GameSession game)
 
     // First message
     var response = await game.ProcessStepsAsync("(start conversation)");
+    await game.ReflectOnTurnAsync(response.ReflectionCritique); // This harness has no audio stage.
     Console.ForegroundColor = ConsoleColor.Cyan;
     Console.WriteLine($"\n{response.Message}");
     Console.ResetColor();
@@ -237,6 +237,7 @@ async Task RunInteractiveModeAsync(GameSession game)
         if (string.IsNullOrEmpty(input) || input.ToLower() == "quit") break;
 
         response = await game.ProcessStepsAsync(input);
+        await game.ReflectOnTurnAsync(response.ReflectionCritique); // This harness has no audio stage.
 
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine($"\n{response.Message}");
@@ -257,6 +258,7 @@ async Task RunAutoModeAsync(GameSession game)
     Console.WriteLine("=== AUTO MODE: Claude plays both roles ===\n");
 
     var response = await game.ProcessStepsAsync("(start conversation)");
+    await game.ReflectOnTurnAsync(response.ReflectionCritique); // This harness has no audio stage.
     Console.ForegroundColor = ConsoleColor.Cyan;
     Console.WriteLine($"\n{response.Message}");
     Console.ResetColor();
@@ -293,6 +295,7 @@ async Task RunAutoModeAsync(GameSession game)
 
         // Process student reply through the game
         response = await game.ProcessStepsAsync(studentReply);
+        await game.ReflectOnTurnAsync(response.ReflectionCritique); // This harness has no audio stage.
 
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine($"\n{response.Message}");
@@ -372,6 +375,7 @@ string FindDataDirectory()
     // Try relative paths from the executable
     var candidates = new[]
     {
+        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data"),
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Data"),
         Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Data"),
         Path.Combine(Directory.GetCurrentDirectory(), "..", "Data"),

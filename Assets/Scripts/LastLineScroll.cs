@@ -8,7 +8,6 @@ using Yarn.Unity;
 
 public class LastLineScroll : MonoBehaviour
 {
-    private Queue<string> tempQueue = new Queue<string>(); 
     private List<string> messageList; 
     private int index; 
     private Dictionary<string, Sprite> portraitsDict;
@@ -42,16 +41,7 @@ public class LastLineScroll : MonoBehaviour
         Debug.Log("clearing messageList"); 
         messageList.Clear();
         if (messageQueue != null) {
-            while (messageQueue.Count > 0) {
-                tempQueue.Enqueue(messageQueue.Dequeue()); 
-            }
-            while (tempQueue.Count > 0) {
-                string thisLine = tempQueue.Dequeue(); 
-                // if (!thisLine.Contains("VISUAL")) {
-                messageList.Add(thisLine); 
-                // }
-                messageQueue.Enqueue(thisLine); 
-            }
+            messageList.AddRange(messageQueue);
             // Get index of last message
             if (messageList.Count > 0) {
                 index = messageList.Count - 1; 
@@ -95,7 +85,7 @@ public class LastLineScroll : MonoBehaviour
         lastLineName.GetComponent<TextMeshProUGUI>().text = thisName; 
         if (thisName != null) {
             if (portraitsDict.TryGetValue(thisName, out portrait)) {
-                lastLineImage.GetComponent<Image>().sprite = portrait; 
+                if (lastLineImage != null) lastLineImage.sprite = portrait;
             }
         } 
 

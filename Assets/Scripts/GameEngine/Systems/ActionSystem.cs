@@ -93,7 +93,7 @@ public class ActionSystem
         var condition = action.Condition;
 
         if (condition.RequiresAllGoals)
-            return state.Goals.Count > 0 && state.Goals.Values.All(v => v);
+            return state.Goals.Count > 0 && state.UnlockableGoals.Count == 0 && state.Goals.Values.All(v => v);
 
         // Specific goals required
         foreach (var goalId in condition.RequiredGoals)
@@ -127,7 +127,7 @@ public class ActionSystem
         if (!_actionDictionary.TryGetValue(actionId, out var action))
             return (currentState, addedResponse);
 
-        if (!CheckActionValid(actionId, currentState))
+        if (!CheckActionValid(actionId, currentState) || !CheckActionAvailable(actionId, currentState))
         {
             InjectSystemMessage(messages, $"WARNING: The action {actionId} is not valid.");
             return (currentState, addedResponse);

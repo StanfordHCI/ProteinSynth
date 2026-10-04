@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using GameEngine.Models;
@@ -12,12 +14,13 @@ using GameEngine.Models;
 namespace GameEngine.LLM;
 
 /// <summary>
-/// Direct Anthropic API client using HttpClient.
-/// Replaces the entire LangGraph pipeline with a single Claude API call.
+/// Claude drafter and reflection adapter. Unity supplies an authenticated transport;
+/// the standalone harness can use a development API key.
 /// </summary>
-public class AnthropicClient
+public class AnthropicClient : ITutorModel, IDisposable
 {
     private readonly HttpClient _httpClient;
+    private readonly Func<string, CancellationToken, Task<string>>? _transport;
     private readonly string _apiKey;
     private readonly string _model;
     private const string ApiUrl = "https://api.anthropic.com/v1/messages";
@@ -29,6 +32,48 @@ public class AnthropicClient
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Add("x-api-key", _apiKey);
         _httpClient.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+    }
+
+    public AnthropicClient(Func<string, CancellationToken, Task<string>> transport)
+    {
+        _transport = transport; _apiKey = ""; _model = "claude-haiku-4-5-20251001";
+        _httpClient = new HttpClient();
+    }
+
+    public void Dispose() => _httpClient.Dispose();
+
+    private async Task<string> SendAsync(string json, CancellationToken token)
+    {
+        if (_transport != null) return await _transport(json, token);
+        using var request = new HttpRequestMessage(HttpMethod.Post, ApiUrl) {
+            Content = new StringContent(json, Encoding.UTF8, "application/json")
+        };
+        using var response = await _httpClient.SendAsync(request, token);
+        var body = await response.Content.ReadAsStringAsync();
+        token.ThrowIfCancellationRequested();
+        if (!response.IsSuccessStatusCode)
+            throw new HttpRequestException($"Tutor service returned HTTP {(int)response.StatusCode}.");
+        return body;
+    }
+
+    public async Task<string> ReflectAsync(string tutor, List<Dictionary<string, string>> messages,
+        string critique, CancellationToken cancellationToken)
+    {
+        var prompt = "Reflect privately on this tutoring conversation. Identify what helped or confused the student, "
+            + "their interests and misconceptions, and concrete adjustments for future turns. "
+            + "Do not revise the last response. Return at most 150 words. Tutor: " + tutor
+            + "\nConversation: " + JsonConvert.SerializeObject(messages)
+            + "\nCritique of the latest turn: " + critique;
+        var body = await SendAsync(JsonConvert.SerializeObject(new {
+            model = _model, max_tokens = 384, system = prompt,
+            messages = new[] { new { role = "user", content = "Write the reflection." } }
+        }), cancellationToken);
+        var root = JObject.Parse(body);
+        var text = new StringBuilder();
+        foreach (var block in root["content"] ?? new JArray())
+            if ((string?)block["type"] == "text") text.AppendLine((string?)block["text"]);
+        if (text.Length == 0) throw new InvalidDataException("The tutor returned no reflection.");
+        return text.ToString().Trim();
     }
 
     /// <summary>
@@ -58,26 +103,13 @@ public class AnthropicClient
             tool_choice = new { type = "tool", name = "respond" }
         };
 
-        var jsonContent = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions
+        var jsonContent = JsonConvert.SerializeObject(requestBody, new JsonSerializerSettings
         {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            NullValueHandling = NullValueHandling.Ignore,
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
         });
 
-        var request = new HttpRequestMessage(HttpMethod.Post, ApiUrl)
-        {
-            Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
-        };
-
-        var response = await _httpClient.SendAsync(request, cancellationToken);
-        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            throw new HttpRequestException(
-                $"Anthropic API error ({response.StatusCode}): {responseBody}");
-        }
-
+        var responseBody = await SendAsync(jsonContent, cancellationToken);
         return ParseToolUseResponse(responseBody);
     }
 
@@ -86,51 +118,28 @@ public class AnthropicClient
     /// </summary>
     private DrafterOutput ParseToolUseResponse(string responseBody)
     {
-        using var doc = JsonDocument.Parse(responseBody);
-        var root = doc.RootElement;
+        var root = JObject.Parse(responseBody);
+        if ((string?)root["stop_reason"] == "max_tokens")
+            throw new InvalidDataException("The tutor response was truncated.");
 
         // Find the tool_use content block
-        if (root.TryGetProperty("content", out var content))
+        if (root.TryGetValue("content", out var content))
         {
-            foreach (var block in content.EnumerateArray())
+            foreach (var block in content)
             {
-                if (block.TryGetProperty("type", out var type) &&
-                    type.GetString() == "tool_use" &&
-                    block.TryGetProperty("input", out var input))
+                if (block is JObject toolBlock &&
+                    (string?)toolBlock["type"] == "tool_use" &&
+                    (string?)toolBlock["name"] == "respond" &&
+                    toolBlock.TryGetValue("input", out var input))
                 {
-                    var inputJson = input.GetRawText();
-                    return JsonSerializer.Deserialize<DrafterOutput>(inputJson,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-                        ?? new DrafterOutput { Message = "I'm sorry, something went wrong. Could you try again?" };
+                    var inputJson = input.ToString(Formatting.None);
+                    return JsonConvert.DeserializeObject<DrafterOutput>(inputJson)
+                        ?? throw new InvalidDataException("The tutor response was empty.");
                 }
             }
         }
 
-        // Fallback: try to parse the text content as JSON
-        if (root.TryGetProperty("content", out var textContent))
-        {
-            foreach (var block in textContent.EnumerateArray())
-            {
-                if (block.TryGetProperty("type", out var type) &&
-                    type.GetString() == "text" &&
-                    block.TryGetProperty("text", out var text))
-                {
-                    var textStr = text.GetString() ?? "";
-                    try
-                    {
-                        return JsonSerializer.Deserialize<DrafterOutput>(textStr,
-                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
-                            ?? new DrafterOutput { Message = textStr };
-                    }
-                    catch
-                    {
-                        return new DrafterOutput { Message = textStr };
-                    }
-                }
-            }
-        }
-
-        return new DrafterOutput { Message = "I'm sorry, I'm having trouble responding. Could you try again?" };
+        throw new InvalidDataException("The tutor did not return the expected structured response.");
     }
 
     /// <summary>

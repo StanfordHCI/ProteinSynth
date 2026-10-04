@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace GameEngine.Models;
 
@@ -57,24 +57,24 @@ public class GameState
 /// </summary>
 public class StateJsonData
 {
-    [JsonPropertyName("id")]
+    [JsonProperty("id")]
     public string Id { get; set; } = "";
 
-    [JsonPropertyName("description")]
+    [JsonProperty("description")]
     public string Description { get; set; } = "";
 
-    [JsonPropertyName("goals")]
+    [JsonProperty("goals")]
     public Dictionary<string, bool> Goals { get; set; } = new();
 
-    [JsonPropertyName("unlockable_goals")]
+    [JsonProperty("unlockable_goals")]
     public Dictionary<string, List<string>> UnlockableGoals { get; set; } = new();
 
-    [JsonPropertyName("actions")]
+    [JsonProperty("actions")]
     public List<string> Actions { get; set; } = new();
 
-    [JsonPropertyName("location")]
+    [JsonProperty("location")]
     public string Location { get; set; } = "";
 
-    [JsonPropertyName("characters")]
+    [JsonProperty("characters")]
     public List<string> Characters { get; set; } = new();
 }

@@ -1,4 +1,4 @@
-﻿title: Start
+title: Start
 tags:
 ---
 
@@ -20,31 +20,22 @@ tags:
 <<declare $debug = false as bool>>
 <<declare $participant_id = "craftstest1" as string>>
 <<declare $condition = "treatment" as string>>
-<<declare $remote = false as bool>>
 
 <<declare $protein_synthesis_topic = "" as string>>
 <<declare $peer_tutor = "Yari" as string>>
 <<declare $finished_scanning_nucleus = false as bool>>
 <<declare $finished_scanning_ribosome = false as bool>>
 <<declare $grade = "" as string>>
-<<declare $initalized_websocket = false as bool>>
+<<declare $request_failed = false as bool>>
+<<declare $resume_node = "PlayerResponding" as string>>
+<<declare $requested_lab_action = "" as string>>
 <<declare $arrange_cards_todo_added = false as bool>>
 
 -> Start
 <<hide_cover Cover>>
 
 
-<<hide_scroll WebsocketManager true>>
-
-<<set $remote to true>>
-//-> Local
-//    <<set $remote to false>>
-
-<<if $remote == true>>
-    <<connect_to_server WebsocketManager remote>>
-<<else>>
-    <<connect_to_server WebsocketManager>>
-<<endif>>
+<<hide_scroll DialogueService true>>
 
 Enter your participant ID number!
 <<RequestInput InputPanel "Type in your participant ID!">>
@@ -73,45 +64,53 @@ Select your peer tutor!
 -> Confirm
 <<UnloadScene>>
 <<hide_static_elements DialogueCanvas false>>
-<<hide_scroll WebsocketManager false>>
+<<hide_scroll DialogueService false>>
 <<update_character DialogueCanvas "$peer_tutor">>
-// checks that player actually input something
-// <<if $player_name is "">>
-//    <<jump PlayerResponding>>
-// <<endif>>
 
-<<set $initalized_websocket to true>>
-
-<<send_first_message WebsocketManager "$player_name" "$initial_state" "$participant_id" "$condition" "$grade" "$peer_tutor">>
-<<jump SendingToServer>>
+<<jump InitializeSession>>
 
 ===
-title: SendingToServer
+title: InitializeSession
 ---
-// reset variables 
-<<set $playerResponse to "">>
-<<set $gptOption1 to "">>
-<<set $gptOption2 to "">>
-<<set $gptOption3 to "">>
-<<set $gptOption4 to "">>
-<<set $gptOption5 to "">>
+<<show_thinking_indicator DialogueCanvas>>
+<<initialize_session DialogueService>>
+<<hide_thinking_indicator DialogueCanvas>>
+<<if $request_failed>>
+    Narration: We couldn't load your session. Please check your connection or ask a researcher for help.
+    -> Retry
+        <<jump InitializeSession>>
+<<endif>>
+<<update_character DialogueCanvas "$peer_tutor">>
+<<jump {$resume_node}>>
+===
 
-// <<if $current_state == "6_portal">>
-//     <<toggle_hide_images OliverThinking false>> // show oliver thinking
-//     <<wait_for_message WebsocketManager>> // wait for responses to show up in queue
-//     <<toggle_hide_images OliverThinking true>> // hide oliver thinking
-// <<else>>
-//     <<show_current_bubbles TwoCharacterDisplay>>
-//     <<set_characters_idle TwoCharacterDisplay>>
-    <<show_thinking_indicator DialogueCanvas>>
-    <<wait_for_message WebsocketManager>> // wait for responses to show up in queue
+title: RetryPendingTurn
+---
+<<retry_turn DialogueService>>
+<<jump AwaitingTutor>>
+===
+
+title: ResumeLab
+---
+Narration: Your conversation was saved. We'll restart the hands-on lab so you can continue the lesson.
+<<resume_lab DialogueService>>
+<<jump {$actionNode}>>
+===
+
+title: AwaitingTutor
+---
+<<show_thinking_indicator DialogueCanvas>>
+<<await_response DialogueService>>
+<<if $request_failed>>
     <<hide_thinking_indicator DialogueCanvas>>
-//     <<hide_current_bubbles TwoCharacterDisplay>>
-//     <<set_characters_not_idle TwoCharacterDisplay>>
-// <<endif>>
+    Narration: We couldn't reach your tutor. Your progress is saved.
+    -> Retry
+        <<jump RetryPendingTurn>>
+<<endif>>
+<<wait_for_message DialogueService>>
+<<hide_thinking_indicator DialogueCanvas>>
 <<jump GPTResponding>>
 ===
-
 
 title: PlayerResponding
 ---
@@ -124,27 +123,18 @@ title: PlayerResponding
     <<jump PlayerResponding>>
 <<endif>>
 
-<<send_player_message WebsocketManager "$playerResponse">> // send player's input to server
-<<jump SendingToServer>>
+<<send_player_message_local DialogueService "$playerResponse">> // submit to the local session
+<<jump AwaitingTutor>>
 ===
 title: GPTResponding
 ---
-<<run_response WebsocketManager>> // dequeue next response
+<<run_response DialogueService>> // display the next prepared line
 <<if $gptResponse != "">>
     <<if $gptResponse == "ACTION">> 
         <<jump {$actionNode}>>
-    // <<elseif $gptResponse == "VISUAL">>
-    //     <<run_response WebsocketManager>>
-    //     <<show_visual_aid VisualAidCard "$image_to_display">>
-    //     {$gptResponse} // card comes down with this line
-    //     <<jump GPTResponding>>
-    // <<elseif $gptResponse == "ALBUM_TUTORIAL">>
-    //     <<jump AlbumTutorial>>
-    // <<elseif $gptResponse == "LOG_TUTORIAL">>
-    //    <<jump LogTutorial>>
     <<else>>
-        <<wait_for_audio WebsocketManager>>
-        <<play_voiceover WebsocketManager>>
+        <<wait_for_audio DialogueService>>
+        <<play_voiceover DialogueService>>
         {$gptResponse}
         <<jump GPTResponding>>
     <<endif>>
@@ -152,20 +142,20 @@ title: GPTResponding
     // if there are options to present after, they will be shown to user
     <<if $gptOption1 != "" || $gptOption2 != "" || $gptOption3 != "" || $gptOption4 != "" || $gptOption5 != "">>
         -> {$gptOption1} <<if $gptOption1 != "">>
-            <<send_player_message WebsocketManager "$gptOption1">>
-            <<jump SendingToServer>>
+            <<send_player_message_local DialogueService "$gptOption1">>
+            <<jump AwaitingTutor>>
         -> {$gptOption2} <<if $gptOption2 != "">>
-            <<send_player_message WebsocketManager "$gptOption2">>
-            <<jump SendingToServer>>
+            <<send_player_message_local DialogueService "$gptOption2">>
+            <<jump AwaitingTutor>>
         -> {$gptOption3} <<if $gptOption3 != "">>
-            <<send_player_message WebsocketManager "$gptOption3">>
-            <<jump SendingToServer>>
+            <<send_player_message_local DialogueService "$gptOption3">>
+            <<jump AwaitingTutor>>
         -> {$gptOption4} <<if $gptOption4 != "">>
-            <<send_player_message WebsocketManager "$gptOption4">>
-            <<jump SendingToServer>>
+            <<send_player_message_local DialogueService "$gptOption4">>
+            <<jump AwaitingTutor>>
         -> {$gptOption5} <<if $gptOption5 != "">>
-            <<send_player_message WebsocketManager "$gptOption5">>
-            <<jump SendingToServer>>
+            <<send_player_message_local DialogueService "$gptOption5">>
+            <<jump AwaitingTutor>>
     <<endif>>
     <<jump PlayerResponding>>
 <<endif>>
@@ -228,19 +218,6 @@ title: ProteinSynthesisLabCytokines
 
 title: ProteinSynthesisLab
 ---
-<<if $initalized_websocket == false>>
-
-    <<hide_scroll WebsocketManager true>>
-    <<set $remote to true>>
-    <<if $remote == true>>
-        <<connect_to_server WebsocketManager remote>>
-    <<else>>
-        <<connect_to_server WebsocketManager>>
-    <<endif>>
-    <<hide_scroll WebsocketManager false>>
-
-    <<set $initalized_websocket to true>>
-<<endif>>
 <<hide_cover Cover>>
 // <<LoadScene ImageTargetTestCodon>> // comment this out if needed
 <<hide_background DialogueCanvas true>>
@@ -866,9 +843,8 @@ title: ProteinSynthesisReflection04
 <<toggle_character_position DialogueCanvas false>>
 
 <<UnloadScene>>
-<<set $playerResponse to "">>
-<<send_player_message WebsocketManager "$playerResponse">>
-<<jump SendingToServer>>
+<<complete_lab DialogueService>>
+<<jump AwaitingTutor>>
 ===
 
 title: ProteinSynthesisAminoAcidInput

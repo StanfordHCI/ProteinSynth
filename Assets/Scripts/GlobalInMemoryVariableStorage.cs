@@ -1,22 +1,17 @@
+using UnityEngine;
 using Yarn.Unity;
 
-public class GlobalInMemoryVariableStorage: InMemoryVariableStorage
+[DefaultExecutionOrder(-1000)]
+[RequireComponent(typeof(DialogueRunner))]
+public class GlobalInMemoryVariableStorage : InMemoryVariableStorage
 {
-    /// Singleton
-    private static GlobalInMemoryVariableStorage instance = null;
-
-    void Awake() {
-        if (instance != null) {
-            Destroy(gameObject);
-        } else {
-            instance = this;
-            // DontDestroyOnLoad(gameObject);
-        }
+    public static GlobalInMemoryVariableStorage Instance { get; private set; }
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+            throw new System.InvalidOperationException("Only one dialogue variable store may be active.");
+        Instance = this;
+        GetComponent<DialogueRunner>().VariableStorage = this;
     }
-
-    public static GlobalInMemoryVariableStorage Instance{
-      get {
-        return instance;
-      }
-    }
+    private void OnDestroy() { if (Instance == this) Instance = null; }
 }

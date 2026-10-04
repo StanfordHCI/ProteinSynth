@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace GameEngine.Models;
 
@@ -9,49 +9,51 @@ namespace GameEngine.Models;
 /// </summary>
 public class DrafterOutput
 {
-    [JsonPropertyName("chosen_goal_for_turn")]
+    [JsonProperty("chosen_goal_for_turn")]
     public string? ChosenGoalForTurn { get; set; }
 
-    [JsonPropertyName("message")]
+    [JsonProperty("message")]
     public string Message { get; set; } = "";
 
-    [JsonPropertyName("chosen_protein")]
+    [JsonProperty("chosen_protein")]
     public string? ChosenProtein { get; set; }
 
-    [JsonPropertyName("pending_phrase_updates")]
+    [JsonProperty("pending_phrase_updates")]
     public List<PhraseUpdate>? PendingPhraseUpdates { get; set; } = new();
 
-    [JsonPropertyName("goal_relevance_score")]
+    [JsonProperty("goal_relevance_score")]
     public int? GoalRelevanceScore { get; set; }
 
-    [JsonPropertyName("responsiveness_score")]
+    [JsonProperty("responsiveness_score")]
     public int? ResponsivenessScore { get; set; }
 
-    [JsonPropertyName("summary_critique")]
+    [JsonProperty("summary_critique")]
     public string? SummaryCritique { get; set; }
 
-    [JsonPropertyName("action")]
+    [JsonProperty("action")]
     public string? Action { get; set; }
 
-    [JsonPropertyName("student_interest")]
+    [JsonProperty("student_interest")]
     public string? StudentInterest { get; set; }
 }
 
 public class PhraseUpdate
 {
-    [JsonPropertyName("phrase")]
+    [JsonProperty("phrase")]
     public string Phrase { get; set; } = "";
 
-    [JsonPropertyName("concept")]
+    [JsonProperty("concept")]
     public string Concept { get; set; } = "";
 }
 
 /// <summary>
 /// Response data structure for the game engine.
-/// Named GameResponse to avoid collision with Unity's ResponseData in WebSocketManager.cs.
 /// </summary>
 public class GameResponse
 {
+    public string ReflectionCritique { get; set; } = "";
+    public string? Reflection { get; set; }
+    public string? ReflectionError { get; set; }
     public string Message { get; set; } = "";
     public Dictionary<string, bool>? GoalsMet { get; set; }
     public string? Action { get; set; }

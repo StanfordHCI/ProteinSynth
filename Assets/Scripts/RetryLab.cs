@@ -108,17 +108,15 @@ public class RetryLab : MonoBehaviour
         if (participantIdInput != null && yarnStorage != null)
         {
             string id = (participantIdInput.text ?? "").Trim();
-            yarnStorage.SetValue("$participant_id", string.IsNullOrEmpty(id) ? "no id provided" : id);
+            yarnStorage.SetValue("$participant_id", id);
         }
 
         // Stop any currently running dialogue first
         GlobalDialogueManager.StopDialogue();
 
-        // Get the protein-specific node name (e.g., "ProteinSynthesisLabLactase")
-        string nodeName = GetYarnNodeName(selectedProtein);
-
-        // Start the dialogue node (which handles scene loading, variable setting, and sequence setting)
-        GlobalDialogueManager.StartDialogue(nodeName);
+        // Initialize/resume the local session before entering the selected lab.
+        yarnStorage.SetValue("$requested_lab_action", "TO_PROTEIN_SYNTHESIS_LAB_" + selectedProtein.ToString().ToUpperInvariant());
+        GlobalDialogueManager.StartDialogue("InitializeSession");
     }
 
     /// <summary>

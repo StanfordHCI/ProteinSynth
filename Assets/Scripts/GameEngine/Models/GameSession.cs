@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GameEngine.Data;
@@ -39,13 +40,13 @@ public class GameSession
 
     // Settings
     public string ParameterSetting { get; set; } = "strict";
-    public bool NoReviser { get; set; } = true;
 
     // Systems (injected)
+    [JsonIgnore]
     public ActionSystem ActionSystem { get; private set; } = null!;
     private StateLoader _stateLoader = null!;
     private PromptBuilder? _promptBuilder;
-    private AnthropicClient? _anthropicClient;
+    private ITutorModel? _anthropicClient;
 
     public GameSession(string username, string gradeLevel = "", string peerTutor = "")
     {
@@ -63,18 +64,15 @@ public class GameSession
     /// <param name="characterDataProvider">Function that provides character.json content for a given character name</param>
     /// <param name="promptDataProvider">Function that provides prompt template content for a given filename</param>
     /// <param name="parameterSetting">"strict" or "lenient"</param>
-    /// <param name="noReviser">Whether to skip the revision step</param>
     /// <param name="initialStateId">Override initial state (default: "0_intro_proteinSynthesis")</param>
     public void InstantiateGame(
         Func<string, (string json, string examples)> stateDataProvider,
         Func<string, string> characterDataProvider,
         Func<string, string> promptDataProvider,
         string parameterSetting = "strict",
-        bool noReviser = true,
         string? initialStateId = null)
     {
         ParameterSetting = parameterSetting;
-        NoReviser = noReviser;
 
         // Create systems
         ActionSystem = new ActionSystem();
@@ -116,7 +114,7 @@ public class GameSession
     /// <summary>
     /// Set the Anthropic API client for LLM calls.
     /// </summary>
-    public void SetAnthropicClient(AnthropicClient client)
+    public void SetAnthropicClient(ITutorModel client)
     {
         _anthropicClient = client;
     }
@@ -127,56 +125,68 @@ public class GameSession
     /// </summary>
     public async Task<GameResponse> ProcessStepsAsync(string userInput, CancellationToken cancellationToken = default)
     {
+        // Step 1: Store user message
+        AddMessage("user", $"{Username}:: {userInput}");
+
+        // Step 2: Prepare context
+        var extraContext = PrepareExtraContext();
+        var unmetGoals = GoalSystem.GetUnmetGoals(CurrentGameState);
+
+        Console.WriteLine($"--- UNMET GOALS: {JsonConvert.SerializeObject(unmetGoals)} ---");
+
+        // Step 3: Build system prompt and call LLM
+        DrafterOutput drafterOutput;
+        if (_anthropicClient != null && _promptBuilder != null)
+        {
+            var evalCondition = EvalContextUtil.DetermineEvalContext(
+                unmetGoals, CurrentGameState.Available);
+
+            var systemPrompt = _promptBuilder.BuildSystemPrompt(
+                PeerTutor, PersonaDescription,
+                Username, GradeLevel, StudentInterest, ChosenProtein,
+                Messages, userInput,
+                CurrentGameState.Description,
+                unmetGoals, CurrentGameState.Available,
+                StudentConceptLanguage,
+                ParameterSetting, LongTermReflections,
+                extraContext, evalCondition);
+
+            drafterOutput = await _anthropicClient.SendMessageAsync(systemPrompt, cancellationToken);
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                "No LLM client configured. Call SetAnthropicClient() or use ProcessStepsWithMock().");
+        }
+
+        var response = ProcessDrafterOutput(drafterOutput, userInput);
+        cancellationToken.ThrowIfCancellationRequested();
+        response.ReflectionCritique = drafterOutput.SummaryCritique ?? "";
+        return response;
+    }
+
+    // Called only after the turn's audio preparation settles. The controller waits
+    // for this work before drafting again, so the next prompt includes its memory.
+    public async Task<GameResponse> ReflectOnTurnAsync(string critique, CancellationToken cancellationToken = default)
+    {
+        var response = new GameResponse();
+        // Reflection informs future turns; it never rewrites this response.
         try
         {
-            // Step 1: Store user message
-            AddMessage("user", $"{Username}:: {userInput}");
-
-            // Step 2: Prepare context
-            var extraContext = PrepareExtraContext();
-            var unmetGoals = GoalSystem.GetUnmetGoals(CurrentGameState);
-
-            Console.WriteLine($"--- UNMET GOALS: {JsonSerializer.Serialize(unmetGoals)} ---");
-
-            // Step 3: Build system prompt and call LLM
-            DrafterOutput drafterOutput;
-            if (_anthropicClient != null && _promptBuilder != null)
+            if (_anthropicClient == null) throw new InvalidOperationException("No LLM client configured.");
+            var reflection = await _anthropicClient.ReflectAsync(PeerTutor, Messages,
+                critique, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!string.IsNullOrWhiteSpace(reflection))
             {
-                var evalCondition = EvalContextUtil.DetermineEvalContext(
-                    unmetGoals, CurrentGameState.Available);
-
-                var systemPrompt = _promptBuilder.BuildSystemPrompt(
-                    PeerTutor, PersonaDescription,
-                    Username, GradeLevel, StudentInterest, ChosenProtein,
-                    Messages, userInput,
-                    CurrentGameState.Description,
-                    unmetGoals, CurrentGameState.Available,
-                    StudentConceptLanguage,
-                    ParameterSetting, LongTermReflections,
-                    extraContext, evalCondition);
-
-                drafterOutput = await _anthropicClient.SendMessageAsync(systemPrompt, cancellationToken);
+                response.Reflection = reflection;
+                LongTermReflections.Add(reflection);
+                while (LongTermReflections.Count > 3) LongTermReflections.RemoveAt(0);
             }
-            else
-            {
-                throw new InvalidOperationException(
-                    "No LLM client configured. Call SetAnthropicClient() or use ProcessStepsWithMockAsync().");
-            }
-
-            return ProcessDrafterOutput(drafterOutput, userInput);
         }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Exception in ProcessSteps: {e}");
-            var errorResponse = new GameResponse
-            {
-                Message = $"{PeerTutor}:: I'm sorry, something went wrong. Could you try again?",
-                GoalsMet = null,
-                Action = null,
-                StudentInterest = null
-            };
-            return errorResponse;
-        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+        catch (Exception e) { response.ReflectionError = e.GetType().Name; }
+        return response;
     }
 
     /// <summary>
@@ -196,6 +206,8 @@ public class GameSession
     {
         var teacherResponse = output.Message;
         var chosenGoalForTurn = output.ChosenGoalForTurn;
+        if (string.IsNullOrWhiteSpace(output.Message))
+            throw new InvalidOperationException("The tutor returned an empty response.");
         var actionCalled = output.Action;
 
         // Set student interest
@@ -235,9 +247,20 @@ public class GameSession
         // Store assistant message
         AddMessage("assistant", formattedResponse);
 
-        // Execute action if called
+        // Never expose an action to the UI unless it is currently allowed.
+        GoalSystem.UnlockGoals(CurrentGameState);
+        CurrentGameState.UpdateActions(ActionSystem);
+        if (!string.IsNullOrEmpty(actionCalled)
+            && (!ActionSystem.CheckActionValid(actionCalled, CurrentGameState)
+                || !ActionSystem.CheckActionAvailable(actionCalled, CurrentGameState)))
+            actionCalled = null;
+
+        // Execute only accepted actions.
         if (!string.IsNullOrEmpty(actionCalled))
         {
+            const string proteinActionPrefix = "TO_PROTEIN_SYNTHESIS_LAB_";
+            if (actionCalled.StartsWith(proteinActionPrefix))
+                ChosenProtein = actionCalled.Substring(proteinActionPrefix.Length).ToLowerInvariant();
             Console.WriteLine($">> Executing action: {actionCalled}");
             var (newState, addedResponse) = ActionSystem.TakeAction(
                 actionCalled, CurrentGameState, AllStates, Messages);
@@ -267,7 +290,7 @@ public class GameSession
 
         Step++;
 
-        Console.WriteLine($"GOALS MET: {JsonSerializer.Serialize(goalsMet)}");
+        Console.WriteLine($"GOALS MET: {JsonConvert.SerializeObject(goalsMet)}");
 
         return new GameResponse
         {
@@ -299,8 +322,8 @@ public class GameSession
                 extraContext += $@"
             SPECIAL INSTRUCTION:
             If you choose to focus on the unmet goal ""{introduceGoal}"", you must follow these critical rules when {PeerTutor} explains the concept:
-            - **CRITICAL RULE:** Do NOT use any of the following scientific terms in your response: {JsonSerializer.Serialize(ConceptData.AdvancedConcepts)}.
-            - Instead, you MUST explain the concept exclusively using simple, everyday language, drawing from the words used by the student: {JsonSerializer.Serialize(StudentConceptLanguage)}. You will introduce the formal scientific term when pursuing a subsequent goal, but NOT now.
+            - **CRITICAL RULE:** Do NOT use any of the following scientific terms in your response: {JsonConvert.SerializeObject(ConceptData.AdvancedConcepts)}.
+            - Instead, you MUST explain the concept exclusively using simple, everyday language, drawing from the words used by the student: {JsonConvert.SerializeObject(StudentConceptLanguage)}. You will introduce the formal scientific term when pursuing a subsequent goal, but NOT now.
             ";
             }
         }
@@ -394,13 +417,44 @@ public class GameSession
         });
     }
 
+    public string Save()
+    {
+        return JsonConvert.SerializeObject(new SessionState {
+            Username = Username, GradeLevel = GradeLevel, PeerTutor = PeerTutor,
+            PersonaDescription = PersonaDescription,
+            ParticipantId = ParticipantId, Step = Step, CurrentStateId = CurrentGameState.Id,
+            AllStates = AllStates, Messages = Messages, StudentConceptLanguage = StudentConceptLanguage,
+            StudentInterest = StudentInterest, ChosenProtein = ChosenProtein,
+            Reflections = LongTermReflections, ParameterSetting = ParameterSetting
+        });
+    }
+
+    public void Restore(string json)
+    {
+        var state = JsonConvert.DeserializeObject<SessionState>(json)
+            ?? throw new InvalidOperationException("Invalid session checkpoint.");
+        if (state.Version != 1 || !state.AllStates.ContainsKey(state.CurrentStateId))
+            throw new InvalidOperationException("Unsupported session checkpoint.");
+        if (state.PeerTutor != PeerTutor)
+            throw new InvalidOperationException("Checkpoint tutor does not match loaded persona.");
+        Username = state.Username; GradeLevel = state.GradeLevel; ParticipantId = state.ParticipantId;
+        if (!string.IsNullOrEmpty(state.PersonaDescription)) PersonaDescription = state.PersonaDescription;
+        Step = state.Step; AllStates = state.AllStates; CurrentGameState = AllStates[state.CurrentStateId];
+        Messages = state.Messages; StudentConceptLanguage = state.StudentConceptLanguage;
+        StudentInterest = state.StudentInterest; ChosenProtein = state.ChosenProtein;
+        LongTermReflections = state.Reflections; ParameterSetting = state.ParameterSetting;
+        foreach (var item in AllStates.Values) item.UpdateActions(ActionSystem);
+    }
+
     private string LoadCharacterDescription(Func<string, string> characterDataProvider, string peerTutor)
     {
         try
         {
             var json = characterDataProvider(peerTutor.ToLower());
-            using var doc = JsonDocument.Parse(json);
-            return doc.RootElement.GetProperty("description").GetString() ?? "";
+            var character = JObject.Parse(json);
+            return character.TryGetValue("description", out var description)
+                ? (string?)description ?? ""
+                : $"{peerTutor} is a friendly peer tutor.";
         }
         catch
         {

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Text.Json;
+using Newtonsoft.Json;
 using GameEngine.Data;
 using GameEngine.Models;
 
@@ -93,16 +93,16 @@ public class PromptBuilder
             .Replace("{conversation_history}", conversationHistoryStr)
             .Replace("{student_input}", studentInput)
             .Replace("{scene_description}", sceneDescription)
-            .Replace("{unmet_goals}", JsonSerializer.Serialize(unmetGoals))
+            .Replace("{unmet_goals}", JsonConvert.SerializeObject(unmetGoals))
             .Replace("{action_goal}", actionGoal)
-            .Replace("{available_actions}", JsonSerializer.Serialize(availableActions))
-            .Replace("{student_concept_language}", JsonSerializer.Serialize(studentConceptLanguage))
-            .Replace("{foundational_concepts_list}", JsonSerializer.Serialize(ConceptData.FoundationalConcepts))
-            .Replace("{advanced_concepts_list}", JsonSerializer.Serialize(ConceptData.AdvancedConcepts))
+            .Replace("{available_actions}", JsonConvert.SerializeObject(availableActions))
+            .Replace("{student_concept_language}", JsonConvert.SerializeObject(studentConceptLanguage))
+            .Replace("{foundational_concepts_list}", JsonConvert.SerializeObject(ConceptData.FoundationalConcepts))
+            .Replace("{advanced_concepts_list}", JsonConvert.SerializeObject(ConceptData.AdvancedConcepts))
             .Replace("{reflections}", string.Join("\n", reflections))
             .Replace("{extra_context}", extraContext)
             .Replace("{eval_context}", evalContext)
-            .Replace("{PROTEINS_LIST}", JsonSerializer.Serialize(ProteinData.ProteinsList));
+            .Replace("{PROTEINS_LIST}", JsonConvert.SerializeObject(ProteinData.ProteinsList));
 
         return prompt;
     }

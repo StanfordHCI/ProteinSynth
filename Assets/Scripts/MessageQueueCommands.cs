@@ -1,96 +1,115 @@
-using UnityEngine;
-using UnityEngine.UI;
-using System.Collections.Generic;
+using System;
 using System.Collections;
-using System.Text.RegularExpressions;
-using Yarn.Unity; 
-using Yarn.Compiler; 
+using System.Collections.Generic;
+using System.Linq;
+using GameEngine.Dialogue;
+using UnityEngine;
+using Yarn.Unity;
 
-using OpenAI;
-
+// Typed presentation adapter: each line owns its speech state and clip identity.
 public class MessageQueueCommands : MonoBehaviour
 {
-    public Queue<string> messagesQueue = new Queue<string>(); // queue of message strings
-    public Queue<AudioClip> audioQueue= new Queue<AudioClip>(); // list of corresponding audio files
     public AudioSource audioSource;
+    private DialogueTurn turn;
+    private readonly Dictionary<string, AudioClip> clips = new Dictionary<string, AudioClip>();
+    private GameManager Manager => GetComponent<GameManager>();
+    private GlobalInMemoryVariableStorage Vars => GlobalInMemoryVariableStorage.Instance;
 
-     // runs messages currently in queue through dialogue
+    public bool CanContinueResponse => turn == null || turn.CanContinue;
+    public bool NextIsTextOnly => turn != null && !turn.Finished && turn.Cursor + 1 < turn.Lines.Count
+        && turn.Lines[turn.Cursor + 1].Speech == SpeechState.Failed;
+
+    public void Present(DialogueTurn response)
+    {
+        ReleaseClips(); turn = response;
+        SetOptions(response.Options);
+        GetComponent<LastLineScroll>()?.SetMessageList(new Queue<string>(response.Lines.Select(line => line.DisplayText)));
+    }
+
+    public void Clear() { ReleaseClips(); turn = null; SetOptions(new List<string>()); }
+
+    public void SetOptions(List<string> options)
+    {
+        for (int i = 0; i < 5; i++) Vars.SetValue("$gptOption" + (i + 1), i < options.Count ? options[i] : "");
+    }
+
+    public void CompleteSpeech(DialogueTurn expectedTurn, DialogueLine line, AudioClip clip)
+    {
+        if (turn != expectedTurn || !turn.Lines.Contains(line) || line.Speech != SpeechState.Pending)
+        { if (clip != null) Destroy(clip); return; }
+        if (clip != null) { clips[line.Id] = clip; line.Speech = SpeechState.Ready; }
+        else line.Speech = SpeechState.Failed;
+    }
+
     [YarnCommand("run_response")]
-    public void RunResponse() {
-        Debug.Log("Messages left in queue: " + messagesQueue.Count.ToString()); 
-        
-        string gptResponse = ""; 
-    
-        // reset gptResponse to empty to signal that all messages have been said
-        if (messagesQueue.Count == 0) {
-            GlobalInMemoryVariableStorage.Instance.SetValue("$gptResponse", "");
-            audioQueue.Clear(); 
-            return; 
+    public void RunResponse()
+    {
+        if (turn == null || turn.Finished) { Vars.SetValue("$gptResponse", ""); return; }
+        if (!CanContinueResponse) throw new InvalidOperationException("Next line is still preparing speech.");
+        if (turn.Cursor >= 0 && turn.Cursor < turn.Lines.Count)
+        {
+            var previous = turn.Lines[turn.Cursor];
+            if (clips.TryGetValue(previous.Id, out var previousClip)) { if (audioSource != null) audioSource.Stop(); Destroy(previousClip); clips.Remove(previous.Id); }
         }
-        
-        gptResponse = messagesQueue.Dequeue();
-        
-        // TO-DO: make this more general, rn assumes the question/call-to-action is somewhere 
-        // in the last 2 sentences and that last 2 sentences are said by same character
-        if (messagesQueue.Count == 1) {
-            // combine last 2 sentences if question is in 2nd to last sentence
-            // if (gptResponse.Contains('?')) {
-                string lastSentence = messagesQueue.Dequeue();
-                // EXCEPTION: if we need to the run the album tutorial
-                if (lastSentence == "ALBUM_TUTORIAL") {
-                    messagesQueue.Enqueue(lastSentence); 
-                }
-                // Only combine if together they are less than 200 characters
-                // else if ((gptResponse + lastSentence).Length <= 200 && gptResponse[0] == lastSentence[0]) {
-                //     lastSentence = lastSentence.Substring(lastSentence.IndexOf(':') + 1); // remove name from last sentence
-                //     gptResponse += lastSentence; 
-                // }
-                
-                 else {
-                    messagesQueue.Enqueue(lastSentence); 
-                }
-            }
-        GlobalInMemoryVariableStorage.Instance.SetValue("$gptResponse", gptResponse);
+        turn.Cursor++;
+        if (turn.Cursor < turn.Lines.Count)
+        {
+            Vars.SetValue("$gptResponse", turn.Lines[turn.Cursor].DisplayText);
+            Manager.SaveProgress();
+            return;
+        }
+        turn.Finished = true;
+        var node = ActionNode(turn.Action);
+        if (node != null)
+        {
+            Manager.BeginAction(turn.Action);
+            Vars.SetValue("$actionNode", node); Vars.SetValue("$gptResponse", "ACTION");
+        }
+        else { Vars.SetValue("$gptResponse", ""); Manager.SaveProgress(); }
     }
 
-    // waits for messages to populate queue to continue dialogue runner
     [YarnCommand("wait_for_message")]
-    public IEnumerator WaitForMessage() {
-        yield return new WaitUntil(() => messagesQueue.Count > 0 && audioQueue.Count > 0);
-        Debug.Log($"Ready to process: {messagesQueue.Count} text messages, {audioQueue.Count} audio clips");
+    public IEnumerator WaitForMessage()
+    {
+        // Used only after await_response succeeds; speech always resolves or fails.
+        while (turn != null && !CanContinueResponse) yield return null;
     }
 
-    // waits for audio chunk 
     [YarnCommand("wait_for_audio")]
-    public IEnumerator WaitForAudio() {
-        yield return new WaitUntil(() => audioQueue.Count > 0);
+    public IEnumerator WaitForAudio()
+    {
+        while (turn != null && turn.Cursor >= 0 && turn.Cursor < turn.Lines.Count
+            && !turn.Lines[turn.Cursor].CanPresent) yield return null;
     }
 
     [YarnCommand("play_voiceover")]
-    public IEnumerator PlayVoiceover() {
-        Debug.Log($"Audio queue count: {audioQueue.Count}, Messages queue count: {messagesQueue.Count}");
-        
-        // Check if queues are synchronized
-        if (audioQueue.Count != messagesQueue.Count) {
-            Debug.LogWarning($"Queue mismatch! Audio: {audioQueue.Count}, Text: {messagesQueue.Count}");
-        }
-        
-        if (audioQueue.Count == 0) {
-            Debug.LogWarning("No audio clips in queue!");
-            yield break;
-        }
-
-        AudioClip clip = audioQueue.Dequeue();
-        Debug.Log($"Playing audio clip: {clip.name}, Duration: {clip.length:F2}s");
-        
-        if (clip != null) {
-            audioSource.clip = clip;
-            audioSource.Play();
-            
-            // Don't wait here - let the text display immediately while audio plays
-            // The Yarn system will handle the timing
-            Debug.Log($"Started playing: {clip.name}");
-        }
+    public void PlayVoiceover()
+    {
+        if (audioSource == null || turn == null || turn.Cursor < 0 || turn.Cursor >= turn.Lines.Count) return;
+        var line = turn.Lines[turn.Cursor];
+        audioSource.Stop();
+        if (clips.TryGetValue(line.Id, out var clip) && clip != null) { audioSource.clip = clip; audioSource.Play(); }
     }
-}
 
+    public static string ActionNode(string action)
+    {
+        if (action == "ENCOURAGE_STUDENT_AND_BID_THEM_FAREWELL") return "EndGame";
+        if (action == "TO_PROTEIN_SYNTHESIS_LAB") return "ProteinSynthesisLab";
+        const string prefix = "TO_PROTEIN_SYNTHESIS_LAB_";
+        if (action != null && action.StartsWith(prefix))
+        {
+            var suffix = action.Substring(prefix.Length).ToLowerInvariant();
+            if (GameEngine.Data.ProteinData.ProteinsList.Contains(suffix))
+                return "ProteinSynthesisLab" + char.ToUpperInvariant(suffix[0]) + suffix.Substring(1);
+        }
+        return null;
+    }
+
+    private void ReleaseClips()
+    {
+        if (audioSource != null) { audioSource.Stop(); audioSource.clip = null; }
+        foreach (var clip in clips.Values) if (clip != null) Destroy(clip);
+        clips.Clear();
+    }
+    private void OnDestroy() => ReleaseClips();
+}

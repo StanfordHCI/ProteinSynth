@@ -1,0 +1,7 @@
+<linker>
+  <!-- Game state and API payloads are serialized via Newtonsoft reflection on IL2CPP. -->
+  <assembly fullname="Assembly-CSharp">
+    <type fullname="GameEngine.*" preserve="all" />
+    <type fullname="&lt;&gt;f__AnonymousType*" preserve="all" />
+  </assembly>
+</linker>
