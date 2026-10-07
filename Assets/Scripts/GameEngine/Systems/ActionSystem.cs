@@ -2,84 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameEngine.Models;
-using GameEngine.Data;
+using GameEngine.Activities;
 
 namespace GameEngine.Systems;
 
 /// <summary>
 /// Manages the action dictionary, availability checks, and action execution.
-/// Port of actions.py (protein synthesis actions only).
+/// Port of actions.py. Action definitions come from the activity.
 /// </summary>
 public class ActionSystem
 {
     private readonly Dictionary<string, ActionDefinition> _actionDictionary = new();
+    private readonly IActivity _activity;
 
-    public ActionSystem()
+    public ActionSystem(IActivity activity)
     {
-        RegisterProteinSynthesisActions();
-        PopulateProteinActions();
+        _activity = activity;
+        activity.RegisterActions(this);
     }
 
-    /// <summary>
-    /// Register the static protein synthesis actions.
-    /// These are the only actions needed for the protein synthesis flow.
-    /// </summary>
-    private void RegisterProteinSynthesisActions()
-    {
-        _actionDictionary["TO_PROTEIN_SYNTHESIS_LAB"] = new ActionDefinition
-        {
-            Description = "Start the lab to explore protein synthesis in depth",
-            ResponseMessage = "",
-            SystemMessage = "The student has completed an augmented reality (AR) lab activity on protein synthesis and are now reflecting on their learning in the AR (augmented reality) activity about the processes of transcription and translation in protein synthesis.",
-            NextStateId = "2_lab_reflection",
-            Condition = ActionCondition.All(),
-            Summarize = false
-        };
-
-        _actionDictionary["PROVIDE_VOCAB"] = new ActionDefinition
-        {
-            Description = "Provide students with the list of scientific vocabulary covered in the lesson (not as a bulleted or numbered list)",
-            ResponseMessage = "Yari:: To summarize, here is the new scientific vocabulary we learned today!",
-            SystemMessage = "The student is about to reflect on their learning in the AR (augmented reality) activity about the processes of transcription and translation in protein synthesis, practicing using the new scientific vocabulary they leanred.",
-            NextStateId = null,
-            Condition = ActionCondition.NoRequirement(),
-            Summarize = false
-        };
-
-        _actionDictionary["ENCOURAGE_STUDENT_AND_BID_THEM_FAREWELL"] = new ActionDefinition
-        {
-            Description = "Kindly encourage the student in their lifelong learning journey and bid them farewell! IMPORTANT: This will IMMEDIATELY end the experience without giving the student a chance to respond. Do not call this action if you want to ask a follow-up question. If you take this action, do NOT prompt the student for a response.",
-            ResponseMessage = "",
-            SystemMessage = "The student has finished reflecting on their learning about the processes of transcription and translation in protein synthesis, and they will be moving onto the next step in their learning journey.",
-            NextStateId = null,
-            Condition = ActionCondition.All(),
-            Summarize = false
-        };
-    }
-
-    /// <summary>
-    /// Dynamically generate TO_PROTEIN_SYNTHESIS_LAB_{PROTEIN} actions for each protein.
-    /// Port of populate_protein_actions() from protein_selection.py.
-    /// </summary>
-    public void PopulateProteinActions()
-    {
-        foreach (var protein in ProteinData.ProteinsList)
-        {
-            var actionId = $"TO_PROTEIN_SYNTHESIS_LAB_{protein.ToUpper()}";
-            if (!_actionDictionary.ContainsKey(actionId))
-            {
-                _actionDictionary[actionId] = new ActionDefinition
-                {
-                    Description = $"Start a lab to explore protein synthesis in depth, using the {protein} case study. IMPORTANT: This will IMMEDIATELY start the lab activity without giving the student a chance to respond. Do not call this action if you want to ask a follow-up question. If you take this action, do NOT prompt the student for a response.",
-                    ResponseMessage = "",
-                    SystemMessage = $"The student has completed an augmented-reality lab on protein synthesis using the specific example of {protein} and is now reflecting on their learning.",
-                    NextStateId = "2_lab_reflection",
-                    Condition = ActionCondition.All(),
-                    Summarize = false
-                };
-            }
-        }
-    }
+    /// <summary>Register (or replace) an action definition.</summary>
+    public void Register(string actionId, ActionDefinition action) => _actionDictionary[actionId] = action;
 
     /// <summary>
     /// Check if an action's conditions are met in the given state.
@@ -172,20 +115,7 @@ public class ActionSystem
         GameState currentState,
         Dictionary<string, GameState> allStates)
     {
-        switch (actionId)
-        {
-            case "PROVIDE_VOCAB":
-                // Remove PROVIDE_VOCAB from lab_reflection state
-                if (allStates.TryGetValue("2_lab_reflection", out var labState))
-                    labState.Actions.Remove("PROVIDE_VOCAB");
-                break;
-
-            case "ENCOURAGE_STUDENT_AND_BID_THEM_FAREWELL":
-                // Remove this action from lab_reflection state
-                if (allStates.TryGetValue("2_lab_reflection", out var labState2))
-                    labState2.Actions.Remove("ENCOURAGE_STUDENT_AND_BID_THEM_FAREWELL");
-                break;
-        }
+        _activity.ApplyActionSideEffects(actionId, allStates);
     }
 
     /// <summary>
@@ -219,14 +149,10 @@ public class ActionSystem
     }
 
     /// <summary>
-    /// Check if the game is completed (no actions left in lab_reflection state).
+    /// Check if the game is completed, as defined by the activity.
     /// Port of is_game_completed() from actions.py.
     /// </summary>
-    public bool IsGameCompleted(Dictionary<string, GameState> allStates)
-    {
-        return allStates.TryGetValue("2_lab_reflection", out var labState)
-               && labState.Actions.Count == 0;
-    }
+    public bool IsGameCompleted(Dictionary<string, GameState> allStates) => _activity.IsCompleted(allStates);
 
     private void InjectSystemMessage(List<Dictionary<string, string>> messages, string content)
     {

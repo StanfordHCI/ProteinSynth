@@ -66,6 +66,30 @@ files, using the data in `Assets/StreamingAssets/GameData/`.
 `GameManager` owns Unity lifecycle, turn transactions, audio, and saves.
 `MessageQueueCommands` owns presentation and the clips keyed by line ID.
 
+### Activities
+
+The engine core is lesson-agnostic. Everything specific to a lesson lives behind
+`GameEngine/Activities/IActivity.cs`:
+- its states and intro state;
+- its vocabulary;
+- the actions it registers and their side effects;
+- its completion rule;
+- extra prompt instructions and placeholders;
+- extra fields in the model's response schema (e.g. `chosen_protein`);
+- its lab actions and their Yarn nodes;
+- the message submitted when the lab finishes;
+- how it reads and writes legacy Python save fields.
+
+`ProteinSynthesisActivity` (`Id` = `protein`) is the protein lesson. Activity-owned
+session values, such as the chosen protein, live in `GameSession.ActivityValues`. Version 1
+checkpoints that stored `ChosenProtein` separately are migrated on load.
+
+Each activity's states live in `GameData/Activities/<id>/States/<state>/`.
+Characters and prompts in `GameData/Characters` and `GameData/Prompts` are shared.
+`GameManager` selects the activity from the Yarn variable `$activity` (default
+`protein`). To add an activity, implement `IActivity`, add its state data, and
+register it in `GameManager.Activities`.
+
 ### Provider requests and audio lifetime
 
 The current model names and voice mapping are hardcoded in `AnthropicClient` and
@@ -188,6 +212,10 @@ turns, so `user_message` is not always literal student input. A failed draft
 produces a diagnostic event, not a response row.
 
 The saved game goes to **`games/game_<participant_id>.json`** using Storage upsert.
+That's the legacy location, used by activities without a `SaveFolder` (ProteinSynth's
+protein activity). An activity with a `SaveFolder`, as used by multi-activity hosts,
+saves to `games/<SaveFolder>/game_<participant_id>.json` instead, so the same
+participant can use several activities, or both apps, without overwriting saves.
 It contains the Python server's original fields, including snake-case states,
 conversation history, goals/actions, student profile, chosen protein, and
 reflections. An additional `unity_checkpoint` contains the precise dialogue cursor,
@@ -196,7 +224,8 @@ Python JSON saves can also be imported when no local save exists; those older
 files lack the Unity line cursor and AR phase, so they resume the conversation.
 
 Diagnostics (speech failures, actions, reflection results, session starts, lab
-completion) live in the game's `unity_checkpoint.ResearchLog`. They are not fake
+completion) live in the game's `unity_checkpoint.ResearchLog`. The `lab_completed`
+diagnostic records `activity` and `activity_values` (which includes `chosen_protein`). They are not fake
 student-response rows. Pending events stay in `Outbox` until both their response
 rows and the game upload succeed. If game upload fails after rows were inserted,
 retrying uses the same timestamps and does not duplicate rows. Events added while
@@ -212,7 +241,12 @@ file uses last-writer-wins, so use one active device per participant.
 ## Save, resume, and failures
 
 Local checkpoints are stored in
-`Application.persistentDataPath/Mosaic/sessions/<SHA256 of participant ID>.json`.
+`Application.persistentDataPath/Mosaic/sessions/<SHA256 of participant ID>.json`, or
+`sessions/<SaveFolder>/<SHA256>.json` for an activity with a `SaveFolder`. Each checkpoint
+records its `ActivityId`. Checkpoints written before activities existed have none; they
+are accepted only at the legacy location and get stamped with the activity on load.
+Loading another activity's save throws `IncompatibleSaveException` (logged as
+`Tutoring request failed: IncompatibleSaveException: ...`), not a connection error.
 Writes use a flushed temporary file and atomic replacement; `.bak` is the previous
 valid version. Entering the same participant ID resumes locally, or downloads its
 saved game from Supabase if no local file exists. Without user Auth, managed
@@ -227,8 +261,8 @@ local file cannot be read or validated, the store tries its `.bak`; it does not
 silently fall back to a cloud save after both fail. Resuming restores the saved
 name, grade, and tutor rather than replacing them with the newly entered values.
 
-Legacy Python imports support only `0_intro_proteinSynthesis` and
-`2_lab_reflection`. They must contain compatible state data, the matching
+Legacy Python imports support only the selected activity's states (for protein,
+`0_intro_proteinSynthesis` and `2_lab_reflection`). They must contain compatible state data, the matching
 `participant_id`, and a valid UUID `logging_id`. Saves from other server scenes
 are rejected. The Unity checkpoint and embedded session currently use version 1.
 
@@ -292,6 +326,7 @@ the preceding Unity/device log beginning
 | `Unable to load managed-client-settings.json` or a `GameData/...` file | Generated StreamingAssets and lesson data in the installed build; rebuild through Unity. |
 | HTTP 401/403 or a permission error | Supabase project/key and access to the `games` bucket. A publishable key needs the optional policies. |
 | Missing bucket or another Storage error | Correct project and bucket. Only an object-not-found response (`NoSuchKey` or `Object not found`, HTTP 400/404) is treated as a new participant. |
+| `IncompatibleSaveException` | The save belongs to a different activity (its `ActivityId` doesn't match). Check `$activity` and which folder the file is in; the file is preserved. |
 | Invalid/unsupported checkpoint, malformed JSON, or unsupported saved scene | Local file and backup, or the cloud JSON if no local file exists; check participant identity, UUID, versions, and supported states. |
 | Timeout or transport failure | Device connectivity and the exception details. Cloud lookup occurs only when no local checkpoint exists. |
 
@@ -308,7 +343,7 @@ Inspect the local checkpoint's `Outbox` for pending turns, and confirm that the
 dashboard is showing the same Supabase project as the effective configuration.
 
 Use a committed tutor turn to test `responses`; initialization and diagnostic
-events alone do not create rows. Check `games/game_<participant_id>.json` for the
+events alone do not create rows. Check `games/game_<participant_id>.json` (or `games/<SaveFolder>/...`) for the
 save and diagnostic history. When using a publishable key, verify both table
 insert access and Storage read/insert/update access. A failed game upload leaves
 the outbox pending even if response rows have already arrived.

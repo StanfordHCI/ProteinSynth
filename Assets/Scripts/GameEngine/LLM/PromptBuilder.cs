@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Linq;
 using GameEngine.Data;
 using GameEngine.Models;
 
@@ -44,7 +45,6 @@ public class PromptBuilder
         string studentName,
         string studentGradeLevel,
         string? studentInterest,
-        string? chosenProtein,
         List<Dictionary<string, string>> conversationHistory,
         string studentInput,
         string sceneDescription,
@@ -54,7 +54,10 @@ public class PromptBuilder
         string? parameterSetting,
         List<string> reflections,
         string extraContext,
-        EvalContextType evalCondition)
+        EvalContextType evalCondition,
+        IReadOnlyList<string> advancedConcepts,
+        IReadOnlyCollection<string> foundationalConcepts,
+        IReadOnlyDictionary<string, string> activityValues)
     {
         // Determine action goal
         var actionGoal = evalCondition == EvalContextType.ActNow
@@ -65,12 +68,22 @@ public class PromptBuilder
         var evalContext = EvalContextUtil.MakeEvaluatorContext(
             evalCondition,
             parameterSetting,
-            ConceptData.AdvancedConcepts,
+            advancedConcepts.ToList(),
             _evalBaseText,
             _criteriaFullText,
             _criteriaRespOnlyText,
             _reflectionStrictText,
             _reflectionLenientText);
+
+        // The evaluation guidelines were written for a separate evaluator call that filled their
+        // placeholders itself. Embedded in this prompt via {eval_context}, nothing filled them, so
+        // Claude saw literal "{peer_tutor}" etc. The history and input already appear above, and the
+        // goal is chosen in this same response, so refer to those instead of duplicating them.
+        evalContext = evalContext
+            .Replace("{peer_tutor}", peerTutor)
+            .Replace("{conversation_history}", "(See the conversation history above.)")
+            .Replace("{student_input}", "(See the student's most recent input above.)")
+            .Replace("{chosen_goal_for_turn}", "(The goal you choose for this turn and report in chosen_goal_for_turn.)");
 
         // Format conversation history
         var historyLines = new List<string>();
@@ -89,7 +102,6 @@ public class PromptBuilder
             .Replace("{student_name}", studentName)
             .Replace("{student_grade_level}", studentGradeLevel)
             .Replace("{student_interest}", studentInterest ?? "")
-            .Replace("{chosen_protein}", chosenProtein ?? "")
             .Replace("{conversation_history}", conversationHistoryStr)
             .Replace("{student_input}", studentInput)
             .Replace("{scene_description}", sceneDescription)
@@ -97,12 +109,15 @@ public class PromptBuilder
             .Replace("{action_goal}", actionGoal)
             .Replace("{available_actions}", JsonConvert.SerializeObject(availableActions))
             .Replace("{student_concept_language}", JsonConvert.SerializeObject(studentConceptLanguage))
-            .Replace("{foundational_concepts_list}", JsonConvert.SerializeObject(ConceptData.FoundationalConcepts))
-            .Replace("{advanced_concepts_list}", JsonConvert.SerializeObject(ConceptData.AdvancedConcepts))
+            .Replace("{foundational_concepts_list}", JsonConvert.SerializeObject(foundationalConcepts))
+            .Replace("{advanced_concepts_list}", JsonConvert.SerializeObject(advancedConcepts))
             .Replace("{reflections}", string.Join("\n", reflections))
             .Replace("{extra_context}", extraContext)
-            .Replace("{eval_context}", evalContext)
-            .Replace("{PROTEINS_LIST}", JsonConvert.SerializeObject(ProteinData.ProteinsList));
+            .Replace("{eval_context}", evalContext);
+
+        // Activity-specific placeholders (e.g. the protein list) are filled in last.
+        foreach (var pair in activityValues)
+            prompt = prompt.Replace(pair.Key, pair.Value);
 
         return prompt;
     }

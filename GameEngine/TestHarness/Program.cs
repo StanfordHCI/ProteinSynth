@@ -1,4 +1,5 @@
 using System.Text.Json;
+using GameEngine.Activities;
 using GameEngine.Data;
 using GameEngine.LLM;
 using GameEngine.Models;
@@ -46,11 +47,14 @@ peerTutor = char.ToUpper(peerTutor[0]) + peerTutor[1..].ToLower();
 
 // Create and initialize game session
 var game = new GameSession(username, gradeLevel, peerTutor);
+var activity = new ProteinSynthesisActivity();
+var statesDir = Path.Combine(dataDir, "Activities", activity.Id, "States");
 game.InstantiateGame(
+    activity,
     stateDataProvider: stateId =>
     {
-        var json = File.ReadAllText(Path.Combine(dataDir, "States", stateId, "state.json"));
-        var examples = File.ReadAllText(Path.Combine(dataDir, "States", stateId, "examples.txt"));
+        var json = File.ReadAllText(Path.Combine(statesDir, stateId, "state.json"));
+        var examples = File.ReadAllText(Path.Combine(statesDir, stateId, "examples.txt"));
         return (json, examples);
     },
     characterDataProvider: name =>
@@ -131,14 +135,14 @@ void RunMockMode(GameSession game)
     PrintTurnResult("Something about DNA making copies", response4, game);
 
     // Turn 5: Student says no questions, protein goal unlocked
-    var proteinsListStr = $"['{string.Join("', '", ProteinData.ProteinsList)}']";
+    var proteinsListStr = $"['{string.Join("', '", ProteinSynthesisActivity.Proteins)}']";
     var proteinGoal = $"Introduce ONE of the following valid list of proteins based on the student's interest: {proteinsListStr}";
 
     var response5 = game.ProcessStepsWithMock("Nah I think I'm good", new DrafterOutput
     {
         ChosenGoalForTurn = proteinGoal,
         Message = "All good! So check this out—since you're into basketball, let's look at a protein that helps your muscles work when you play. It's called myosin. Ready to dive into the lab?",
-        ChosenProtein = "myosin",
+        Extra = new Dictionary<string, Newtonsoft.Json.Linq.JToken> { ["chosen_protein"] = "myosin" },
         Action = null
     });
     PrintTurnResult("Nah I think I'm good", response5, game);
@@ -387,7 +391,7 @@ string FindDataDirectory()
     foreach (var candidate in candidates)
     {
         var fullPath = Path.GetFullPath(candidate);
-        if (Directory.Exists(fullPath) && Directory.Exists(Path.Combine(fullPath, "States")))
+        if (Directory.Exists(fullPath) && Directory.Exists(Path.Combine(fullPath, "Activities")))
             return fullPath;
     }
 

@@ -1,4 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings></PropertyGroup>
-  <ItemGroup><ProjectReference Include="../GameEngine.csproj" /></ItemGroup>
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
+    <UnityJsonPath Condition="'$(UnityJsonPath)' == ''">../../Library/PackageCache/com.unity.nuget.newtonsoft-json@3.2.1/Runtime/Newtonsoft.Json.dll</UnityJsonPath>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../GameEngine.csproj" />
+    <Reference Include="Newtonsoft.Json" Condition="Exists('$(UnityJsonPath)')"><HintPath>$(UnityJsonPath)</HintPath></Reference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" Condition="!Exists('$(UnityJsonPath)')" />
+  </ItemGroup>
 </Project>

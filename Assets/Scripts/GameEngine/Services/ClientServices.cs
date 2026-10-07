@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using GameEngine.Activities;
 using GameEngine.Persistence;
 
 namespace GameEngine.Services;
@@ -121,32 +122,34 @@ public sealed class ClientServices : IDisposable
         await SendAsync(request, token);
     }
 
-    public async Task SyncCheckpointAsync(Checkpoint checkpoint, CancellationToken token)
+    public async Task SyncCheckpointAsync(Checkpoint checkpoint, IActivity activity, CancellationToken token)
     {
         if (!hasSupabase) throw new InvalidOperationException("Research sync requires Supabase configuration.");
-        using var request = JsonRequest(GameUrl(checkpoint.ParticipantId, false), ServerGameFormat.Serialize(checkpoint));
+        using var request = JsonRequest(GameUrl(checkpoint.ParticipantId, false, activity), ServerGameFormat.Serialize(checkpoint, activity));
         Authorize(request);
         request.Headers.Add("x-upsert", "true");
         request.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
         await SendAsync(request, token);
     }
 
-    public async Task<Checkpoint?> LoadCheckpointAsync(string participant, CancellationToken token)
+    public async Task<Checkpoint?> LoadCheckpointAsync(string participant, IActivity activity, CancellationToken token)
     {
         if (!hasSupabase) return null;
-        using var request = new HttpRequestMessage(HttpMethod.Get, GameUrl(participant, true));
+        using var request = new HttpRequestMessage(HttpMethod.Get, GameUrl(participant, true, activity));
         Authorize(request);
         request.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
         try
         {
-            return ServerGameFormat.Deserialize(Encoding.UTF8.GetString(await SendAsync(request, token)), participant);
+            return ServerGameFormat.Deserialize(Encoding.UTF8.GetString(await SendAsync(request, token)), participant, activity);
         }
         catch (ServiceRequestException e) when (e.ObjectNotFound) { return null; }
     }
 
-    private string GameUrl(string participant, bool download) => config.supabase_url.TrimEnd('/')
+    // games/game_<participant>.json for the legacy location, games/<folder>/game_<participant>.json otherwise.
+    private string GameUrl(string participant, bool download, IActivity activity) => config.supabase_url.TrimEnd('/')
         + "/storage/v1/object/" + (download ? "authenticated/" : "")
-        + "games/" + Uri.EscapeDataString("game_" + participant + ".json");
+        + "games/" + (activity.SaveFolder == null ? "" : Uri.EscapeDataString(activity.SaveFolder) + "/")
+        + Uri.EscapeDataString("game_" + participant + ".json");
 
     private void Authorize(HttpRequestMessage request)
     {
