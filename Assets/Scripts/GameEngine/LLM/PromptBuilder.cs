@@ -75,6 +75,16 @@ public class PromptBuilder
             _reflectionStrictText,
             _reflectionLenientText);
 
+        // The evaluation guidelines were written for a separate evaluator call that filled their
+        // placeholders itself. Embedded in this prompt via {eval_context}, nothing filled them, so
+        // Claude saw literal "{peer_tutor}" etc. The history and input already appear above, and the
+        // goal is chosen in this same response, so refer to those instead of duplicating them.
+        evalContext = evalContext
+            .Replace("{peer_tutor}", peerTutor)
+            .Replace("{conversation_history}", "(See the conversation history above.)")
+            .Replace("{student_input}", "(See the student's most recent input above.)")
+            .Replace("{chosen_goal_for_turn}", "(The goal you choose for this turn and report in chosen_goal_for_turn.)");
+
         // Format conversation history
         var historyLines = new List<string>();
         foreach (var msg in conversationHistory)

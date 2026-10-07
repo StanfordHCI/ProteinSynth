@@ -327,6 +327,23 @@ try
 }
 finally { Directory.Delete(saveDirectory, true); }
 
+// Every placeholder in the assembled prompt must be filled, including inside the embedded evaluation guidelines.
+string P(string name) => File.ReadAllText(Path.Combine(root, "Prompts", name));
+var promptBuilder = new PromptBuilder(P("INITIAL_PROMPT.txt"), P("EVAL_BASE.txt"), P("CRITERIA_FULL.txt"),
+    P("CRITERIA_RESP_ONLY.txt"), P("REFLECTION_STRICT.txt"), P("REFLECTION_LENIENT.txt"));
+foreach (var evalType in new[] { EvalContextType.PursuingGoal, EvalContextType.ActNow, EvalContextType.JustResponsiveness })
+foreach (var setting in new[] { "strict", "lenient", "none" })
+{
+    var built = promptBuilder.BuildSystemPrompt("Jessica", "persona", "Sam", "9th", null,
+        new List<Dictionary<string, string>> { new() { ["role"] = "user", ["content"] = "Sam:: hi" } }, "what is a codon",
+        "scene", new List<string> { "goal" }, new Dictionary<string, string>(), new Dictionary<string, List<GameEngine.Data.ConceptData.PhraseEntry>>(),
+        setting, new List<string>(), "", evalType, protein.AdvancedConcepts, protein.FoundationalConcepts, protein.PromptValues(Create()));
+    var leftover = System.Text.RegularExpressions.Regex.Matches(built, @"\{[a-z_]+\}").Select(m => m.Value).Distinct().ToList();
+    Check(leftover.Count == 0, $"Prompt ({evalType}, {setting}) has no unfilled placeholders: {string.Join(", ", leftover)}");
+    if (evalType == EvalContextType.PursuingGoal && setting == "strict")
+        Check(built.Contains("goal that Jessica's response") && built.Contains("Teacher (Jessica)::"), "Evaluation guidelines name the tutor");
+}
+
 GameSession CreateNamed(string participant) { var session = Create(); session.ParticipantId = participant; return session; }
 Console.WriteLine($"PASS: {count} local-engine regression checks");
 
