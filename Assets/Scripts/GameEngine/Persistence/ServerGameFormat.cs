@@ -60,6 +60,7 @@ public static class ServerGameFormat
             var saved = value["unity_checkpoint"]!.ToObject<Checkpoint>()
                 ?? throw new InvalidDataException("Saved game has an empty Unity checkpoint.");
             saved.Validate(participant);
+            saved.EnsureActivity(activity);
             return saved;
         }
         // Import original Python JSON saves when no local checkpoint is available.
@@ -81,7 +82,7 @@ public static class ServerGameFormat
         if (!activity.StateIds.Contains(state.CurrentStateId))
             throw new InvalidDataException("This saved game uses a scene not supported by the Unity tutoring client.");
         var checkpoint = new Checkpoint {
-            ParticipantId = state.ParticipantId, SessionId = (string?)value["logging_id"] ?? "",
+            ParticipantId = state.ParticipantId, SessionId = (string?)value["logging_id"] ?? "", ActivityId = activity.Id,
             SessionJson = JsonConvert.SerializeObject(state), Condition = (string?)value["condition"] ?? "treatment",
             FinishedScenes = value["finished_scenes"]?.ToObject<Dictionary<string, bool>>() ?? new(),
             Phase = activity.IsCompleted(states) ? "completed" : "conversation"

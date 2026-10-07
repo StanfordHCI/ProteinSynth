@@ -15,6 +15,12 @@ public interface IActivity
     /// <summary>Stable identifier, e.g. "protein". Used for data folders and saves.</summary>
     string Id { get; }
 
+    /// <summary>
+    /// Subfolder for this activity's saves, locally and in the cloud ("games/{SaveFolder}/").
+    /// Null keeps the legacy root-level location used by ProteinSynth before activities existed.
+    /// </summary>
+    string? SaveFolder { get; }
+
     /// <summary>State the conversation starts in.</summary>
     string IntroStateId { get; }
 

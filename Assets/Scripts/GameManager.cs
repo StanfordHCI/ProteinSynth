@@ -112,7 +112,7 @@ public class GameManager : MonoBehaviour
                 if (!services.CanSync) Debug.LogWarning("Supabase is not configured; research is saved locally only.");
             }
             await LoadData(Activity, lifetime.Token);
-            var checkpoint = store.Load(participant);
+            var checkpoint = store.Load(participant, Activity);
             if (checkpoint == null && services.CanSync)
                 checkpoint = await services.LoadCheckpointAsync(participant, Activity, lifetime.Token);
             checkpoint?.Validate(participant);
@@ -124,7 +124,7 @@ public class GameManager : MonoBehaviour
             Session.ParticipantId = participant;
             if (checkpoint != null) Session.Restore(checkpoint.SessionJson);
             Saved = checkpoint ?? new Checkpoint {
-                ParticipantId = participant, SessionJson = Session.Save(), Condition = ReadVariable("$condition", "treatment")
+                ParticipantId = participant, ActivityId = Activity.Id, SessionJson = Session.Save(), Condition = ReadVariable("$condition", "treatment")
             };
             if (checkpoint == null) AddEvent("session_started", new { Session.Username, Session.GradeLevel, Session.PeerTutor, Saved.Condition });
             var selectedLab = ReadVariable("$requested_lab_action");
@@ -363,7 +363,7 @@ public class GameManager : MonoBehaviour
         Saved.Outbox.Add(new ResearchEvent { session_id = Saved.SessionId, participant_id = Saved.ParticipantId, kind = kind, payload = payload });
         nextSync = 0;
     }
-    private void Save() { if (Saved != null) store.Save(Saved); }
+    private void Save() { if (Saved != null) store.Save(Saved, Activity); }
     private void TrySave() { try { Save(); } catch (Exception e) { Debug.LogError("Session save failed: " + e.GetType().Name); } }
     private void Fail(Exception e) { LastError = e.GetType().Name; Debug.LogError("Tutoring request failed: " + e.GetType().Name + ": " + e.Message); }
 
@@ -372,13 +372,15 @@ public class GameManager : MonoBehaviour
         syncing = true;
         try
         {
-            foreach (var path in Directory.GetFiles(Path.Combine(storageRoot, "sessions"), "*.json"))
+            // Each activity saves in its own subfolder; legacy saves sit at the root.
+            foreach (var path in Directory.GetFiles(Path.Combine(storageRoot, "sessions"), "*.json", SearchOption.AllDirectories))
             {
                 var disk = JsonConvert.DeserializeObject<Checkpoint>(File.ReadAllText(path));
-                var checkpoint = Saved != null && disk.ParticipantId == Saved.ParticipantId ? Saved : disk;
-                var count = await ResearchSync.FlushAsync(services, Activity,
+                if (disk == null || !Activities.TryGetValue(disk.ActivityId ?? DefaultActivity, out var activity)) continue;
+                var checkpoint = Saved != null && disk.SessionId == Saved.SessionId ? Saved : disk;
+                var count = await ResearchSync.FlushAsync(services, activity,
                     () => Saved != null && checkpoint.SessionId == Saved.SessionId ? Saved : checkpoint,
-                    store.Save, lifetime.Token);
+                    latest => store.Save(latest, activity), lifetime.Token);
                 if (count > 0) Debug.Log($"Research synced: {count} response(s) to responses; saved game uploaded to games.");
             }
         }

@@ -160,17 +160,17 @@ try
     restored.ParticipantId = "../../unsafe";
     var checkpoint = new Checkpoint { ParticipantId = "../../unsafe", SessionJson = restored.Save(), Turn = turn, Phase = "lab", LabAction = "TO_PROTEIN_SYNTHESIS_LAB_MYOSIN" };
     checkpoint.Outbox.Add(new ResearchEvent { kind = "turn", participant_id = checkpoint.ParticipantId, session_id = checkpoint.SessionId, payload = new { user_message = "Question", agent_message = "Jessica:: Answer.", agent_response_time = 1.25 } });
-    store.Save(checkpoint);
-    var loaded = store.Load(checkpoint.ParticipantId)!;
-    Check(Path.GetDirectoryName(store.PathFor(checkpoint.ParticipantId)) == directory, "Participant ID cannot escape save directory");
+    store.Save(checkpoint, protein);
+    var loaded = store.Load(checkpoint.ParticipantId, protein)!;
+    Check(Path.GetDirectoryName(store.PathFor(checkpoint.ParticipantId, protein)) == directory, "Participant ID cannot escape save directory");
     Check(loaded.Phase == "lab" && loaded.LabAction == checkpoint.LabAction, "AR resume phase preserved");
     Check(loaded.Outbox.Single().id == checkpoint.Outbox.Single().id, "Research retry keeps idempotency key across restarts");
-    store.Save(checkpoint);
-    File.WriteAllText(store.PathFor(checkpoint.ParticipantId), "broken");
-    Check(store.Load(checkpoint.ParticipantId)!.SessionId == checkpoint.SessionId, "Recover previous atomic checkpoint if current file corrupt");
+    store.Save(checkpoint, protein);
+    File.WriteAllText(store.PathFor(checkpoint.ParticipantId, protein), "broken");
+    Check(store.Load(checkpoint.ParticipantId, protein)!.SessionId == checkpoint.SessionId, "Recover previous atomic checkpoint if current file corrupt");
     checkpoint.PendingReflection = new PendingReflection { TurnId = turn.Id, Critique = "Critique to preserve" };
-    store.Save(checkpoint);
-    Check(store.Load(checkpoint.ParticipantId)!.PendingReflection?.Critique == "Critique to preserve", "Interrupted reflection is saved for resumption");
+    store.Save(checkpoint, protein);
+    Check(store.Load(checkpoint.ParticipantId, protein)!.PendingReflection?.Critique == "Critique to preserve", "Interrupted reflection is saved for resumption");
     // A leftover auth file must be irrelevant, even if corrupt/expired.
     File.WriteAllText(Path.Combine(directory, "auth.json"), "obsolete corrupt authentication");
     var handler = new FakeHttp();
@@ -212,7 +212,7 @@ try
     var diagnostic = new ResearchEvent { kind = "speech_failed", session_id = checkpoint.SessionId, participant_id = checkpoint.ParticipantId };
     checkpoint.Outbox.Add(diagnostic);
     handler.FailStorage = true;
-    try { await ResearchSync.FlushAsync(services, protein, () => checkpoint, store.Save, default); throw new Exception("Upload failure swallowed"); }
+    try { await ResearchSync.FlushAsync(services, protein, () => checkpoint, latest => store.Save(latest, protein), default); throw new Exception("Upload failure swallowed"); }
     catch (ServiceRequestException e) { Check(e.Message.Contains("HTTP 503"), "Sync failures expose HTTP status"); }
     Check(checkpoint.Outbox.Count == 2 && checkpoint.ResearchLog.Count == 0, "Storage failure leaves response and diagnostics durable for retry");
     handler.FailStorage = false;
@@ -220,7 +220,7 @@ try
         checkpoint = checkpoint.Snapshot();
         checkpoint.Outbox.Add(new ResearchEvent { kind = "action", session_id = checkpoint.SessionId, participant_id = checkpoint.ParticipantId });
     };
-    var sent = await ResearchSync.FlushAsync(services, protein, () => checkpoint, store.Save, default);
+    var sent = await ResearchSync.FlushAsync(services, protein, () => checkpoint, latest => store.Save(latest, protein), default);
     Check(sent == 1 && handler.Rows.Count == 1, "Retry after partial failure cannot duplicate response rows");
     Check(checkpoint.Outbox.Count == 1 && checkpoint.Outbox[0].kind == "action", "Events from a newly committed checkpoint survive an in-flight upload");
     Check(checkpoint.ResearchLog.Count == 2 && checkpoint.ResearchLog.Any(item => item.id == diagnostic.id), "Diagnostics persist in game history rather than fake response rows");
@@ -288,6 +288,46 @@ var legacySession = Newtonsoft.Json.Linq.JObject.Parse(Create().Save());
 legacySession.Remove("ActivityValues"); legacySession["ChosenProtein"] = "keratin";
 var migrated = Create(); migrated.Restore(legacySession.ToString());
 Check(ProteinSynthesisActivity.ChosenProtein(migrated) == "keratin" && !migrated.Save().Contains("\"ChosenProtein\""), "Legacy chosen protein migrates and isn't written back");
+// Saves are separated per activity, locally and in the cloud; legacy protein saves stay put.
+var hostProtein = new ProteinSynthesisActivity("protein");
+var saveDirectory = Path.Combine(Path.GetTempPath(), "mosaic-activity-saves-" + Guid.NewGuid());
+try
+{
+    var saves = new CheckpointStore(saveDirectory);
+    const string pid = "same-participant";
+    Check(saves.PathFor(pid, protein) == Path.Combine(saveDirectory, Path.GetFileName(saves.PathFor(pid, protein))),
+        "Legacy protein saves keep their root-level local path");
+    Check(saves.PathFor(pid, hostProtein) != saves.PathFor(pid, minimal) && saves.PathFor(pid, hostProtein) != saves.PathFor(pid, protein),
+        "Each activity folder gets its own local save");
+    var proteinSave = new Checkpoint { ParticipantId = pid, SessionJson = CreateNamed(pid).Save() };
+    var testSave = new Checkpoint { ParticipantId = pid, SessionJson = CreateNamed(pid).Save() };
+    saves.Save(proteinSave, hostProtein); saves.Save(testSave, minimal);
+    Check(saves.Load(pid, hostProtein)!.SessionId == proteinSave.SessionId && saves.Load(pid, minimal)!.SessionId == testSave.SessionId,
+        "The same participant in two activities doesn't collide");
+    Check(saves.Load(pid, hostProtein)!.ActivityId == "protein" && saves.Load(pid, minimal)!.ActivityId == "test", "Saves record their activity");
+    File.Copy(saves.PathFor(pid, minimal), saves.PathFor(pid, hostProtein), true);
+    try { saves.Load(pid, hostProtein); throw new Exception("Another activity's save was accepted"); }
+    catch (IncompatibleSaveException e) { Check(e.Message.Contains("'test'") && e.Message.Contains("'protein'"), "Mismatched activity is reported explicitly"); }
+    var legacy = new Checkpoint { ParticipantId = pid, SessionJson = CreateNamed(pid).Save() };
+    CheckpointStore.AtomicWrite(saves.PathFor(pid, protein), Newtonsoft.Json.JsonConvert.SerializeObject(legacy));
+    Check(saves.Load(pid, protein)!.ActivityId == "protein", "Legacy saves without an activity load and are stamped");
+    try { legacy.EnsureActivity(hostProtein); throw new Exception("Legacy save accepted by a foldered activity"); }
+    catch (IncompatibleSaveException) { count++; }
+
+    var cloud = new FakeHttp();
+    using var cloudServices = new ClientServices(new ClientConfiguration { supabase_url = "https://study.supabase.co", supabase_key = "sb_secret_test",
+        anthropic_api_key = "private-tutor", openai_api_key = "private-speech" }, cloud);
+    await cloudServices.LoadCheckpointAsync(pid, hostProtein, default);
+    Check(cloud.LastReadPath == "/storage/v1/object/authenticated/games/protein/game_same-participant.json", "Foldered activity uses games/<activity>/");
+    await cloudServices.LoadCheckpointAsync(pid, protein, default);
+    Check(cloud.LastReadPath == "/storage/v1/object/authenticated/games/game_same-participant.json", "Legacy protein keeps games/game_<id>.json");
+    cloud.SavedGame = ServerGameFormat.Serialize(testSave, minimal);
+    try { await cloudServices.LoadCheckpointAsync(pid, hostProtein, default); throw new Exception("Cloud save from another activity accepted"); }
+    catch (IncompatibleSaveException) { count++; }
+}
+finally { Directory.Delete(saveDirectory, true); }
+
+GameSession CreateNamed(string participant) { var session = Create(); session.ParticipantId = participant; return session; }
 Console.WriteLine($"PASS: {count} local-engine regression checks");
 
 // Minimal non-protein activity: one state, one action, one response field.
@@ -297,6 +337,7 @@ class TestActivity : IActivity
     public int Responses, TurnsEnded;
     public List<string> ActionsTaken = new();
     public string Id => "test";
+    public string? SaveFolder => "test";
     public string IntroStateId => "observe";
     public IReadOnlyList<string> StateIds { get; } = new[] { "observe" };
     public IReadOnlyList<string> AdvancedConcepts { get; } = new[] { "catalyst" };

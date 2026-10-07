@@ -28,7 +28,11 @@ public sealed class ProteinSynthesisActivity : IActivity
         "keratin", "immunoglobulins", "tyrosinase", "cytokines"
     };
 
+    /// <param name="saveFolder">Null keeps ProteinSynth's legacy save location; a multi-activity host passes "protein".</param>
+    public ProteinSynthesisActivity(string? saveFolder = null) => SaveFolder = saveFolder;
+
     public string Id => "protein";
+    public string? SaveFolder { get; }
     public string IntroStateId => IntroState;
     public IReadOnlyList<string> StateIds { get; } = new[] { IntroState, ReflectionState };
 

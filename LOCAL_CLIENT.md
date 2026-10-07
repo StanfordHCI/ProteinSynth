@@ -212,6 +212,10 @@ turns, so `user_message` is not always literal student input. A failed draft
 produces a diagnostic event, not a response row.
 
 The saved game goes to **`games/game_<participant_id>.json`** using Storage upsert.
+That's the legacy location, used by activities without a `SaveFolder` (ProteinSynth's
+protein activity). An activity with a `SaveFolder`, as used by multi-activity hosts,
+saves to `games/<SaveFolder>/game_<participant_id>.json` instead, so the same
+participant can use several activities, or both apps, without overwriting saves.
 It contains the Python server's original fields, including snake-case states,
 conversation history, goals/actions, student profile, chosen protein, and
 reflections. An additional `unity_checkpoint` contains the precise dialogue cursor,
@@ -237,7 +241,12 @@ file uses last-writer-wins, so use one active device per participant.
 ## Save, resume, and failures
 
 Local checkpoints are stored in
-`Application.persistentDataPath/Mosaic/sessions/<SHA256 of participant ID>.json`.
+`Application.persistentDataPath/Mosaic/sessions/<SHA256 of participant ID>.json`, or
+`sessions/<SaveFolder>/<SHA256>.json` for an activity with a `SaveFolder`. Each checkpoint
+records its `ActivityId`. Checkpoints written before activities existed have none; they
+are accepted only at the legacy location and get stamped with the activity on load.
+Loading another activity's save throws `IncompatibleSaveException` (logged as
+`Tutoring request failed: IncompatibleSaveException: ...`), not a connection error.
 Writes use a flushed temporary file and atomic replacement; `.bak` is the previous
 valid version. Entering the same participant ID resumes locally, or downloads its
 saved game from Supabase if no local file exists. Without user Auth, managed
@@ -317,6 +326,7 @@ the preceding Unity/device log beginning
 | `Unable to load managed-client-settings.json` or a `GameData/...` file | Generated StreamingAssets and lesson data in the installed build; rebuild through Unity. |
 | HTTP 401/403 or a permission error | Supabase project/key and access to the `games` bucket. A publishable key needs the optional policies. |
 | Missing bucket or another Storage error | Correct project and bucket. Only an object-not-found response (`NoSuchKey` or `Object not found`, HTTP 400/404) is treated as a new participant. |
+| `IncompatibleSaveException` | The save belongs to a different activity (its `ActivityId` doesn't match). Check `$activity` and which folder the file is in; the file is preserved. |
 | Invalid/unsupported checkpoint, malformed JSON, or unsupported saved scene | Local file and backup, or the cloud JSON if no local file exists; check participant identity, UUID, versions, and supported states. |
 | Timeout or transport failure | Device connectivity and the exception details. Cloud lookup occurs only when no local checkpoint exists. |
 
@@ -333,7 +343,7 @@ Inspect the local checkpoint's `Outbox` for pending turns, and confirm that the
 dashboard is showing the same Supabase project as the effective configuration.
 
 Use a committed tutor turn to test `responses`; initialization and diagnostic
-events alone do not create rows. Check `games/game_<participant_id>.json` for the
+events alone do not create rows. Check `games/game_<participant_id>.json` (or `games/<SaveFolder>/...`) for the
 save and diagnostic history. When using a publishable key, verify both table
 insert access and Storage read/insert/update access. A failed game upload leaves
 the outbox pending even if response rows have already arrived.
