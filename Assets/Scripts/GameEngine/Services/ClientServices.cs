@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using GameEngine.Activities;
 using GameEngine.Persistence;
 
 namespace GameEngine.Services;
@@ -121,17 +122,17 @@ public sealed class ClientServices : IDisposable
         await SendAsync(request, token);
     }
 
-    public async Task SyncCheckpointAsync(Checkpoint checkpoint, CancellationToken token)
+    public async Task SyncCheckpointAsync(Checkpoint checkpoint, IActivity activity, CancellationToken token)
     {
         if (!hasSupabase) throw new InvalidOperationException("Research sync requires Supabase configuration.");
-        using var request = JsonRequest(GameUrl(checkpoint.ParticipantId, false), ServerGameFormat.Serialize(checkpoint));
+        using var request = JsonRequest(GameUrl(checkpoint.ParticipantId, false), ServerGameFormat.Serialize(checkpoint, activity));
         Authorize(request);
         request.Headers.Add("x-upsert", "true");
         request.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
         await SendAsync(request, token);
     }
 
-    public async Task<Checkpoint?> LoadCheckpointAsync(string participant, CancellationToken token)
+    public async Task<Checkpoint?> LoadCheckpointAsync(string participant, IActivity activity, CancellationToken token)
     {
         if (!hasSupabase) return null;
         using var request = new HttpRequestMessage(HttpMethod.Get, GameUrl(participant, true));
@@ -139,7 +140,7 @@ public sealed class ClientServices : IDisposable
         request.Headers.CacheControl = new CacheControlHeaderValue { NoCache = true };
         try
         {
-            return ServerGameFormat.Deserialize(Encoding.UTF8.GetString(await SendAsync(request, token)), participant);
+            return ServerGameFormat.Deserialize(Encoding.UTF8.GetString(await SendAsync(request, token)), participant, activity);
         }
         catch (ServiceRequestException e) when (e.ObjectNotFound) { return null; }
     }

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using GameEngine.Models;
 
@@ -82,37 +81,5 @@ public class StateLoader
         var json = JsonConvert.SerializeObject(data);
         var replaced = json.Replace("[[PERSONA]]", peerTutor);
         return JsonConvert.DeserializeObject<StateJsonData>(replaced)!;
-    }
-
-    /// <summary>
-    /// Update the intro state's unlockable goal to include the current PROTEINS_LIST.
-    /// Port of update_protein_selection_goal() from protein_selection.py.
-    /// This modifies the state in-place rather than writing to disk.
-    /// </summary>
-    public static void UpdateProteinSelectionGoal(GameState introState)
-    {
-        var proteinsListStr = $"['{string.Join("', '", Data.ProteinData.ProteinsList)}']";
-        var prefix = "Introduce ONE of the following valid list of proteins based on the student's interest: ";
-
-        // Find and replace the protein selection unlockable goal
-        var goalToReplace = introState.UnlockableGoals.Keys
-            .FirstOrDefault(g => g.StartsWith(prefix));
-
-        if (goalToReplace != null)
-        {
-            var newGoal = prefix + proteinsListStr;
-            var conditions = introState.UnlockableGoals[goalToReplace];
-            introState.UnlockableGoals.Remove(goalToReplace);
-            introState.UnlockableGoals[newGoal] = conditions;
-        }
-
-        // Add all protein lab actions to the state
-        introState.Actions.Clear();
-        foreach (var protein in Data.ProteinData.ProteinsList)
-        {
-            var actionId = $"TO_PROTEIN_SYNTHESIS_LAB_{protein.ToUpper()}";
-            var desc = $"Start a lab to explore protein synthesis in depth, using the {protein} case study. IMPORTANT: This will IMMEDIATELY start the lab activity without giving the student a chance to respond. Do not call this action if you want to ask a follow-up question. If you take this action, do NOT prompt the student for a response.";
-            introState.Actions[actionId] = desc;
-        }
     }
 }

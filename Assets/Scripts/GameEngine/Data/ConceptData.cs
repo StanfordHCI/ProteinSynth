@@ -3,24 +3,11 @@ using System.Collections.Generic;
 namespace GameEngine.Data;
 
 /// <summary>
-/// Concept vocabulary data for protein synthesis tutoring.
-/// Port of concept_utils.py constants.
+/// Student concept-language tracking. Vocabulary lists belong to each activity.
+/// Port of concept_utils.py.
 /// </summary>
 public static class ConceptData
 {
-    /// <summary>Advanced scientific terms the tutor should handle carefully</summary>
-    public static readonly List<string> AdvancedConcepts = new()
-    {
-        "protein synthesis", "transcription", "translation",
-        "ribosomes", "mRNA", "tRNA", "amino acids", "codon"
-    };
-
-    /// <summary>Foundational concepts that map to everyday language</summary>
-    public static readonly HashSet<string> FoundationalConcepts = new()
-    {
-        "cell", "nucleus", "instruction", "building blocks", "growth", "jobs"
-    };
-
     /// <summary>Entry in the student's concept language dictionary</summary>
     public class PhraseEntry
     {

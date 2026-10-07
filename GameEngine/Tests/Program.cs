@@ -1,3 +1,4 @@
+using GameEngine.Activities;
 using GameEngine.Models;
 using GameEngine.LLM;
 using GameEngine.Dialogue;
@@ -9,11 +10,13 @@ using System.Text;
 var count = 0;
 void Check(bool condition, string description) { if (!condition) throw new Exception(description); count++; }
 var root = Path.Combine(AppContext.BaseDirectory, "Data");
+var protein = new ProteinSynthesisActivity();
 GameSession Create(ITutorModel? model = null)
 {
     var game = new GameSession("Student", "9th", "Jessica");
-    game.InstantiateGame(id => (File.ReadAllText(Path.Combine(root, "States", id, "state.json")),
-        File.ReadAllText(Path.Combine(root, "States", id, "examples.txt"))),
+    var states = Path.Combine(root, "Activities", protein.Id, "States");
+    game.InstantiateGame(protein, id => (File.ReadAllText(Path.Combine(states, id, "state.json")),
+        File.ReadAllText(Path.Combine(states, id, "examples.txt"))),
         name => File.ReadAllText(Path.Combine(root, "Characters", name, "character.json")),
         name => File.ReadAllText(Path.Combine(root, "Prompts", name)));
     if (model != null) game.SetAnthropicClient(model);
@@ -73,7 +76,8 @@ var complete = Create();
 while (complete.CurrentGameState.Goals.Any(x => !x.Value))
 {
     var goal = complete.CurrentGameState.Goals.First(x => !x.Value).Key;
-    complete.ProcessStepsWithMock("Continue", new DrafterOutput { Message = "Learning together.", ChosenGoalForTurn = goal, ChosenProtein = "myosin" });
+    complete.ProcessStepsWithMock("Continue", new DrafterOutput { Message = "Learning together.", ChosenGoalForTurn = goal,
+        Extra = new Dictionary<string, Newtonsoft.Json.Linq.JToken> { ["chosen_protein"] = "myosin" } });
 }
 var labAction = complete.ProcessStepsWithMock("Let's do it", new DrafterOutput { Message = "Let's start the lab.", Action = "TO_PROTEIN_SYNTHESIS_LAB_MYOSIN" });
 Check(labAction.Action == "TO_PROTEIN_SYNTHESIS_LAB_MYOSIN" && complete.CurrentGameState.Id == "2_lab_reflection", "Intro unlocks the chosen lab and reflection state");
@@ -86,10 +90,10 @@ Check(complete.ProcessStepsWithMock("Done", new DrafterOutput { Message = "Goodb
     "Farewell unlocks after completing the reflection goals");
 
 using (var adapter = new AnthropicClient((json, token) => Task.FromResult("{\"content\":[{\"type\":\"tool_use\",\"name\":\"respond\",\"input\":{\"message\":\"Hello.\"}}]}")))
-    Check((await adapter.SendMessageAsync("context")).Message == "Hello.", "Actual Claude adapter reads structured responses");
+    Check((await adapter.SendMessageAsync("context", protein.ResponseFields)).Message == "Hello.", "Actual Claude adapter reads structured responses");
 using (var adapter = new AnthropicClient((json, token) => Task.FromResult("{\"stop_reason\":\"max_tokens\",\"content\":[]}")))
 {
-    try { await adapter.SendMessageAsync("context"); throw new Exception("Truncation silently accepted"); }
+    try { await adapter.SendMessageAsync("context", protein.ResponseFields); throw new Exception("Truncation silently accepted"); }
     catch (InvalidDataException) { count++; }
 }
 ClientConfiguration.ValidateSupabaseKey("sb_publishable_test");
@@ -179,8 +183,8 @@ try
     await services.SendEventAsync(checkpoint.Outbox[0], default);
     Check(handler.Events.Count == 2 && handler.Events[0] == handler.Events[1] && handler.Rows.Count == 1,
         "Retried responses keep stable server-schema fields and conflict identity");
-    await services.SyncCheckpointAsync(checkpoint, default);
-    var cloud = await services.LoadCheckpointAsync(checkpoint.ParticipantId, default);
+    await services.SyncCheckpointAsync(checkpoint, protein, default);
+    var cloud = await services.LoadCheckpointAsync(checkpoint.ParticipantId, protein, default);
     Check(cloud?.SessionId == checkpoint.SessionId && cloud?.Turn?.Id == checkpoint.Turn.Id, "Game bucket recovers exact Unity checkpoint");
     Check(cloud?.PendingReflection?.TurnId == turn.Id, "Cloud resume retains pending reflection");
     Check(handler.LastReadPath.Contains(Uri.EscapeDataString("game_" + checkpoint.ParticipantId + ".json")),
@@ -196,19 +200,19 @@ try
         Check(legacy[key] != null || key == "chosen_protein", "Server save contract includes " + key);
     Check(legacy["all_states"]![restored.CurrentGameState.Id]!["unlockable_goals"] != null, "Nested states use Python snake_case fields");
     legacy.AsObject().Remove("unity_checkpoint");
-    var imported = ServerGameFormat.Deserialize(legacy.ToJsonString(), checkpoint.ParticipantId);
+    var imported = ServerGameFormat.Deserialize(legacy.ToJsonString(), checkpoint.ParticipantId, protein);
     var importedSession = Create(); importedSession.Restore(imported.SessionJson);
     Check(importedSession.Step == restored.Step && importedSession.Messages.Count == restored.Messages.Count,
         "Existing Python JSON saves import history and step");
     Check(importedSession.LongTermReflections.SequenceEqual(restored.LongTermReflections), "Python import preserves reflection memory");
     Check(imported.SessionId == checkpoint.SessionId, "Python import keeps the research session identifier");
-    try { ServerGameFormat.Deserialize(handler.SavedGame, "wrong participant"); throw new Exception("Wrong participant accepted"); }
+    try { ServerGameFormat.Deserialize(handler.SavedGame, "wrong participant", protein); throw new Exception("Wrong participant accepted"); }
     catch (InvalidDataException) { count++; }
 
     var diagnostic = new ResearchEvent { kind = "speech_failed", session_id = checkpoint.SessionId, participant_id = checkpoint.ParticipantId };
     checkpoint.Outbox.Add(diagnostic);
     handler.FailStorage = true;
-    try { await ResearchSync.FlushAsync(services, () => checkpoint, store.Save, default); throw new Exception("Upload failure swallowed"); }
+    try { await ResearchSync.FlushAsync(services, protein, () => checkpoint, store.Save, default); throw new Exception("Upload failure swallowed"); }
     catch (ServiceRequestException e) { Check(e.Message.Contains("HTTP 503"), "Sync failures expose HTTP status"); }
     Check(checkpoint.Outbox.Count == 2 && checkpoint.ResearchLog.Count == 0, "Storage failure leaves response and diagnostics durable for retry");
     handler.FailStorage = false;
@@ -216,19 +220,19 @@ try
         checkpoint = checkpoint.Snapshot();
         checkpoint.Outbox.Add(new ResearchEvent { kind = "action", session_id = checkpoint.SessionId, participant_id = checkpoint.ParticipantId });
     };
-    var sent = await ResearchSync.FlushAsync(services, () => checkpoint, store.Save, default);
+    var sent = await ResearchSync.FlushAsync(services, protein, () => checkpoint, store.Save, default);
     Check(sent == 1 && handler.Rows.Count == 1, "Retry after partial failure cannot duplicate response rows");
     Check(checkpoint.Outbox.Count == 1 && checkpoint.Outbox[0].kind == "action", "Events from a newly committed checkpoint survive an in-flight upload");
     Check(checkpoint.ResearchLog.Count == 2 && checkpoint.ResearchLog.Any(item => item.id == diagnostic.id), "Diagnostics persist in game history rather than fake response rows");
-    var synced = ServerGameFormat.Deserialize(handler.SavedGame, checkpoint.ParticipantId);
+    var synced = ServerGameFormat.Deserialize(handler.SavedGame, checkpoint.ParticipantId, protein);
     Check(synced.Outbox.Count == 0 && synced.ResearchLog.Count == 2, "Cloud snapshot includes acknowledged diagnostics without resending them");
     handler.FailRead = HttpStatusCode.Forbidden;
-    try { await services.LoadCheckpointAsync(checkpoint.ParticipantId, default); throw new Exception("Read denial mistaken for missing save"); }
+    try { await services.LoadCheckpointAsync(checkpoint.ParticipantId, protein, default); throw new Exception("Read denial mistaken for missing save"); }
     catch (ServiceRequestException) { count++; }
     handler.FailRead = null; handler.SavedGame = "";
-    Check(await services.LoadCheckpointAsync(checkpoint.ParticipantId, default) == null, "Missing storage object allows a new participant");
+    Check(await services.LoadCheckpointAsync(checkpoint.ParticipantId, protein, default) == null, "Missing storage object allows a new participant");
     handler.LegacyMissing = true;
-    Check(await services.LoadCheckpointAsync(checkpoint.ParticipantId, default) == null, "Legacy HTTP 400 object-not-found also allows a new participant");
+    Check(await services.LoadCheckpointAsync(checkpoint.ParticipantId, protein, default) == null, "Legacy HTTP 400 object-not-found also allows a new participant");
     var legacyConfig = new ClientConfiguration { supabase_url = config.supabase_url, supabase_anon_key = serviceRole,
         anthropic_api_key = config.anthropic_api_key, openai_api_key = config.openai_api_key };
     using (var legacyServices = new ClientServices(legacyConfig, new FakeHttp { Key = serviceRole }))
@@ -244,13 +248,85 @@ Check(settings.supabase_url == "https://study.supabase.co" && !settings.speech_e
 settings.speech_enabled = true;
 try { settings.ValidateProviderKeys(); throw new Exception("Missing speech key accepted"); }
 catch (InvalidOperationException) { count++; }
+
+// The engine core must run a non-protein activity with no protein data or assumptions.
+var minimal = new TestActivity();
+GameSession CreateMinimal()
+{
+    var session = new GameSession("Student", "9th", "Jessica");
+    session.InstantiateGame(minimal, id => (TestActivity.StateJson, ""),
+        name => File.ReadAllText(Path.Combine(root, "Characters", name, "character.json")),
+        name => File.ReadAllText(Path.Combine(root, "Prompts", name)));
+    return session;
+}
+var activityGame = CreateMinimal();
+Check(activityGame.CurrentGameState.Id == "observe" && activityGame.AllStates.Count == 1, "Activity supplies its own intro state");
+var activityTurn = activityGame.ProcessStepsWithMock("hi", new DrafterOutput { Message = "Let's look.", ChosenGoalForTurn = "Greet the student" });
+Check(activityTurn.Action == null && minimal.Responses == 1 && minimal.TurnsEnded == 1, "Activity hooks run on every turn");
+var activityLab = activityGame.ProcessStepsWithMock("ready", new DrafterOutput { Message = "Go!", Action = "START_EXPERIMENT" });
+Check(activityLab.Action == "START_EXPERIMENT" && minimal.ActionsTaken.Single() == "START_EXPERIMENT", "Activity-registered action executes");
+Check(activityGame.ActivityValues["attempts"] == "1", "Activity values update through hooks");
+var activityRestored = CreateMinimal(); activityRestored.Restore(activityGame.Save());
+Check(activityRestored.ActivityValues["attempts"] == "1" && activityRestored.Step == 2, "Activity values survive save/restore");
+Check(!activityGame.ActionSystem.IsGameCompleted(activityGame.AllStates) && minimal.IsLabAction("START_EXPERIMENT"), "Completion and lab rules come from the activity");
+var unexpected = activityGame.ProcessStepsWithMock("again", new DrafterOutput { Message = "Hm.", Action = "TO_PROTEIN_SYNTHESIS_LAB_MYOSIN" });
+Check(unexpected.Action == null, "Unknown actions are rejected outside the protein activity");
+Check(activityGame.ActionSystem.GetActionDescription("TO_PROTEIN_SYNTHESIS_LAB_MYOSIN") == null
+    && activityGame.ActionSystem.GetActionDescription("PROVIDE_VOCAB") == null, "No protein action is registered for another activity");
+
+string? schema = null;
+using (var adapter = new AnthropicClient((json, token) => { schema = json; return Task.FromResult("{\"content\":[{\"type\":\"tool_use\",\"name\":\"respond\",\"input\":{\"message\":\"Hi.\",\"chosen_protein\":\"insulin\"}}]}"); }))
+{
+    var proteinOutput = await adapter.SendMessageAsync("context", protein.ResponseFields);
+    Check(schema!.Contains("\"chosen_protein\"") && proteinOutput.Extra?["chosen_protein"]?.ToString() == "insulin", "Protein response field is requested and read back");
+    await adapter.SendMessageAsync("context", minimal.ResponseFields);
+    Check(!schema!.Contains("chosen_protein") && schema.Contains("\"observation\""), "Response schema comes from the activity");
+}
+
+// Version 1 sessions saved ChosenProtein in its own field; it must migrate into activity values.
+var legacySession = Newtonsoft.Json.Linq.JObject.Parse(Create().Save());
+legacySession.Remove("ActivityValues"); legacySession["ChosenProtein"] = "keratin";
+var migrated = Create(); migrated.Restore(legacySession.ToString());
+Check(ProteinSynthesisActivity.ChosenProtein(migrated) == "keratin" && !migrated.Save().Contains("\"ChosenProtein\""), "Legacy chosen protein migrates and isn't written back");
 Console.WriteLine($"PASS: {count} local-engine regression checks");
+
+// Minimal non-protein activity: one state, one action, one response field.
+class TestActivity : IActivity
+{
+    public const string StateJson = "{\"id\":\"observe\",\"description\":\"Watch a reaction.\",\"goals\":{\"Greet the student\":false},\"unlockable_goals\":{},\"actions\":[\"START_EXPERIMENT\"]}";
+    public int Responses, TurnsEnded;
+    public List<string> ActionsTaken = new();
+    public string Id => "test";
+    public string IntroStateId => "observe";
+    public IReadOnlyList<string> StateIds { get; } = new[] { "observe" };
+    public IReadOnlyList<string> AdvancedConcepts { get; } = new[] { "catalyst" };
+    public IReadOnlyCollection<string> FoundationalConcepts { get; } = new[] { "change" };
+    public IReadOnlyDictionary<string, object> ResponseFields { get; } = new Dictionary<string, object> { ["observation"] = new { type = "string" } };
+    public string LabCompletedMessage => "(done)";
+    public void RegisterActions(GameEngine.Systems.ActionSystem actions) =>
+        actions.Register("START_EXPERIMENT", new ActionDefinition { Description = "Start", Condition = ActionCondition.All() });
+    public void PrepareStates(IDictionary<string, GameState> states) { }
+    public void ApplyActionSideEffects(string actionId, IDictionary<string, GameState> states) { }
+    public bool IsCompleted(IDictionary<string, GameState> states) => false;
+    public string BuildExtraContext(GameSession session, IReadOnlyList<string> unmetGoals) => "";
+    public IReadOnlyDictionary<string, string> PromptValues(GameSession session) => new Dictionary<string, string>();
+    public void OnResponse(GameSession session, DrafterOutput output, IReadOnlyDictionary<string, bool> goalsMet) => Responses++;
+    public void OnActionTaken(GameSession session, string actionId) { ActionsTaken.Add(actionId); session.ActivityValues["attempts"] = ActionsTaken.Count.ToString(); }
+    public void AfterTurn(GameSession session) => TurnsEnded++;
+    public bool IsLabAction(string actionId) => actionId == "START_EXPERIMENT";
+    public bool IsCompletionAction(string actionId) => false;
+    public string? DialogueNodeFor(string? actionId) => actionId == "START_EXPERIMENT" ? "Experiment" : null;
+    public void SelectLab(GameSession session, GameSession fresh, string actionId) { }
+    public void UpgradeSession(SessionState state) { }
+    public void ExportServerFields(SessionState state, Newtonsoft.Json.Linq.JObject game) { }
+    public void ImportServerFields(Newtonsoft.Json.Linq.JObject game, SessionState state) { }
+}
 
 class FakeModel : ITutorModel
 {
     public int Drafts, Reflections;
     public bool Cancel, FailReflection, TimeoutReflection;
-    public Task<DrafterOutput> SendMessageAsync(string prompt, CancellationToken token = default)
+    public Task<DrafterOutput> SendMessageAsync(string prompt, IReadOnlyDictionary<string, object> responseFields, CancellationToken token = default)
     {
         if (Cancel) throw new OperationCanceledException();
         Drafts++;

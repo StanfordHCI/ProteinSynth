@@ -59,7 +59,7 @@ public class MessageQueueCommands : MonoBehaviour
             return;
         }
         turn.Finished = true;
-        var node = ActionNode(turn.Action);
+        var node = Manager.Activity.DialogueNodeFor(turn.Action);
         if (node != null)
         {
             Manager.BeginAction(turn.Action);
@@ -89,20 +89,6 @@ public class MessageQueueCommands : MonoBehaviour
         var line = turn.Lines[turn.Cursor];
         audioSource.Stop();
         if (clips.TryGetValue(line.Id, out var clip) && clip != null) { audioSource.clip = clip; audioSource.Play(); }
-    }
-
-    public static string ActionNode(string action)
-    {
-        if (action == "ENCOURAGE_STUDENT_AND_BID_THEM_FAREWELL") return "EndGame";
-        if (action == "TO_PROTEIN_SYNTHESIS_LAB") return "ProteinSynthesisLab";
-        const string prefix = "TO_PROTEIN_SYNTHESIS_LAB_";
-        if (action != null && action.StartsWith(prefix))
-        {
-            var suffix = action.Substring(prefix.Length).ToLowerInvariant();
-            if (GameEngine.Data.ProteinData.ProteinsList.Contains(suffix))
-                return "ProteinSynthesisLab" + char.ToUpperInvariant(suffix[0]) + suffix.Substring(1);
-        }
-        return null;
     }
 
     private void ReleaseClips()

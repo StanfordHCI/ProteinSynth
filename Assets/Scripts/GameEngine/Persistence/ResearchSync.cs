@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GameEngine.Activities;
 using GameEngine.Services;
 
 namespace GameEngine.Persistence;
@@ -10,7 +11,7 @@ public static class ResearchSync
 {
     // Acknowledge only after both response rows and the game snapshot are durable.
     // Resolving the latest checkpoint avoids losing turns committed during upload.
-    public static async Task<int> FlushAsync(ClientServices services, Func<Checkpoint> latest,
+    public static async Task<int> FlushAsync(ClientServices services, IActivity activity, Func<Checkpoint> latest,
         Action<Checkpoint> save, CancellationToken token)
     {
         var items = latest().Outbox.ToArray();
@@ -19,7 +20,7 @@ public static class ResearchSync
         var ids = items.Select(item => item.id).ToArray();
         var snapshot = latest().Snapshot();
         snapshot.Acknowledge(ids);
-        await services.SyncCheckpointAsync(snapshot, token);
+        await services.SyncCheckpointAsync(snapshot, activity, token);
         var current = latest();
         current.Acknowledge(ids);
         save(current);

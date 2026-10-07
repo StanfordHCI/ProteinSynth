@@ -80,7 +80,8 @@ public class AnthropicClient : ITutorModel, IDisposable
     /// Send a message to Claude and get a structured DrafterOutput response.
     /// Uses tool_use (function calling) for reliable structured output.
     /// </summary>
-    public async Task<DrafterOutput> SendMessageAsync(string systemPrompt, CancellationToken cancellationToken = default)
+    public async Task<DrafterOutput> SendMessageAsync(string systemPrompt, IReadOnlyDictionary<string, object> responseFields,
+        CancellationToken cancellationToken = default)
     {
         var requestBody = new
         {
@@ -97,7 +98,7 @@ public class AnthropicClient : ITutorModel, IDisposable
                 {
                     name = "respond",
                     description = "Generate a tutoring response with goal tracking and action selection.",
-                    input_schema = GetDrafterOutputSchema()
+                    input_schema = GetDrafterOutputSchema(responseFields)
                 }
             },
             tool_choice = new { type = "tool", name = "respond" }
@@ -145,70 +146,62 @@ public class AnthropicClient : ITutorModel, IDisposable
     /// <summary>
     /// JSON schema for the DrafterOutput tool parameter.
     /// </summary>
-    private static object GetDrafterOutputSchema()
+    private static object GetDrafterOutputSchema(IReadOnlyDictionary<string, object> responseFields)
     {
-        return new
+        var properties = new Dictionary<string, object>
         {
-            type = "object",
-            properties = new Dictionary<string, object>
+            ["chosen_goal_for_turn"] = new
             {
-                ["chosen_goal_for_turn"] = new
-                {
-                    type = new[] { "string", "null" },
-                    description = "The single goal you have chosen to focus on for this turn, or null if none."
-                },
-                ["message"] = new
-                {
-                    type = "string",
-                    description = "The peer tutor's dialogue response."
-                },
-                ["chosen_protein"] = new
-                {
-                    type = new[] { "string", "null" },
-                    description = "The single protein you chose to introduce to the student, if any."
-                },
-                ["pending_phrase_updates"] = new
-                {
-                    type = "array",
-                    items = new
-                    {
-                        type = "object",
-                        properties = new Dictionary<string, object>
-                        {
-                            ["phrase"] = new { type = "string" },
-                            ["concept"] = new { type = "string" }
-                        },
-                        required = new[] { "phrase", "concept" }
-                    },
-                    description = "Pending phrase updates based on student input of current turn."
-                },
-                ["goal_relevance_score"] = new
-                {
-                    type = new[] { "integer", "null" },
-                    description = "Score between 1-5 for goal relevance, or null."
-                },
-                ["responsiveness_score"] = new
-                {
-                    type = new[] { "integer", "null" },
-                    description = "Score between 1-5 for responsiveness."
-                },
-                ["summary_critique"] = new
-                {
-                    type = new[] { "string", "null" },
-                    description = "2-3 sentences summarizing how to improve the response."
-                },
-                ["action"] = new
-                {
-                    type = new[] { "string", "null" },
-                    description = "The name of the action being taken, or null if none."
-                },
-                ["student_interest"] = new
-                {
-                    type = new[] { "string", "null" },
-                    description = "The single student interest being referenced, if any."
-                }
+                type = new[] { "string", "null" },
+                description = "The single goal you have chosen to focus on for this turn, or null if none."
             },
-            required = new[] { "message" }
+            ["message"] = new
+            {
+                type = "string",
+                description = "The peer tutor's dialogue response."
+            },
+            ["pending_phrase_updates"] = new
+            {
+                type = "array",
+                items = new
+                {
+                    type = "object",
+                    properties = new Dictionary<string, object>
+                    {
+                        ["phrase"] = new { type = "string" },
+                        ["concept"] = new { type = "string" }
+                    },
+                    required = new[] { "phrase", "concept" }
+                },
+                description = "Pending phrase updates based on student input of current turn."
+            },
+            ["goal_relevance_score"] = new
+            {
+                type = new[] { "integer", "null" },
+                description = "Score between 1-5 for goal relevance, or null."
+            },
+            ["responsiveness_score"] = new
+            {
+                type = new[] { "integer", "null" },
+                description = "Score between 1-5 for responsiveness."
+            },
+            ["summary_critique"] = new
+            {
+                type = new[] { "string", "null" },
+                description = "2-3 sentences summarizing how to improve the response."
+            },
+            ["action"] = new
+            {
+                type = new[] { "string", "null" },
+                description = "The name of the action being taken, or null if none."
+            },
+            ["student_interest"] = new
+            {
+                type = new[] { "string", "null" },
+                description = "The single student interest being referenced, if any."
+            }
         };
+        foreach (var field in responseFields) properties[field.Key] = field.Value;
+        return new { type = "object", properties, required = new[] { "message" } };
     }
 }

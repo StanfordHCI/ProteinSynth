@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GameEngine.Activities;
 using GameEngine.Dialogue;
 using GameEngine.LLM;
 using GameEngine.Models;
@@ -21,6 +22,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
     public GameSession Session { get; private set; }
+    public IActivity Activity { get; private set; }
     public bool IsInitialized => Session != null;
     public bool IsProcessing => operation != null && !operation.IsCompleted;
     public Checkpoint Saved { get; private set; }
@@ -40,6 +42,10 @@ public class GameManager : MonoBehaviour
     private string storageRoot;
     private string lastInput;
     private GlobalInMemoryVariableStorage Vars => GlobalInMemoryVariableStorage.Instance;
+    // Activities this app can run, selected by the Yarn variable $activity.
+    private static readonly Dictionary<string, IActivity> Activities = new[] { (IActivity)new ProteinSynthesisActivity() }
+        .ToDictionary(activity => activity.Id);
+    private const string DefaultActivity = "protein";
 
     private void Awake()
     {
@@ -81,6 +87,10 @@ public class GameManager : MonoBehaviour
             var participant = ReadVariable("$participant_id").Trim();
             if (participant.Length == 0) participant = Guid.NewGuid().ToString("N").Substring(0, 8);
             Vars.SetValue("$participant_id", participant);
+            var activityId = ReadVariable("$activity", DefaultActivity);
+            if (!Activities.TryGetValue(activityId, out var activity))
+                throw new InvalidDataException("Unknown activity: " + activityId);
+            Activity = activity;
             if (services == null)
             {
 #if UNITY_EDITOR
@@ -101,15 +111,15 @@ public class GameManager : MonoBehaviour
                 model = new AnthropicClient(services.TutorAsync);
                 if (!services.CanSync) Debug.LogWarning("Supabase is not configured; research is saved locally only.");
             }
-            await LoadData(lifetime.Token);
+            await LoadData(Activity, lifetime.Token);
             var checkpoint = store.Load(participant);
             if (checkpoint == null && services.CanSync)
-                checkpoint = await services.LoadCheckpointAsync(participant, lifetime.Token);
+                checkpoint = await services.LoadCheckpointAsync(participant, Activity, lifetime.Token);
             checkpoint?.Validate(participant);
             var state = checkpoint == null ? null : JsonConvert.DeserializeObject<SessionState>(checkpoint.SessionJson);
             Session = CreateSession(state?.Username ?? ReadVariable("$player_name", "Student"),
                 state?.GradeLevel ?? ReadVariable("$grade"), state?.PeerTutor ?? ReadVariable("$peer_tutor", "Yari"),
-                ReadVariable("$initial_state", "0_intro_proteinSynthesis"));
+                ReadVariable("$initial_state", Activity.IntroStateId));
             speechOperation = null;
             Session.ParticipantId = participant;
             if (checkpoint != null) Session.Restore(checkpoint.SessionJson);
@@ -120,14 +130,11 @@ public class GameManager : MonoBehaviour
             var selectedLab = ReadVariable("$requested_lab_action");
             if (!string.IsNullOrEmpty(selectedLab))
             {
-                const string prefix = "TO_PROTEIN_SYNTHESIS_LAB_";
-                if (!selectedLab.StartsWith(prefix) || MessageQueueCommands.ActionNode(selectedLab) == null)
+                if (!Activity.IsLabAction(selectedLab) || Activity.DialogueNodeFor(selectedLab) == null)
                     throw new InvalidDataException("Selected lab is invalid.");
                 // Explicit lab selection is a separate user entry point, not a model action.
                 var fresh = CreateSession(Session.Username, Session.GradeLevel, Session.PeerTutor);
-                Session.AllStates["2_lab_reflection"] = fresh.AllStates["2_lab_reflection"];
-                Session.CurrentGameState = Session.AllStates["2_lab_reflection"];
-                Session.ChosenProtein = selectedLab.Substring(prefix.Length).ToLowerInvariant();
+                Activity.SelectLab(Session, fresh, selectedLab);
                 Saved.SessionJson = Session.Save(); Saved.Phase = "lab"; Saved.LabAction = selectedLab;
                 Saved.Turn = null; Saved.PendingInput = null;
                 AddEvent("lab_selected", new { action = selectedLab });
@@ -170,7 +177,8 @@ public class GameManager : MonoBehaviour
     private GameSession CreateSession(string username, string grade, string tutor, string initialState = null)
     {
         var session = new GameSession(username, grade, tutor);
-        session.InstantiateGame(id => (data["States/" + id + "/state.json"], data["States/" + id + "/examples.txt"]),
+        var states = "Activities/" + Activity.Id + "/States/";
+        session.InstantiateGame(Activity, id => (data[states + id + "/state.json"], data[states + id + "/examples.txt"]),
             name => data["Characters/" + name + "/character.json"], name => data["Prompts/" + name],
             initialStateId: initialState);
         session.SetAnthropicClient(model);
@@ -325,15 +333,15 @@ public class GameManager : MonoBehaviour
     public void BeginAction(string action)
     {
         if (Saved.Turn == null || Saved.Turn.Action != action) throw new InvalidOperationException("Action does not belong to this turn.");
-        if (action.StartsWith("TO_PROTEIN_SYNTHESIS_LAB")) { Saved.Phase = "lab"; Saved.LabAction = action; }
-        else if (action == "ENCOURAGE_STUDENT_AND_BID_THEM_FAREWELL") Saved.Phase = "completed";
+        if (Activity.IsLabAction(action)) { Saved.Phase = "lab"; Saved.LabAction = action; }
+        else if (Activity.IsCompletionAction(action)) Saved.Phase = "completed";
         AddEvent("action", new { action }); Save();
     }
 
     [YarnCommand("resume_lab")]
     public void ResumeLab()
     {
-        var node = MessageQueueCommands.ActionNode(Saved.LabAction);
+        var node = Activity.DialogueNodeFor(Saved.LabAction);
         if (node == null) throw new InvalidDataException("Saved lab action is invalid.");
         Vars.SetValue("$actionNode", node);
         GlobalDialogueManager.triggered = false;
@@ -344,9 +352,9 @@ public class GameManager : MonoBehaviour
     {
         if (!IsInitialized) { LastError = "Start a tutoring session before completing the lab."; return; }
         Saved.Phase = "conversation"; Saved.LabAction = null;
-        lastInput = "(The student completed the AR protein synthesis lab.)";
+        lastInput = Activity.LabCompletedMessage;
         Saved.PendingInput = lastInput;
-        AddEvent("lab_completed", new { Session.ChosenProtein }); Save();
+        AddEvent("lab_completed", new { activity = Activity.Id, activity_values = Session.ActivityValues }); Save();
         Submit(lastInput);
     }
 
@@ -368,7 +376,7 @@ public class GameManager : MonoBehaviour
             {
                 var disk = JsonConvert.DeserializeObject<Checkpoint>(File.ReadAllText(path));
                 var checkpoint = Saved != null && disk.ParticipantId == Saved.ParticipantId ? Saved : disk;
-                var count = await ResearchSync.FlushAsync(services,
+                var count = await ResearchSync.FlushAsync(services, Activity,
                     () => Saved != null && checkpoint.SessionId == Saved.SessionId ? Saved : checkpoint,
                     store.Save, lifetime.Token);
                 if (count > 0) Debug.Log($"Research synced: {count} response(s) to responses; saved game uploaded to games.");
@@ -379,14 +387,14 @@ public class GameManager : MonoBehaviour
         finally { syncing = false; }
     }
 
-    private async Task LoadData(CancellationToken token)
+    private async Task LoadData(IActivity activity, CancellationToken token)
     {
-        if (data.Count > 0) return;
         var paths = new List<string>();
-        foreach (var id in new[] { "0_intro_proteinSynthesis", "2_lab_reflection" })
-            foreach (var file in new[] { "state.json", "examples.txt" }) paths.Add("States/" + id + "/" + file);
+        foreach (var id in activity.StateIds)
+            foreach (var file in new[] { "state.json", "examples.txt" }) paths.Add("Activities/" + activity.Id + "/States/" + id + "/" + file);
         foreach (var name in new[] { "alex", "benji", "isaiah", "jessica", "maya", "yari" }) paths.Add("Characters/" + name + "/character.json");
         foreach (var name in new[] { "INITIAL_PROMPT.txt", "EVAL_BASE.txt", "CRITERIA_FULL.txt", "CRITERIA_RESP_ONLY.txt", "REFLECTION_STRICT.txt", "REFLECTION_LENIENT.txt" }) paths.Add("Prompts/" + name);
+        paths.RemoveAll(data.ContainsKey);
         var loaded = new Dictionary<string, string>();
         foreach (var path in paths) loaded[path] = await ReadAsset("GameData/" + path, token);
         foreach (var pair in loaded) data[pair.Key] = pair.Value;

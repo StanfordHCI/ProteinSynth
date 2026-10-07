@@ -66,6 +66,30 @@ files, using the data in `Assets/StreamingAssets/GameData/`.
 `GameManager` owns Unity lifecycle, turn transactions, audio, and saves.
 `MessageQueueCommands` owns presentation and the clips keyed by line ID.
 
+### Activities
+
+The engine core is lesson-agnostic. Everything specific to a lesson lives behind
+`GameEngine/Activities/IActivity.cs`:
+- its states and intro state;
+- its vocabulary;
+- the actions it registers and their side effects;
+- its completion rule;
+- extra prompt instructions and placeholders;
+- extra fields in the model's response schema (e.g. `chosen_protein`);
+- its lab actions and their Yarn nodes;
+- the message submitted when the lab finishes;
+- how it reads and writes legacy Python save fields.
+
+`ProteinSynthesisActivity` (`Id` = `protein`) is the protein lesson. Activity-owned
+session values, such as the chosen protein, live in `GameSession.ActivityValues`. Version 1
+checkpoints that stored `ChosenProtein` separately are migrated on load.
+
+Each activity's states live in `GameData/Activities/<id>/States/<state>/`.
+Characters and prompts in `GameData/Characters` and `GameData/Prompts` are shared.
+`GameManager` selects the activity from the Yarn variable `$activity` (default
+`protein`). To add an activity, implement `IActivity`, add its state data, and
+register it in `GameManager.Activities`.
+
 ### Provider requests and audio lifetime
 
 The current model names and voice mapping are hardcoded in `AnthropicClient` and
@@ -196,7 +220,8 @@ Python JSON saves can also be imported when no local save exists; those older
 files lack the Unity line cursor and AR phase, so they resume the conversation.
 
 Diagnostics (speech failures, actions, reflection results, session starts, lab
-completion) live in the game's `unity_checkpoint.ResearchLog`. They are not fake
+completion) live in the game's `unity_checkpoint.ResearchLog`. The `lab_completed`
+diagnostic records `activity` and `activity_values` (which includes `chosen_protein`). They are not fake
 student-response rows. Pending events stay in `Outbox` until both their response
 rows and the game upload succeed. If game upload fails after rows were inserted,
 retrying uses the same timestamps and does not duplicate rows. Events added while
@@ -227,8 +252,8 @@ local file cannot be read or validated, the store tries its `.bak`; it does not
 silently fall back to a cloud save after both fail. Resuming restores the saved
 name, grade, and tutor rather than replacing them with the newly entered values.
 
-Legacy Python imports support only `0_intro_proteinSynthesis` and
-`2_lab_reflection`. They must contain compatible state data, the matching
+Legacy Python imports support only the selected activity's states (for protein,
+`0_intro_proteinSynthesis` and `2_lab_reflection`). They must contain compatible state data, the matching
 `participant_id`, and a valid UUID `logging_id`. Saves from other server scenes
 are rejected. The Unity checkpoint and embedded session currently use version 1.
 

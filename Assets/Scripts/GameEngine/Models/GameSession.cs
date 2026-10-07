@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GameEngine.Activities;
 using GameEngine.Data;
 using GameEngine.LLM;
 using GameEngine.Systems;
@@ -35,7 +36,8 @@ public class GameSession
     // Student tracking
     public Dictionary<string, List<ConceptData.PhraseEntry>> StudentConceptLanguage { get; set; } = new();
     public string? StudentInterest { get; set; }
-    public string? ChosenProtein { get; set; }
+    /// <summary>Activity-owned values (e.g. the chosen protein), saved with the session.</summary>
+    public Dictionary<string, string> ActivityValues { get; set; } = new();
     public List<string> LongTermReflections { get; set; } = new();
 
     // Settings
@@ -44,6 +46,8 @@ public class GameSession
     // Systems (injected)
     [JsonIgnore]
     public ActionSystem ActionSystem { get; private set; } = null!;
+    [JsonIgnore]
+    public IActivity Activity { get; private set; } = null!;
     private StateLoader _stateLoader = null!;
     private PromptBuilder? _promptBuilder;
     private ITutorModel? _anthropicClient;
@@ -57,15 +61,17 @@ public class GameSession
     }
 
     /// <summary>
-    /// Initialize the game with states, persona, and protein list.
+    /// Initialize the game with the activity's states and the tutor persona.
     /// Port of Game.instantiate_game() from testing_8.py:314-351.
     /// </summary>
+    /// <param name="activity">Lesson-specific behavior and state list</param>
     /// <param name="stateDataProvider">Function that provides (stateJson, examplesText) for a given stateId</param>
     /// <param name="characterDataProvider">Function that provides character.json content for a given character name</param>
     /// <param name="promptDataProvider">Function that provides prompt template content for a given filename</param>
     /// <param name="parameterSetting">"strict" or "lenient"</param>
-    /// <param name="initialStateId">Override initial state (default: "0_intro_proteinSynthesis")</param>
+    /// <param name="initialStateId">Override initial state (default: the activity's intro state)</param>
     public void InstantiateGame(
+        IActivity activity,
         Func<string, (string json, string examples)> stateDataProvider,
         Func<string, string> characterDataProvider,
         Func<string, string> promptDataProvider,
@@ -73,33 +79,28 @@ public class GameSession
         string? initialStateId = null)
     {
         ParameterSetting = parameterSetting;
+        Activity = activity;
 
         // Create systems
-        ActionSystem = new ActionSystem();
+        ActionSystem = new ActionSystem(activity);
         _stateLoader = new StateLoader(ActionSystem);
 
         // Load persona description
         PersonaDescription = LoadCharacterDescription(characterDataProvider, PeerTutor);
 
         // Load states
-        var (introJson, introExamples) = stateDataProvider("0_intro_proteinSynthesis");
-        var introState = _stateLoader.LoadState(introJson, introExamples, Username, GradeLevel, PeerTutor);
-
-        // Update protein selection goal in intro state
-        StateLoader.UpdateProteinSelectionGoal(introState);
-
-        var (labJson, labExamples) = stateDataProvider("2_lab_reflection");
-        var labReflectionState = _stateLoader.LoadState(labJson, labExamples, Username, GradeLevel, PeerTutor);
-
-        AllStates = new Dictionary<string, GameState>
+        AllStates = new Dictionary<string, GameState>();
+        foreach (var stateId in activity.StateIds)
         {
-            [introState.Id] = introState,
-            [labReflectionState.Id] = labReflectionState
-        };
+            var (json, examples) = stateDataProvider(stateId);
+            var state = _stateLoader.LoadState(json, examples, Username, GradeLevel, PeerTutor);
+            AllStates[state.Id] = state;
+        }
+        activity.PrepareStates(AllStates);
 
         CurrentGameState = initialStateId != null && AllStates.ContainsKey(initialStateId)
             ? AllStates[initialStateId]
-            : introState;
+            : AllStates[activity.IntroStateId];
 
         // Build the prompt builder
         _promptBuilder = new PromptBuilder(
@@ -143,15 +144,16 @@ public class GameSession
 
             var systemPrompt = _promptBuilder.BuildSystemPrompt(
                 PeerTutor, PersonaDescription,
-                Username, GradeLevel, StudentInterest, ChosenProtein,
+                Username, GradeLevel, StudentInterest,
                 Messages, userInput,
                 CurrentGameState.Description,
                 unmetGoals, CurrentGameState.Available,
                 StudentConceptLanguage,
                 ParameterSetting, LongTermReflections,
-                extraContext, evalCondition);
+                extraContext, evalCondition,
+                Activity.AdvancedConcepts, Activity.FoundationalConcepts, Activity.PromptValues(this));
 
-            drafterOutput = await _anthropicClient.SendMessageAsync(systemPrompt, cancellationToken);
+            drafterOutput = await _anthropicClient.SendMessageAsync(systemPrompt, Activity.ResponseFields, cancellationToken);
         }
         else
         {
@@ -212,7 +214,6 @@ public class GameSession
 
         // Set student interest
         SetStudentInterest(output.StudentInterest);
-        SetChosenProtein(output.ChosenProtein);
 
         // Format response
         var formattedResponse = $"{PeerTutor}:: {teacherResponse}";
@@ -222,20 +223,8 @@ public class GameSession
             ? new Dictionary<string, bool> { [chosenGoalForTurn] = true }
             : new Dictionary<string, bool>();
 
-        // Inject protein action if protein goal was just met
-        var proteinsListStr = $"['{string.Join("', '", ProteinData.ProteinsList)}']";
-        var introduceProteinGoal = $"Introduce ONE of the following valid list of proteins based on the student's interest: {proteinsListStr}";
-
-        if (goalsMet.TryGetValue(introduceProteinGoal, out var met) && met
-            && CurrentGameState.Id == "0_intro_proteinSynthesis"
-            && !string.IsNullOrEmpty(ChosenProtein)
-            && ChosenProtein.ToLower() != "none" && ChosenProtein.ToLower() != "null")
-        {
-            var actionId = $"TO_PROTEIN_SYNTHESIS_LAB_{ChosenProtein.ToUpper()}";
-            Console.WriteLine($"DEBUG: INJECTING ACTION {actionId}");
-            ActionSystem.AddAction(AllStates, CurrentGameState.Id, actionId);
-            CurrentGameState.UpdateActions(ActionSystem);
-        }
+        // Activity-specific handling (e.g. offer the chosen protein's lab)
+        Activity.OnResponse(this, output, goalsMet);
 
         // Mark goals as met
         GoalSystem.MarkGoalsMet(CurrentGameState, goalsMet);
@@ -258,9 +247,7 @@ public class GameSession
         // Execute only accepted actions.
         if (!string.IsNullOrEmpty(actionCalled))
         {
-            const string proteinActionPrefix = "TO_PROTEIN_SYNTHESIS_LAB_";
-            if (actionCalled.StartsWith(proteinActionPrefix))
-                ChosenProtein = actionCalled.Substring(proteinActionPrefix.Length).ToLowerInvariant();
+            Activity.OnActionTaken(this, actionCalled);
             Console.WriteLine($">> Executing action: {actionCalled}");
             var (newState, addedResponse) = ActionSystem.TakeAction(
                 actionCalled, CurrentGameState, AllStates, Messages);
@@ -271,19 +258,8 @@ public class GameSession
         GoalSystem.UnlockGoals(CurrentGameState);
         CurrentGameState.UpdateActions(ActionSystem);
 
-        // Failsafe protein selection
-        if (CurrentGameState.Id == "0_intro_proteinSynthesis"
-            && (string.IsNullOrEmpty(ChosenProtein) || !ProteinData.ProteinsList.Contains(ChosenProtein.ToLower()))
-            && GoalSystem.AllGoalsMet(CurrentGameState)
-            && CurrentGameState.Available.Count == 0)
-        {
-            var random = new Random();
-            ChosenProtein = ProteinData.ProteinsList[random.Next(ProteinData.ProteinsList.Count)];
-            Console.WriteLine($"****FAILSAFE: Auto-selected protein: {ChosenProtein}");
-            var failsafeActionId = $"TO_PROTEIN_SYNTHESIS_LAB_{ChosenProtein.ToUpper()}";
-            ActionSystem.AddAction(AllStates, CurrentGameState.Id, failsafeActionId);
-            CurrentGameState.UpdateActions(ActionSystem);
-        }
+        // Activity end-of-turn hook (e.g. failsafe protein selection)
+        Activity.AfterTurn(this);
 
         if (GoalSystem.AllGoalsMet(CurrentGameState))
             Console.WriteLine("\nDEBUG: ALL GOALS MET");
@@ -317,12 +293,12 @@ public class GameSession
         if (introduceGoal != null)
         {
             var conceptName = introduceGoal.Replace($"{PeerTutor} introduces ", "");
-            if (ConceptData.AdvancedConcepts.Contains(conceptName))
+            if (Activity.AdvancedConcepts.Contains(conceptName))
             {
                 extraContext += $@"
             SPECIAL INSTRUCTION:
             If you choose to focus on the unmet goal ""{introduceGoal}"", you must follow these critical rules when {PeerTutor} explains the concept:
-            - **CRITICAL RULE:** Do NOT use any of the following scientific terms in your response: {JsonConvert.SerializeObject(ConceptData.AdvancedConcepts)}.
+            - **CRITICAL RULE:** Do NOT use any of the following scientific terms in your response: {JsonConvert.SerializeObject(Activity.AdvancedConcepts)}.
             - Instead, you MUST explain the concept exclusively using simple, everyday language, drawing from the words used by the student: {JsonConvert.SerializeObject(StudentConceptLanguage)}. You will introduce the formal scientific term when pursuing a subsequent goal, but NOT now.
             ";
             }
@@ -330,7 +306,7 @@ public class GameSession
         else if (connectGoal != null)
         {
             var conceptName = connectGoal.Replace($"{PeerTutor} connects ", "");
-            if (ConceptData.AdvancedConcepts.Contains(conceptName))
+            if (Activity.AdvancedConcepts.Contains(conceptName))
             {
                 extraContext += $@"
               SPECIAL INSTRUCTION:
@@ -339,55 +315,10 @@ public class GameSession
             }
         }
 
-        // Protein choosing goal
-        var proteinsListStr = $"['{string.Join("', '", ProteinData.ProteinsList)}']";
-        var proteinChooseGoal = $"Introduce ONE of the following valid list of proteins based on the student's interest: {proteinsListStr}";
-        if (CurrentGameState.Id == "0_intro_proteinSynthesis" && unmetGoals.Contains(proteinChooseGoal))
-        {
-            extraContext += "Choose one protein to introduce the student to and populate the `chosen_protein` field of the JSON you are returning with this protein. The value should be a string.";
-        }
-
-        // Lab reflection scaffolding
-        if (CurrentGameState.Id == "2_lab_reflection")
-        {
-            extraContext += @"
-          ### SPECIAL DIALOGUE INSTRUCTION — Scaffolded, learner-friendly feedback
-          Your primary goal is to evaluate the student's reflection and respond in a way that keeps them motivated and clear on next steps—without revealing internal criteria.
-
-          IF THE REFLECTION **MEETS** THE TARGET:
-          - Respond with brief, specific positive reinforcement that names what worked (1 sentence), then transition the lesson (1 sentence).
-          - Keep it concise; no new tasks unless it advances the next goal.
-
-          IF THE REFLECTION **DOES NOT MEET** THE TARGET:
-          - Use the pattern: **Affirm → Diagnose → Guide → Ask**.
-            1) **Affirm** one specific thing they did (use their wording).
-            2) **Diagnose (internally)** the main gap using one or two tags from this list (do NOT show tags to the student):
-              - `missing_terms` (didn't bring in enough precise terms)
-              - `weak_connection` (real-world/personal link is vague)
-              - `mechanism_unclear` (the ""how/why"" is thin)
-              - `transfer_mismatch` (near/far mapping is off)
-              - `misconception` (scientific error)
-            3) **Guide** with ONE actionable cue in friendly, non-numerical language (e.g., ""try naming a few key terms we used,"" ""explain what changes and why"").
-            4) **Ask** ONE focused follow-up question that makes the next step obvious.
-          - Keep to **2 sentences + 1 question**. Avoid listing rules or numbers. Do not mention ""criteria,"" ""rubric,"" or internal tags.
-
-          TONE & STYLE
-          - Warm, nonjudgmental, growth-mindset (""You're close—let's refine…"").
-          - Use the student's phrasing when helpful; avoid jargon in feedback itself.
-          - Prefer choices when useful: ""Want to connect this to your soccer training or cooking at home?""
-          ";
-        }
+        // Activity-specific instructions (e.g. protein choice, reflection scaffolding)
+        extraContext += Activity.BuildExtraContext(this, unmetGoals);
 
         return extraContext;
-    }
-
-    /// <summary>
-    /// Generate the intro message for a new game.
-    /// Port of make_intro_message() from testing_8.py:170-175.
-    /// </summary>
-    public string MakeIntroMessage()
-    {
-        return $"{PeerTutor}:: Hi there, {Username}! My name's {PeerTutor}, and I'll be your peer tutor today—so glad we get to hang out! Your body is like the busiest city you've ever seen, working 24/7 behind the scenes. Even right now, it's making new skin, growing hair, building muscles—without you ever telling it to. Isn't that so cool?";
     }
 
     private void SetStudentInterest(string? newInterest)
@@ -396,15 +327,6 @@ public class GameSession
             && newInterest != "NONE" && newInterest != "null")
         {
             StudentInterest = newInterest;
-        }
-    }
-
-    private void SetChosenProtein(string? protein)
-    {
-        if (!string.IsNullOrEmpty(protein)
-            && ProteinData.ProteinsList.Contains(protein.ToLower()))
-        {
-            ChosenProtein = protein;
         }
     }
 
@@ -424,7 +346,7 @@ public class GameSession
             PersonaDescription = PersonaDescription,
             ParticipantId = ParticipantId, Step = Step, CurrentStateId = CurrentGameState.Id,
             AllStates = AllStates, Messages = Messages, StudentConceptLanguage = StudentConceptLanguage,
-            StudentInterest = StudentInterest, ChosenProtein = ChosenProtein,
+            StudentInterest = StudentInterest, ActivityValues = ActivityValues,
             Reflections = LongTermReflections, ParameterSetting = ParameterSetting
         });
     }
@@ -433,6 +355,7 @@ public class GameSession
     {
         var state = JsonConvert.DeserializeObject<SessionState>(json)
             ?? throw new InvalidOperationException("Invalid session checkpoint.");
+        Activity.UpgradeSession(state);
         if (state.Version != 1 || !state.AllStates.ContainsKey(state.CurrentStateId))
             throw new InvalidOperationException("Unsupported session checkpoint.");
         if (state.PeerTutor != PeerTutor)
@@ -441,7 +364,7 @@ public class GameSession
         if (!string.IsNullOrEmpty(state.PersonaDescription)) PersonaDescription = state.PersonaDescription;
         Step = state.Step; AllStates = state.AllStates; CurrentGameState = AllStates[state.CurrentStateId];
         Messages = state.Messages; StudentConceptLanguage = state.StudentConceptLanguage;
-        StudentInterest = state.StudentInterest; ChosenProtein = state.ChosenProtein;
+        StudentInterest = state.StudentInterest; ActivityValues = state.ActivityValues;
         LongTermReflections = state.Reflections; ParameterSetting = state.ParameterSetting;
         foreach (var item in AllStates.Values) item.UpdateActions(ActionSystem);
     }

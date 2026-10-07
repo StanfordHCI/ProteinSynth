@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace GameEngine.Models;
 
@@ -14,9 +15,6 @@ public class DrafterOutput
 
     [JsonProperty("message")]
     public string Message { get; set; } = "";
-
-    [JsonProperty("chosen_protein")]
-    public string? ChosenProtein { get; set; }
 
     [JsonProperty("pending_phrase_updates")]
     public List<PhraseUpdate>? PendingPhraseUpdates { get; set; } = new();
@@ -35,6 +33,10 @@ public class DrafterOutput
 
     [JsonProperty("student_interest")]
     public string? StudentInterest { get; set; }
+
+    /// <summary>Activity-specific response fields (see IActivity.ResponseFields).</summary>
+    [JsonExtensionData]
+    public IDictionary<string, JToken>? Extra { get; set; }
 }
 
 public class PhraseUpdate
