@@ -1151,6 +1151,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parent1: {fileID: 919132147669430891}
   parent2: {fileID: 919132147844088513}
+  parent1Genotype: Bb
+  parent2Genotype: Bb
   traitText: {fileID: 0}
   offspringRatio: {fileID: 0}
   checkSquare: {fileID: 1756868914}
@@ -4493,7 +4495,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Aa
+  m_text: Bb
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ae779a0275bf4445da08f47b439221d9, type: 2}
   m_sharedMaterial: {fileID: -3548939016871257507, guid: ae779a0275bf4445da08f47b439221d9,
@@ -5434,7 +5436,7 @@ GameObject:
   - component: {fileID: 515683719}
   - component: {fileID: 515683720}
   m_Layer: 5
-  m_Name: Aa
+  m_Name: Bb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8503,7 +8505,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: AA
+  m_text: 'BB
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ae779a0275bf4445da08f47b439221d9, type: 2}
   m_sharedMaterial: {fileID: -3548939016871257507, guid: ae779a0275bf4445da08f47b439221d9,
@@ -9581,7 +9585,7 @@ GameObject:
   - component: {fileID: 962683549}
   - component: {fileID: 962683550}
   m_Layer: 0
-  m_Name: ImageTarget_aa
+  m_Name: ImageTarget_bb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9646,7 +9650,7 @@ MonoBehaviour:
   PreviewVisible: 1
   RuntimeOcclusion: 0
   RuntimeCollider: 0
-  mTrackableName: aa
+  mTrackableName: bb
   mInitializedInEditor: 1
   mDataSetPath: Vuforia/PunnettSquares.xml
   mAspectRatio: 1
@@ -9700,7 +9704,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mObserverBehaviour: {fileID: 962683547}
   mHiddenRoot: {fileID: 0}
-  mTargetName: aa
+  mTargetName: bb
   mDatasetName: Vuforia/PunnettSquares.xml
   mCastedBehaviour: {fileID: 962683547}
   mMeshFilter: {fileID: 0}
@@ -9762,7 +9766,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: AA
+  m_text: 'BB
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ae779a0275bf4445da08f47b439221d9, type: 2}
   m_sharedMaterial: {fileID: -3548939016871257507, guid: ae779a0275bf4445da08f47b439221d9,
@@ -10510,7 +10516,7 @@ GameObject:
   - component: {fileID: 1097538475}
   - component: {fileID: 1097538476}
   m_Layer: 0
-  m_Name: ImageTarget_A_A_
+  m_Name: ImageTarget_B_B_
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10591,7 +10597,7 @@ MonoBehaviour:
   PreviewVisible: 1
   RuntimeOcclusion: 0
   RuntimeCollider: 0
-  mTrackableName: A_A_
+  mTrackableName: B_B_
   mInitializedInEditor: 1
   mDataSetPath: Vuforia/PunnettSquares.xml
   mAspectRatio: 1
@@ -10629,7 +10635,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mObserverBehaviour: {fileID: 1097538474}
   mHiddenRoot: {fileID: 0}
-  mTargetName: A_A_
+  mTargetName: B_B_
   mDatasetName: Vuforia/PunnettSquares.xml
   mCastedBehaviour: {fileID: 1097538474}
   mMeshFilter: {fileID: 0}
@@ -11299,7 +11305,7 @@ GameObject:
   - component: {fileID: 1215988694}
   - component: {fileID: 1215988695}
   m_Layer: 5
-  m_Name: AA
+  m_Name: BB
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11588,7 +11594,7 @@ GameObject:
   - component: {fileID: 1264585689}
   - component: {fileID: 1264585690}
   m_Layer: 5
-  m_Name: aa
+  m_Name: bb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12118,7 +12124,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: aa
+  m_text: 'bb
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ae779a0275bf4445da08f47b439221d9, type: 2}
   m_sharedMaterial: {fileID: -3548939016871257507, guid: ae779a0275bf4445da08f47b439221d9,
@@ -12431,7 +12439,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Aa
+  m_text: 'bb
 
 '
   m_isRightToLeft: 0
@@ -13646,7 +13654,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Aa
+  m_text: 'Bb
 
 '
   m_isRightToLeft: 0
@@ -15270,7 +15278,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Aa
+  m_text: 'Bb
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ae779a0275bf4445da08f47b439221d9, type: 2}
   m_sharedMaterial: {fileID: -3548939016871257507, guid: ae779a0275bf4445da08f47b439221d9,
@@ -15705,7 +15715,7 @@ GameObject:
   - component: {fileID: 1740749606}
   - component: {fileID: 1740749607}
   m_Layer: 0
-  m_Name: ImageTarget_A_a
+  m_Name: ImageTarget_B_b
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15786,7 +15796,7 @@ MonoBehaviour:
   PreviewVisible: 1
   RuntimeOcclusion: 0
   RuntimeCollider: 0
-  mTrackableName: A_a
+  mTrackableName: B_b
   mInitializedInEditor: 1
   mDataSetPath: Vuforia/PunnettSquares.xml
   mAspectRatio: 1
@@ -15824,7 +15834,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mObserverBehaviour: {fileID: 1740749605}
   mHiddenRoot: {fileID: 0}
-  mTargetName: A_a
+  mTargetName: B_b
   mDatasetName: Vuforia/PunnettSquares.xml
   mCastedBehaviour: {fileID: 1740749605}
   mMeshFilter: {fileID: 0}
@@ -15843,7 +15853,7 @@ GameObject:
   - component: {fileID: 1743201983}
   - component: {fileID: 1743201986}
   m_Layer: 0
-  m_Name: ImageTarget_A_a1
+  m_Name: ImageTarget_B_b1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -15936,7 +15946,7 @@ MonoBehaviour:
   PreviewVisible: 1
   RuntimeOcclusion: 0
   RuntimeCollider: 0
-  mTrackableName: A_a1
+  mTrackableName: B_b1
   mInitializedInEditor: 1
   mDataSetPath: Vuforia/PunnettSquares.xml
   mAspectRatio: 1
@@ -15962,7 +15972,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mObserverBehaviour: {fileID: 1743201985}
   mHiddenRoot: {fileID: 0}
-  mTargetName: A_a1
+  mTargetName: B_b1
   mDatasetName: Vuforia/PunnettSquares.xml
   mCastedBehaviour: {fileID: 1743201985}
   mMeshFilter: {fileID: 0}

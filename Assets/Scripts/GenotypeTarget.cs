@@ -10,7 +10,6 @@ using Vuforia;
 public class GenotypeTarget : MonoBehaviour
 {
     private ObserverBehaviour observer;
-    private char[] digits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
 
     void Start()
     {
@@ -23,7 +22,7 @@ public class GenotypeTarget : MonoBehaviour
 
     private void OnTargetStatusChanged(ObserverBehaviour behaviour, TargetStatus status)
     {
-        string genotype = NormalizeGenotype(behaviour.TargetName);
+        string genotype = Genotype.FromTargetName(behaviour.TargetName);
 
         // If we're tracking or extended tracked, register
         if (status.Status == Status.TRACKED)
@@ -45,11 +44,4 @@ public class GenotypeTarget : MonoBehaviour
             observer.OnTargetStatusChanged -= OnTargetStatusChanged;
         }
     }
-
-    // Normalize all genotype variants to represent the same genotype
-    // Needed multiple variants for image marker tracking purposes
-    private string NormalizeGenotype(string targetName) {
-        return targetName.TrimEnd(digits);
-    }
-
 }

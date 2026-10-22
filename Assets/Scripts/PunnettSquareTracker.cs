@@ -37,6 +37,12 @@ public class PunnettSquareTracker : MonoBehaviour
     public GameObject parent1;
     public GameObject parent2;
 
+    // Genotypes of the birds currently being crossed; the correct square is computed from these.
+    // TODO: Set from the room birds the student selects (SetParents)
+    [Header("Parents")]
+    public string parent1Genotype = Genotype.Bb;
+    public string parent2Genotype = Genotype.Bb;
+
     [Header("UI Elements")]
     public TextMeshProUGUI traitText;
     public TextMeshProUGUI offspringRatio;
@@ -62,14 +68,16 @@ public class PunnettSquareTracker : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        checkSquare.interactable = false; 
+        checkSquare.interactable = false;
+        if (traitText != null) traitText.text = Genotype.TraitDescription;
+        SetParents(parent1Genotype, parent2Genotype);
+    }
 
-        // TODO: Dynamically update these answers, for now hard-coded for example
-        answerGenotypes = new string[,]
-        {
-            { "A_A_", "A_a" },
-            { "A_a", "aa" }
-        };
+    // Choose which two birds are being crossed and recompute the correct Punnett square
+    public void SetParents(string genotype1, string genotype2) {
+        parent1Genotype = genotype1;
+        parent2Genotype = genotype2;
+        answerGenotypes = Genotype.Cross(parent1Genotype, parent2Genotype);
     }
 
     // Update is called once per frame

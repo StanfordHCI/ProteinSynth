@@ -28,17 +28,17 @@ public class RatioBarUI : MonoBehaviour
 
     private static readonly Dictionary<string, Color> genotypeColors = new()
     {
-        { "A_A_", new Color(1f, 0.2f, 0.8f) },
-        { "A_a",  new Color(1f, 0.65f, 0f) },
-        { "aa",   new Color(0.353f, 0.392f, 1f) }  // #5A64FF
+        { Genotype.BB, new Color(0.18f, 0.42f, 1f) },   // blue
+        { Genotype.Bb, new Color(0.45f, 0.75f, 1f) },   // light blue (carrier, still blue)
+        { Genotype.bb, new Color(1f, 0.78f, 0.2f) }     // gold
     };
 
     // Sorting order for genotypes
     private static readonly Dictionary<string, int> genotypeSortOrder = new()
     {
-        { "A_A_", 0 },
-        { "A_a",  1 },
-        { "aa",   2 }
+        { Genotype.BB, 0 },
+        { Genotype.Bb, 1 },
+        { Genotype.bb, 2 }
     };
 
 
@@ -134,21 +134,15 @@ public class RatioBarUI : MonoBehaviour
         }
     }
 
-    // Convert internal encoding to display string
-    string GenotypeDisplayName(string g) => g switch
-    {
-        "A_A_" => "AA",
-        "A_a"  => "Aa",
-        "aa"   => "aa",
-        _      => g
-    };
+    // Genotypes are already stored in display form ("BB", "Bb", "bb")
+    string GenotypeDisplayName(string g) => g;
 
     // Dark label on light backgrounds, light on dark
     Color GetLabelColor(string g) => g switch
     {
-        "A_A_" => new Color(0.6f, 0f, 0.4f),    // dark pink
-        "A_a"  => new Color(0.6f, 0.35f, 0f),   // dark orange
-        "aa"   => new Color(0.145f, 0.075f, 0.463f),  // #251376
+        Genotype.BB => new Color(0.9f, 0.95f, 1f),     // near white
+        Genotype.Bb => new Color(0.05f, 0.2f, 0.45f),  // dark blue
+        Genotype.bb => new Color(0.45f, 0.3f, 0f),     // dark gold
         _      => Color.black
     };
 
@@ -157,9 +151,9 @@ public class RatioBarUI : MonoBehaviour
         int countAA = 0, countAa = 0, countaa = 0;
         foreach (string g in genotypes)
         {
-            if (g == "A_A_") countAA++;
-            else if (g == "A_a") countAa++;
-            else if (g == "aa") countaa++;
+            if (g == Genotype.BB) countAA++;
+            else if (g == Genotype.Bb) countAa++;
+            else if (g == Genotype.bb) countaa++;
         }
 
         counterAA.text = $"{countAA}";
