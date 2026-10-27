@@ -1,0 +1,12 @@
+title: BirdScan
+tags:
+---
+// Step 1 of the Punnett square lab: sample birds around the room.
+// Load the scene that holds BirdScanManager first if it isn't already open, e.g. <<LoadScene PunnettSquares>>
+<<start_bird_scan BirdScanManager>>
+Elissa: Point your camera at birds around you to record a genetic sample.
+<<wait_for_bird_samples BirdScanManager>>
+Elissa: That's all six samples! Notice that blue birds can have different genotypes.
+<<end_bird_scan BirdScanManager>>
+// TODO: continue to the Punnett square step
+===
